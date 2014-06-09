@@ -1,0 +1,4 @@
+Import("env")
+
+env.Object('StringStuff.cpp')
+env.Object('Bins.cpp')

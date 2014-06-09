@@ -1,4 +1,4 @@
-Lensing
-=======
+Lensing code:
 
-Lensing codes for science
+Mesh code (for easy pair-finding)
+Galaxy-galaxy lensing code
