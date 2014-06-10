@@ -31,6 +31,7 @@ class LensObject {
   double getRA() const {return ra;}
   double getDec() const {return dec;}
   Position<double> getRADec() const {return Position<double>(ra,dec);}
+  float getMag() const {return mag;}
   /*
   float getRedshift() const {return z;}
   float getRedshiftError() const {return zerr;}
@@ -73,10 +74,16 @@ class LensObject {
   double getY() const {return dec;}
   double getZ() const {return 0.;}
 
+  // to be exported to SourceObjects.h
+  double getE1() const { return 0.; }
+  double getE2() const { return 0.; }
+  double getERms() const { return 1.; }
+  double getShapeError() const { return 1.; }
+
  private:
   string id;
   double ra, dec;
-  double mag;
+  float mag;
   /*
   float z, zerr, zconf;
   float fracdev_g, fracdev_r, fracdev_i;
