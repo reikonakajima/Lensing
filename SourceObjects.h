@@ -1,7 +1,5 @@
 //
-// 2009.08.??  RN  initial 
-// 2009.10.27  RN  changed SourceObject to contain run info (later removed by commenting out)
-// 2009.11.03  RN  added: int NumberOfPatches() 
+// SourceObjects.h
 //
 #ifndef SOURCEOBJECTS_H
 #define SOURCEOBJECTS_H
@@ -13,8 +11,6 @@
 #include <list>
 #include <vector>
 #include "Bounds.h"
-#include "RachelCode.h"
-#include "Patch.h"
 using std::list;
 
 
@@ -35,6 +31,7 @@ class SourceObject {
 
   double getRA() const { return ra; }
   double getDec() const { return dec; }
+  /*
   float getTrueZ() const { return trueZ; }
   float getSpectroZ() const { return trueZ; }
   float getPhotoZ() const { return trueZ; }  // this is not a joke.  
@@ -52,15 +49,15 @@ class SourceObject {
   float getERms() const  { return eRMS; }
   float getZLRG() const { return zlrg; }
   bool  isLRG() const { return islrg; }
-
+  */
   void setShapeError(float serr) { shapeerr = serr; }
   void setRResolution(float res_r) { resr = res_r; }
   void setIResolution(float res_i) { resi = res_i; }
   void setERms(float e_rms) { eRMS = e_rms; }
-
+  /*
   void printLine(ostream& os) const;
   void printLineInBinary(ofstream& ofs) const;
-
+  */
   // for use with Mesh object
   double getX() const { return ra; }
   double getY() const { return dec; }
@@ -68,13 +65,6 @@ class SourceObject {
 
  protected:
   double ra, dec;  // position
-  //  double angle;
-  //  int run;
-  //  int reduction;
-  //  int camcol;
-  //  int field;
-  //  int id;
-  //  int x_ccd, y_ccd;
   float e1, e2;    // measured shape
   float shapeerr;  // shape measurement error
   float eRMS;      // shape noise (calculated from rmag)
@@ -85,30 +75,6 @@ class SourceObject {
   mutable float trueZ;   // redshift, if known...
 };
 
-
-
-
-class SDSSSourceObjectList;
-class RachelSDSSSourceObject;
-class SDSSSourceObject : public SourceObject {
- public:
-  SDSSSourceObject(const string& buffer);
-  SDSSSourceObject(const RachelSDSSSourceObject& obj);
-  SDSSSourceObject() {}
-  // set friends
-  friend class SDSSSourceObjectList;
-};
-
-
-
-class RachelSDSSSourceObjectList;
-class RachelSDSSSourceObject : public SourceObject {
- public:
-  RachelSDSSSourceObject(const string& buffer); 
-  RachelSDSSSourceObject(){}; 
-  // set friends
-  friend class RachelSDSSSourceObjectList;
-};
 
 
 
@@ -127,19 +93,6 @@ class SourceObjectList : public list<SourceObject*> {
   mutable Bounds<double> bounds;
 };
 
-class SDSSSourceObjectList : public SourceObjectList {
- public:
-  SDSSSourceObjectList(ifstream& ifs, const bool isBinary = false);
-  SDSSSourceObjectList();  // an empty list
-};
-
-
-
-
-class RachelSDSSSourceObjectList : public SourceObjectList {
- public:
-  RachelSDSSSourceObjectList(ifstream& ifs); 
-};
 
 
 

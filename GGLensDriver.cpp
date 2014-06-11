@@ -6,6 +6,7 @@
 #include "StringStuff.h"
 #include "Bounds.h"
 #include "LensObjects.h"
+#include "SourceObjects.h"
 #include "GGLens.h"
 #include "Bins.h"
 using std::ostringstream;
@@ -137,7 +138,7 @@ main(int argc, char* argv[]) {
     //
     // create GGLensObjectList from lens_list and source_list
     //
-    GGLensObjectList(lens_list, source_list, radial_bin);
+    GGLensObjectList gglens_list(lens_list, source_list, radial_bin);
 
   } catch (MyException& m) {
     m.dump(cerr);
