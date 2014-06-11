@@ -1,4 +1,7 @@
 Import("env")
 
-env.Object('StringStuff.cpp')
+env.Append(CPPPATH=['.', '..',])
+
 env.Object('Bins.cpp')
+env.Object('Mesh.cpp')
+env.Object('StringStuff.cpp')

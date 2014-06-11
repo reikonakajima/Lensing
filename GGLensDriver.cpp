@@ -233,7 +233,7 @@ main(int argc, char* argv[]) {
 	       << theta / DEGREE << " " 
 	       << endl;
 	  
-	  if (isnan(et)) {
+	  if (std::isnan(et)) {
 	    lost_et++;
 	    continue;
 	  }
@@ -285,6 +285,7 @@ main(int argc, char* argv[]) {
 	continue; 
       }
 
+      /*
       //
       // print output
       //
@@ -296,15 +297,16 @@ main(int argc, char* argv[]) {
 	   << shear_sum[irad].getError_t() << " "
 	   << shear_sum[irad].getError_s() << " "
 	   << shear_sum[irad].getApparentMag();
+      */
 
     } // [end of lens objects for loop]
 
-
+    /*
     // DEBUG
     cerr << "lost to et: " << lost_et << endl;
     cerr << "lost to source obj: " << bad_src << endl;
     cerr << "lost to bg_count: " << lost_bgcount << endl;
-
+    */
 
   } catch (MyException& m) {
     m.dump(cerr);

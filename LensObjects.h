@@ -1,7 +1,6 @@
 //
 // LensObjects.h
 //
-
 #ifndef LENSOBJECTS_H
 #define LENSOBJECTS_H
 #include <iostream>
