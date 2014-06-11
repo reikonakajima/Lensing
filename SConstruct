@@ -16,10 +16,12 @@ sub_objects = '''
 	    utilities/StringStuff.o
 	    utilities/Bins.o
 	    utilities/Mesh.o
+	    GGLens.o
 	    LensObjects.o
 	    '''.split()
 
 # build the objects
+env.Object('GGLens.cpp')
 env.Object('LensObjects.cpp')
 
 # build the main programs
