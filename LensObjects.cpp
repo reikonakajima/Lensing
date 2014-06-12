@@ -4,14 +4,7 @@ using namespace std;
 
 LensObject::LensObject(const string buffer) {
   istringstream iss(buffer);
-  if (!(iss >> id >> ra >> dec >> mag
-	/*
-	>> z >> zerr >> zconf
-	>> fracdev_g >> fracdev_r >> fracdev_i
-	>> umag >> gmag >> rmag >> imag >> zmag
-	>> umagerr >> gmagerr >> rmagerr >> imagerr >> zmagerr
-	*/
-	)) {
+  if (!(iss >> id >> ra >> dec)) {
     cerr << "## " << buffer << endl;
     throw LensObjectsError("can't read LensObject");
   }
@@ -23,91 +16,11 @@ LensObject::printLine(ostream& os) const{
   os << fixed << setprecision(0)
      << id << " "
      << setprecision(5) << setw(10)
-     << ra << " " << setw(10) << dec << "  "
-     << setprecision(4) << setw(6)
-     << mag
-    /*
-     << z << " " << zerr << " " << zconf << "  "
-     << fracdev_g << " " << fracdev_r << " " << fracdev_i << "  "
-     << umag << " " << gmag << " " << rmag << " " << imag << " " << zmag << "  "
-     << umagerr << " " << gmagerr << " " << rmagerr << " " << imagerr << " " << zmagerr << "  "
-    */
+     << ra << " " << setw(10) << dec
      << endl;
   return;
 }
 
-/*
-void 
-LensObject::printLineWithModifiedRADec(ostream& os, double newra, double newdec) const {
-  os << fixed << setprecision(0)
-     << id << " "
-     << setprecision(5) << setw(10)
-     << newra << " " << setw(10) << newdec << "  "
-     << setprecision(4) << setw(6)
-     << z << " " << zerr << " " << zconf << "  "
-     << fracdev_g << " " << fracdev_r << " " << fracdev_i << "  "
-     << umag << " " << gmag << " " << rmag << " " << imag << " " << zmag << "  "
-     << umagerr << " " << gmagerr << " " << rmagerr << " " << imagerr << " " << zmagerr << "  "
-     << endl;
-  return;
-}
-
-
-string 
-LensObject::getUGRIZString() const {
-  ostringstream oss;
-  oss << setprecision(5);
-  oss << umag << " "
-      << gmag << " "
-      << rmag << " "
-      << imag << " "
-      << zmag;
-  return oss.str();
-}
-
-
-string 
-LensObject::getMaggieString() const {
-  ostringstream oss;
-  oss << setprecision(5);
-  oss << mag2maggies(umag, sdss_b_u) << " "
-      << mag2maggies(gmag, sdss_b_g) << " "
-      << mag2maggies(rmag, sdss_b_r) << " "
-      << mag2maggies(imag, sdss_b_i) << " "
-      << mag2maggies(zmag, sdss_b_z);
-  return oss.str();
-}
-
-
-string 
-LensObject::getMaggieInvVarString() const {
-  ostringstream oss;
-  oss << setprecision(5);
-  oss << calculateInvVarMaggies(umag, umagerr, sdss_b_u) << " "
-      << calculateInvVarMaggies(gmag, gmagerr, sdss_b_g) << " "
-      << calculateInvVarMaggies(rmag, rmagerr, sdss_b_r) << " "
-      << calculateInvVarMaggies(imag, imagerr, sdss_b_i) << " "
-      << calculateInvVarMaggies(zmag, zmagerr, sdss_b_z);
-  return oss.str();
-}
-
-
-float 
-LensObject::getDistanceModulus(const Cosmology& c, float hubbleconst, float alternatez) const {
-  
-  float z = this->getRedshift();
-  if (z == 0. && alternatez == 0.)
-    throw LensObjectsError("getDistanceModulus: redshift not specified");
-  else if (z == 0. || alternatez > 0.)
-    z = alternatez;
-  if (z < 0.)
-    return 1000.0;
-  double Dlum = c.DL(z) * HubbleLengthMpc;   // Lum Dist in [Mpc/h]
-  Dlum *= 1.0e6 * hubbleconst;               // Lum Dist in [pc]
-  float  distmod = 5. * (log10(Dlum) - 1.);  // distance modulus
-  return distmod;
-}
-*/
 
 LensObjectList::LensObjectList(istream& is) {
   string buffer;
@@ -125,17 +38,20 @@ bool Compare_Source_Dec(LensObject* lhs, LensObject* rhs) {
   return lhs->getDec() < rhs->getDec(); // sort in increasing order
 }
 
+
 void 
 LensObjectList::sortByRA() {
   this->sort(Compare_Source_RA);
   return;
 }
 
+
 void 
 LensObjectList::sortByDec() {
   this->sort(Compare_Source_Dec);
   return;
 }
+
 
 LensObjectList
 LensObjectList::cullByRA(double minra, double maxra) {
@@ -147,6 +63,7 @@ LensObjectList::cullByRA(double minra, double maxra) {
   return culledlist;
 }
 
+
 LensObjectList
 LensObjectList::cullByDec(double mindec, double maxdec) {
   LensObjectList culledlist;
@@ -156,6 +73,7 @@ LensObjectList::cullByDec(double mindec, double maxdec) {
   culledlist.assign(i0, i1);
   return culledlist;
 }
+
 
 LensObjectList::iterator 
 LensObjectList::searchRA(LensObjectList::iterator first, LensObjectList::iterator last, 

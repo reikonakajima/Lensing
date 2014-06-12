@@ -6,11 +6,7 @@
 #include <iostream>
 #include <list>
 #include <vector>
-//#include "Cosmology.h"
 #include "Bounds.h"
-//#include "AstronomicalConstants.h"
-//#include "Maggies.h"
-//using namespace cosmology;
 using std::list;
 using std::istringstream;
 
@@ -30,66 +26,17 @@ class LensObject {
   double getRA() const {return ra;}
   double getDec() const {return dec;}
   Position<double> getRADec() const {return Position<double>(ra,dec);}
-  /*
-  float getMag() const {return mag;}
 
-  float getRedshift() const {return z;}
-  float getRedshiftError() const {return zerr;}
-  float getRedshiftConfidence() const {return zconf;}
-
-  void setRedshift(float z_) {z = z_; return;}
-  void setRedshiftError(float zerr_) {zerr = zerr_; return;}
-  void setRedshiftConfidence(float zconf_) {zconf = zconf_; return;}
-
-  float getGFracDeV() const {return fracdev_g;}
-  float getRFracDeV() const {return fracdev_r;}
-  float getIFracDeV() const {return fracdev_i;}
-  float getFracDeV() const { return (fracdev_g + fracdev_r + fracdev_i)/3.; }
-
-  float getUMag() const {return umag;}
-  float getGMag() const {return gmag;}
-  float getRMag() const {return rmag;}
-  float getIMag() const {return imag;}
-  float getZMag() const {return zmag;}
-
-  float getUMagErr() const {return umagerr;}
-  float getGMagErr() const {return gmagerr;}
-  float getRMagErr() const {return rmagerr;}
-  float getIMagErr() const {return imagerr;}
-  float getZMagErr() const {return zmagerr;}
-
-  string getUGRIZString() const;
-  string getMaggieString() const;
-  string getMaggieInvVarString() const;
-
-  float getDistanceModulus(const Cosmology& c, float hubbleconst, float alternatez = 0.) const;
-  float getSimpleRAbsMag(const Cosmology& c,  float hubbleconst, float alternatez = 0.) const 
-  { return rmag - this->getDistanceModulus(c, hubbleconst, alternatez); }
-  */
   void printLine(ostream& os) const;
-  //void printLineWithModifiedRADec(ostream& os, double newra, double newdec) const;
 
   // for use with Mesh.h
   double getX() const {return ra;}
   double getY() const {return dec;}
   double getZ() const {return 0.;}
 
-  // to be exported to SourceObjects.h
-  double getE1() const { return 0.; }
-  double getE2() const { return 0.; }
-  double getERms() const { return 1.; }
-  double getShapeError() const { return 1.; }
-
  private:
   string id;
   double ra, dec;
-  float mag;
-  /*
-  float z, zerr, zconf;
-  float fracdev_g, fracdev_r, fracdev_i;
-  float umag, gmag, rmag, imag, zmag;
-  float umagerr, gmagerr, rmagerr, imagerr, zmagerr;
-  */
 };
 
 
