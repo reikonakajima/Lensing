@@ -104,8 +104,8 @@ main(int argc, char* argv[]) {
     //   list(==vector):  bounds, 
     //   each object: position, shear, resolution, (optional: redshift, magnitude)
     //                may have multiple bands
-    LensObjectList master_source_list(sourcef);  // TODO:  MAKE ME  !!!
-    LensObjectList source_list(sourcef);    // TODO:  FIXME  !!!
+    SourceObjectList master_source_list(sourcef);  // TODO:  MAKE ME  !!!
+    SourceObjectList source_list(sourcef);    // TODO:  FIXME  !!!
 
 
     //

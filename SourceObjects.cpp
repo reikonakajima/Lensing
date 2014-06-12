@@ -69,6 +69,13 @@ SourceObjectList::getVectorForm() {
 }
 
 
+SourceObject::SourceObject(ifstream& ifs) {
+
+  wt = -1.;          // indicate that the weight has not been set (if < 0)
+  responsiv = -10.;  // indicate that the responsivity has not been set (if < -1)
+
+}
+
 /*
 void
 SourceObject::printLine(ostream& os) const {

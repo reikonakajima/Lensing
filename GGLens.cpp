@@ -16,7 +16,7 @@ GGLensObject::GGLensObject(const int num_radial_bins) :
 
 
 GGLensObjectList::GGLensObjectList(LensObjectList lens_list,
-				   LensObjectList source_list,   // FIXME!!  with sourceObjectList
+				   SourceObjectList source_list,
 				   GenericBins _radial_bin,
 				   geometry _geom,
 				   double _mesh_size) :
@@ -32,7 +32,7 @@ GGLensObjectList::GGLensObjectList(LensObjectList lens_list,
   }
 
   Bounds<double> srcbounds = source_list.getBounds();
-  vector<LensObject*> srcvector = source_list.getVectorForm();   // TODO:  FIXME !!!  vector type
+  vector<SourceObject*> srcvector = source_list.getVectorForm();
   double ramin = srcbounds.getXMin();
   double ramax = srcbounds.getXMax();
   double decmin = srcbounds.getYMin();
@@ -40,7 +40,7 @@ GGLensObjectList::GGLensObjectList(LensObjectList lens_list,
   const int meshdimX = static_cast<int>((ramax-ramin) / mesh_size);
   const int meshdimY = static_cast<int>((decmax-decmin) / mesh_size);
   const bool isPeriodic = false;          // we want a non-periodic mesh
-  Mesh<LensObject*> srcmesh(meshdimX, meshdimY, 1, srcvector, isPeriodic,
+  Mesh<SourceObject*> srcmesh(meshdimX, meshdimY, 1, srcvector, isPeriodic,
 			    ramin, ramax, decmin, decmax);
 
 
@@ -100,7 +100,7 @@ GGLensObjectList::GGLensObjectList(LensObjectList lens_list,
 	//
 	// calculate tangential/skew shear
 	//
-	LensObject* srcobj = srcvector[isrc->second];
+	SourceObject* srcobj = srcvector[isrc->second];
 	double sra = srcobj->getRA();   // in pixels
 	double sdec = srcobj->getDec(); // in pixels
 	double dra = sra - lensra;
@@ -142,28 +142,14 @@ GGLensObjectList::GGLensObjectList(LensObjectList lens_list,
 	}
 
 	//
-	// calculate weights
+	// calculate weights, responsivities, shears and shear errors
 	//
-	//// TODO: modularize weights as part of SourceObject
-	//// TODO: include invsigcrit
-	double vare = srcobj->getShapeError() * srcobj->getShapeError();
-	double varSN = srcobj->getERms() * srcobj->getERms();
-	double invshapeweight = (vare + varSN);
-	double weight = 1 / invshapeweight;
-
-	//
-	// calculate other quantities
-	//
-	double k0 = varSN*vare/(varSN+vare);
-	double k1 = varSN/(varSN+vare);
-	k1 *= k1;
-	double weightedsignal_t = et / invshapeweight; // ok  * invsigcrit
-	double weightedsignal_s = es / invshapeweight; // ok  * invsigcrit
-	/////////////  CHECK  (where does this responsivity come from?)
-	double responsiv = weight * (1. - k0 - k1*et*et);           // ok
-	double weightederror_t = weight / invshapeweight * et * et; // ?
-	double weightederror_s = weight / invshapeweight * es * es; // ?
-	double weightedinvsigcrit = weight;  // * invsigcrit
+	double weight = srcobj->getLensingWeight();
+	double responsiv = srcobj->getResponsivity(et);
+	double weightedsignal_t = et * weight;
+	double weightedsignal_s = es * weight;
+	double weightederror_t = weight * weight * et * et;
+	double weightederror_s = weight * weight * es * es;
 
 	/// add source object to sm bin 
 	(*this_gglens)(irad).addPairCounts();

@@ -431,5 +431,13 @@ Mesh<Ttype, Tpos>::closemeshes(int ix, int iy, int iz,
   return(retlist);
 }
 
+
+
+//
+// explicit instantiations
+//
+
 #include "LensObjects.h"
-template class Mesh<LensObject*, double>;    // explicit instantiation
+template class Mesh<LensObject*, double>;
+#include "SourceObjects.h"
+template class Mesh<SourceObject*, double>;

@@ -27,7 +27,7 @@ class SourceObjectsError : public MyException {
 class SourceObject {
 
  public:
-  SourceObject() {} 
+  SourceObject(ifstream& ifs);
 
   double getRA() const { return ra; }
   double getDec() const { return dec; }
@@ -38,23 +38,44 @@ class SourceObject {
   float getRMag() const { return rmag; }
 
   void setTrueZ(float truez_) { trueZ = truez_; }
-
+  */
   Shear getShear() const {return Shear(-e1,e2);}  // parity change
   float getE1() const {return -e1;}               // parity change
   float getE2() const {return e2;}
   float getESq() const {return e1*e1 + e2*e2;}
   float getShapeError() const  { return 2.*shapeerr; }  // ask rachel...
+  float getResolution() const  { return resr; }
+  float getERms() const  { return eRMS; }
+
+  double getLensingWeight() const { if (wt < 0) setLensingWeight(); return wt; }
+  void setLensingWeight() const {
+    setVars();
+    double invshapeweight = (vare + varSN);
+    wt = 1. / invshapeweight;
+    return;
+  }
+
+  double getResponsivity(double et) { if (responsiv < -1.) setResponsivity(et); return responsiv; }
+  void setResponsivity(double et) {
+    setVars();
+    double k0 = varSN*vare / (varSN+vare);
+    double k1 = varSN / (varSN+vare);
+    k1 *= k1;
+    double responsiv = getLensingWeight() * (1. - k0 - k1*et*et);
+    return;
+  }
+
+  /*
   float getRResolution() const  { return resr; }
   float getIResolution() const  { return resi; }
-  float getERms() const  { return eRMS; }
   float getZLRG() const { return zlrg; }
   bool  isLRG() const { return islrg; }
-  */
+
   void setShapeError(float serr) { shapeerr = serr; }
-  void setRResolution(float res_r) { resr = res_r; }
+  void setResolution(float res_r) { resr = res_r; }
   void setIResolution(float res_i) { resi = res_i; }
   void setERms(float e_rms) { eRMS = e_rms; }
-  /*
+
   void printLine(ostream& os) const;
   void printLineInBinary(ofstream& ofs) const;
   */
@@ -68,7 +89,20 @@ class SourceObject {
   float e1, e2;    // measured shape
   float shapeerr;  // shape measurement error
   float eRMS;      // shape noise (calculated from rmag)
+  mutable double vare;     // shapeerr^2
+  mutable double varSN;    // eRMS^2
+  void setVars() const {
+    if (vare < 0 || varSN < 0) {
+      vare = shapeerr * shapeerr;
+      varSN = eRMS * eRMS;
+    }
+    return;
+  }
+  mutable double wt;         // calculated weight
+  mutable double responsiv;  // responsivity
+
   float rmag;      // r band magnitude
+
   float zlrg;      // LRG photometric redshift
   bool islrg;      // is this an LRG?
   float resr, resi;   // resolution in r/i bands
@@ -83,6 +117,7 @@ class SourceObject {
 //
 class SourceObjectList : public list<SourceObject*> {
  public:
+  SourceObjectList(ifstream& ifs) {};
   void sortByRA(); 
   void sortByDec();
   void setBounds();

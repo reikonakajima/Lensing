@@ -10,6 +10,7 @@
 #include "Bins.h"
 #include "ggLensSum.h"
 #include "LensObjects.h"
+#include "SourceObjects.h"
 
 using std::list;
 using std::istringstream;
@@ -58,7 +59,7 @@ class GGLensObjectList {
   enum geometry { Flat, SphericalSurface };
   GGLensObjectList() {}  // empty list
   GGLensObjectList(LensObjectList lens_list,
-		   LensObjectList source_list,  // FIXME!!  with sourceObjectList
+		   SourceObjectList source_list,  // FIXME!!  with sourceObjectList
 		   GenericBins radial_bin,
 		   geometry = Flat,             // FIXME!! Change default to SphericalSurface
 		   double mesh_size = 30.);     // FIXME!! mesh_size will default to width / 100
