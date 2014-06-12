@@ -20,7 +20,7 @@ GGLensObjectList::GGLensObjectList(LensObjectList lens_list,
 				   GenericBins _radial_bin,
 				   geometry _geom,
 				   double _mesh_size) :
-  radial_bin(_radial_bin) , geom(_geom), mesh_size(mesh_size) {
+  radial_bin(_radial_bin) , geom(_geom), mesh_size(_mesh_size) {
 
   //
   // create source mesh list, for fast iteration over lens-source pairs

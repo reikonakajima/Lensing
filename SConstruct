@@ -6,7 +6,7 @@
 env = Environment()
 env.Append(CPPPATH=['utilities','/vol/software/software/tools/tmv/tmv0.72/x86_64/include'])
 env.Append(LIBS=['tmv', 'blas',])
-env.Append(LIBPATH = ['/vol/software/software/tools/tmv/tmv0.72/x86_64/lib',])
+env.Append(LIBPATH = ['/vol/software/software/tools/tmv/tmv0.72/x86_64/lib', '/usr/local/lib'])
 
 # build the sub-objects
 Export("env")
