@@ -40,25 +40,35 @@ class LensObject {
 };
 
 
-class LensObjectList : public list<LensObject*> {
+class LensObjectList {
  public:
   LensObjectList() {}  // empty list
   LensObjectList(istream& is);
+
+  Bounds<double> getBounds() { if (!bounds) findBounds(); return bounds;}
+  void findBounds();  // finds the bounds of the objects in this list and saves it
+
+  list<LensObject*>::iterator begin() { return lens_list.begin(); }
+  list<LensObject*>::iterator end() { return lens_list.end(); }
+  int size() { return lens_list.size(); }
+  
   void sortByRA();
   void sortByDec();
   LensObjectList cullByRA(double minra, double maxra);
   LensObjectList cullByDec(double mindec, double maxdec);
-  Bounds<double> getBounds() { if (!bounds) findBounds(); return bounds;}
-  void findBounds();  // finds the bounds of the objects in this list and saves it
+
   vector<LensObject*> getVectorForm();
+
  private:
+
+  list<LensObject*> lens_list;
   Bounds<double> bounds;  // run findBounds() to set value
-  LensObjectList::iterator searchRA(LensObjectList::iterator first, 
-				    LensObjectList::iterator last,
-				    const double ra);
-  LensObjectList::iterator searchDec(LensObjectList::iterator first, 
-				     LensObjectList::iterator last,
-				     const double dec);
+  list<LensObject*>::iterator searchRA(list<LensObject*>::iterator first, 
+				       list<LensObject*>::iterator last,
+				       const double ra);
+  list<LensObject*>::iterator searchDec(list<LensObject*>::iterator first, 
+					list<LensObject*>::iterator last,
+					const double dec);
 };
 
 

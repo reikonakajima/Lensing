@@ -51,7 +51,7 @@ GGLensObjectList::GGLensObjectList(LensObjectList lens_list,
   /// each GGLensObject will have some number of radial bins
   int rad_nbin = radial_bin.size() - 1;  // radial_bin contains bin edges, so nbin is one less
 
-  LensObjectList::iterator it = lens_list.begin();
+  list<LensObject*>::iterator it = lens_list.begin();
   for (; it != lens_list.end(); ++it) {
 
     LensObject* lensobj = *it;

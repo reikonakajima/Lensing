@@ -6,7 +6,7 @@ LensObject::LensObject(const string buffer) {
   istringstream iss(buffer);
   if (!(iss >> id >> ra >> dec)) {
     cerr << "## " << buffer << endl;
-    throw LensObjectsError("can't read LensObject");
+    throw LensObjectsError("error reading LensObject");
   }
 }
 
@@ -26,7 +26,7 @@ LensObjectList::LensObjectList(istream& is) {
   string buffer;
   while (getlineNoComment(is, buffer)) {
     LensObject* ptr = new LensObject(buffer);
-    this->push_back(ptr);
+    lens_list.push_back(ptr);
   }
 }
 
@@ -41,14 +41,14 @@ bool Compare_Source_Dec(LensObject* lhs, LensObject* rhs) {
 
 void 
 LensObjectList::sortByRA() {
-  this->sort(Compare_Source_RA);
+  lens_list.sort(Compare_Source_RA);
   return;
 }
 
 
 void 
 LensObjectList::sortByDec() {
-  this->sort(Compare_Source_Dec);
+  lens_list.sort(Compare_Source_Dec);
   return;
 }
 
@@ -57,9 +57,9 @@ LensObjectList
 LensObjectList::cullByRA(double minra, double maxra) {
   LensObjectList culledlist;
   this->sortByRA();
-  LensObjectList::iterator i0 = searchRA(this->begin(), this->end(), minra);
-  LensObjectList::iterator i1 = searchRA(i0, this->end(), maxra);
-  culledlist.assign(i0, i1);
+  list<LensObject*>::iterator i0 = searchRA(lens_list.begin(), lens_list.end(), minra);
+  list<LensObject*>::iterator i1 = searchRA(i0, lens_list.end(), maxra);
+  culledlist.lens_list.assign(i0, i1);
   return culledlist;
 }
 
@@ -68,26 +68,26 @@ LensObjectList
 LensObjectList::cullByDec(double mindec, double maxdec) {
   LensObjectList culledlist;
   this->sortByDec();
-  LensObjectList::iterator i0 = searchDec(this->begin(), this->end(), mindec);
-  LensObjectList::iterator i1 = searchDec(i0, this->end(), maxdec);
-  culledlist.assign(i0, i1);
+  list<LensObject*>::iterator i0 = searchDec(lens_list.begin(), lens_list.end(), mindec);
+  list<LensObject*>::iterator i1 = searchDec(i0, lens_list.end(), maxdec);
+  culledlist.lens_list.assign(i0, i1);
   return culledlist;
 }
 
 
-LensObjectList::iterator 
-LensObjectList::searchRA(LensObjectList::iterator first, LensObjectList::iterator last, 
+list<LensObject*>::iterator 
+LensObjectList::searchRA(list<LensObject*>::iterator first, list<LensObject*>::iterator last, 
 			 const double ra) {
-  LensObjectList::iterator i = first;
+  list<LensObject*>::iterator i = first;
   while ( ra > (*i)->getRA() && i != last)
     ++i;
   return i;
 }
 
-LensObjectList::iterator 
-LensObjectList::searchDec(LensObjectList::iterator first, LensObjectList::iterator last, 
+list<LensObject*>::iterator 
+LensObjectList::searchDec(list<LensObject*>::iterator first, list<LensObject*>::iterator last, 
 			  const double dec) {
-  LensObjectList::iterator i = first;
+  list<LensObject*>::iterator i = first;
   while ( dec > (*i)->getDec() && i != last)
     ++i;
   return i;
@@ -100,15 +100,15 @@ LensObjectList::findBounds() {
   double minra, maxra, mindec, maxdec;
 
   this->sortByRA();
-  LensObjectList::const_iterator i = this->begin();
+  list<LensObject*>::const_iterator i = lens_list.begin();
   minra = (*i)->getRA();
-  i = this->end();  --i;
+  i = lens_list.end();  --i;
   maxra = (*i)->getRA();
 
   this->sortByDec();
-  i = this->begin();
+  i = lens_list.begin();
   mindec = (*i)->getDec();
-  i = this->end();  --i;
+  i = lens_list.end();  --i;
   maxdec = (*i)->getDec();
 
   bounds.setXMin(minra);
@@ -124,9 +124,9 @@ vector<LensObject*>
 LensObjectList::getVectorForm() {
 
   vector<LensObject*> vectorform;
-  vectorform.reserve(this->size());
-  LensObjectList::const_iterator i = this->begin();
-  for (; i != this->end(); ++i) {
+  vectorform.reserve(lens_list.size());
+  list<LensObject*>::const_iterator i = lens_list.begin();
+  for (; i != lens_list.end(); ++i) {
     vectorform.push_back(*i);
   }
   return vectorform;
