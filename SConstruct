@@ -4,13 +4,16 @@
 
 # CPPPATH: sets the include path for C++
 env = Environment()
-env.Append(CPPPATH=['utilities','/vol/software/software/tools/tmv/tmv0.72/x86_64/include'])
+env.Append(CPPPATH=['/vol/software/software/tools/tmv/tmv0.72/x86_64/include'])
 env.Append(LIBS=['tmv', 'blas',])
 env.Append(LIBPATH = ['/vol/software/software/tools/tmv/tmv0.72/x86_64/lib', '/usr/local/lib'])
 
 # build the sub-objects
 Export("env")
 SConscript("utilities/SConscript")
+
+# append options specific to the head node
+env.Append(CPPPATH=['utilities',])
 
 # specify the sub-objects
 sub_objects = '''
