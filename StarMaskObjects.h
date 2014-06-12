@@ -19,8 +19,9 @@ class StarMaskObjectsError : public MyException {
  * offset from the star position), and sets it up as a "lens" in galaxy-galaxy lensing format.
  * The columns are formatted: mag, x (of halo center), y (of halo center), rhalo, xstar, ystar
  * 
- * [note: files named <field>.tight.dat have x==xstar, and y==ystar, as they are star mask files.
- * files named <field>.wide.dat have x and y as the halo center, as they are stellar halo masks.]
+ * [Note: files named <field>.tight.dat have x==xstar, and y==ystar, as they are star mask files.
+ * files named <field>.wide.dat have x and y as the halo center, as they are stellar halo masks.
+ * The x and y values are stored in the LensObject::RA/Dec variables.]
  * 
  * The purpose is to estimate systematic tangential shear around a star, or about a stellar "halo"
  * (the reflection ghost of a star).
