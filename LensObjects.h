@@ -61,7 +61,6 @@ class LensObject {
 template <class ObjPtr>
 class LensObjectList {
  public:
-  LensObjectList() {}  // empty list
   LensObjectList(istream& is);
 
   Bounds<double> getBounds() { if (!bounds) findBounds(); return bounds;}
@@ -77,6 +76,7 @@ class LensObjectList {
   LensObjectList cullByDec(double mindec, double maxdec);
 
  protected:
+  LensObjectList() {}
 
   vector<ObjPtr> lens_list;
   Bounds<double> bounds;  // run findBounds() to set value
