@@ -20,6 +20,7 @@ class LensObjectsError : public MyException {
 
 class LensObject {
  public:
+  LensObject() {}
   LensObject(const string buffer);
 
   string getId() const {return id;}
@@ -34,7 +35,7 @@ class LensObject {
   double getY() const {return dec;}
   double getZ() const {return 0.;}
 
- private:
+ protected:
   string id;
   double ra, dec;
 };
@@ -58,7 +59,7 @@ class LensObjectList {
   LensObjectList cullByRA(double minra, double maxra);
   LensObjectList cullByDec(double mindec, double maxdec);
 
- private:
+ protected:
 
   vector<ObjPtr> lens_list;
   Bounds<double> bounds;  // run findBounds() to set value

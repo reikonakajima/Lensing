@@ -22,6 +22,7 @@ sub_objects = '''
 	    utilities/Mesh.o
 	    GGLens.o
 	    LensObjects.o
+	    StarMaskObjects.o
 	    SourceObjects.o
 	    Shear.o
 	    '''.split()
@@ -29,6 +30,7 @@ sub_objects = '''
 # build the objects
 env.Object('GGLens.cpp')
 env.Object('LensObjects.cpp')
+env.Object('StarMaskObjects.cpp')
 env.Object('SourceObjects.cpp')
 env.Object('Shear.cpp')
 
