@@ -164,7 +164,6 @@ GGLensObjectList::GGLensObjectList(LensObjectList lens_list,
 	double weightederror_t = weight / invshapeweight * et * et; // ?
 	double weightederror_s = weight / invshapeweight * es * es; // ?
 	double weightedinvsigcrit = weight;  // * invsigcrit
-	double weightedrmag = weight * lensobj->getMag();
 
 	/// add source object to sm bin 
 	(*this_gglens)(irad).addPairCounts();
@@ -174,7 +173,6 @@ GGLensObjectList::GGLensObjectList(LensObjectList lens_list,
 	(*this_gglens)(irad).addDeltaSigma_s(weightedsignal_s);
 	(*this_gglens)(irad).addError_t(weightederror_t);
 	(*this_gglens)(irad).addError_s(weightederror_s);
-	(*this_gglens)(irad).addApparentMag(weightedrmag);
 
       } // END: source object (within bglist[irad]) 'for' loop
 

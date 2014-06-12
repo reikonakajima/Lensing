@@ -30,8 +30,9 @@ class LensObject {
   double getRA() const {return ra;}
   double getDec() const {return dec;}
   Position<double> getRADec() const {return Position<double>(ra,dec);}
-  float getMag() const {return mag;}
   /*
+  float getMag() const {return mag;}
+
   float getRedshift() const {return z;}
   float getRedshiftError() const {return zerr;}
   float getRedshiftConfidence() const {return zconf;}
