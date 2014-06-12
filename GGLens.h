@@ -58,7 +58,7 @@ class GGLensObjectList {
  public:
   enum geometry { Flat, SphericalSurface };
   GGLensObjectList() {}  // empty list
-  GGLensObjectList(LensObjectList lens_list,
+  GGLensObjectList(LensObjectList<LensObject*> lens_list,
 		   SourceObjectList source_list,  // FIXME!!  with sourceObjectList
 		   GenericBins radial_bin,
 		   geometry = Flat,             // FIXME!! Change default to SphericalSurface

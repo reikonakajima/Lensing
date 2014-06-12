@@ -40,6 +40,7 @@ class LensObject {
 };
 
 
+template <class ObjPtr>
 class LensObjectList {
  public:
   LensObjectList() {}  // empty list
@@ -48,8 +49,8 @@ class LensObjectList {
   Bounds<double> getBounds() { if (!bounds) findBounds(); return bounds;}
   void findBounds();  // finds the bounds of the objects in this list and saves it
 
-  list<LensObject*>::iterator begin() { return lens_list.begin(); }
-  list<LensObject*>::iterator end() { return lens_list.end(); }
+  typename vector<ObjPtr>::iterator begin() { return lens_list.begin(); }
+  typename vector<ObjPtr>::iterator end() { return lens_list.end(); }
   int size() { return lens_list.size(); }
   
   void sortByRA();
@@ -57,18 +58,24 @@ class LensObjectList {
   LensObjectList cullByRA(double minra, double maxra);
   LensObjectList cullByDec(double mindec, double maxdec);
 
-  vector<LensObject*> getVectorForm();
-
  private:
 
-  list<LensObject*> lens_list;
+  vector<ObjPtr> lens_list;
   Bounds<double> bounds;  // run findBounds() to set value
-  list<LensObject*>::iterator searchRA(list<LensObject*>::iterator first, 
-				       list<LensObject*>::iterator last,
-				       const double ra);
-  list<LensObject*>::iterator searchDec(list<LensObject*>::iterator first, 
-					list<LensObject*>::iterator last,
-					const double dec);
+  typename vector<ObjPtr>::iterator searchRA(typename vector<ObjPtr>::iterator first,
+					   typename vector<ObjPtr>::iterator last,
+					   const double ra);
+  typename vector<ObjPtr>::iterator searchDec(typename vector<ObjPtr>::iterator first,
+					    typename vector<ObjPtr>::iterator last,
+					    const double dec);
+  static bool Compare_Source_RA(ObjPtr lhs, ObjPtr rhs) {
+      return lhs->getRA() < rhs->getRA(); // sort in increasing order
+  }
+  static bool Compare_Source_Dec(ObjPtr lhs, ObjPtr rhs) {
+      return lhs->getDec() < rhs->getDec(); // sort in increasing order
+  }
+
+
 };
 
 

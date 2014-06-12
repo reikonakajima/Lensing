@@ -15,7 +15,7 @@ GGLensObject::GGLensObject(const int num_radial_bins) :
   tangential_shears(num_radial_bins) {} // initialize the vector object
 
 
-GGLensObjectList::GGLensObjectList(LensObjectList lens_list,
+GGLensObjectList::GGLensObjectList(LensObjectList<LensObject*> lens_list,
 				   SourceObjectList source_list,
 				   GenericBins _radial_bin,
 				   geometry _geom,
@@ -51,7 +51,7 @@ GGLensObjectList::GGLensObjectList(LensObjectList lens_list,
   /// each GGLensObject will have some number of radial bins
   int rad_nbin = radial_bin.size() - 1;  // radial_bin contains bin edges, so nbin is one less
 
-  list<LensObject*>::iterator it = lens_list.begin();
+  vector<LensObject*>::iterator it = lens_list.begin();
   for (; it != lens_list.end(); ++it) {
 
     LensObject* lensobj = *it;
