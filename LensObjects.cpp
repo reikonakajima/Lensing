@@ -35,8 +35,7 @@ LensObjectList<ObjPtr>::LensObjectList(istream& is) {
 template <class ObjPtr>
 void 
 LensObjectList<ObjPtr>::sortByRA() {
-    //lens_list.sort(Compare_Source_RA);
-    std::sort(lens_list.begin(), lens_list.end(), LensObjectList<ObjPtr>::Compare_Source_RA);
+  std::sort(lens_list.begin(), lens_list.end(), LensObjectList<ObjPtr>::Compare_Source_RA);
   return;
 }
 
@@ -44,7 +43,7 @@ LensObjectList<ObjPtr>::sortByRA() {
 template <class ObjPtr>
 void 
 LensObjectList<ObjPtr>::sortByDec() {
-    //lens_list.sort(Compare_Source_Dec);
+  std::sort(lens_list.begin(), lens_list.end(), LensObjectList<ObjPtr>::Compare_Source_Dec);
   return;
 }
 

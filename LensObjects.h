@@ -63,11 +63,11 @@ class LensObjectList {
   vector<ObjPtr> lens_list;
   Bounds<double> bounds;  // run findBounds() to set value
   typename vector<ObjPtr>::iterator searchRA(typename vector<ObjPtr>::iterator first,
-					   typename vector<ObjPtr>::iterator last,
-					   const double ra);
+					     typename vector<ObjPtr>::iterator last,
+					     const double ra);
   typename vector<ObjPtr>::iterator searchDec(typename vector<ObjPtr>::iterator first,
-					    typename vector<ObjPtr>::iterator last,
-					    const double dec);
+					      typename vector<ObjPtr>::iterator last,
+					      const double dec);
   static bool Compare_Source_RA(ObjPtr lhs, ObjPtr rhs) {
       return lhs->getRA() < rhs->getRA(); // sort in increasing order
   }
