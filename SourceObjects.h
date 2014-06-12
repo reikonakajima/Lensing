@@ -61,7 +61,7 @@ class SourceObject {
     double k0 = varSN*vare / (varSN+vare);
     double k1 = varSN / (varSN+vare);
     k1 *= k1;
-    double responsiv = getLensingWeight() * (1. - k0 - k1*et*et);
+    responsiv = getLensingWeight() * (1. - k0 - k1*et*et);
     return;
   }
 
