@@ -20,7 +20,6 @@ class LensObjectsError : public MyException {
 
 class LensObject {
  public:
-  LensObject() {}
   LensObject(const string buffer);
 
   string getId() const {return id;}
@@ -36,6 +35,7 @@ class LensObject {
   double getZ() const {return 0.;}
 
  protected:
+  LensObject() {}
   string id;
   double ra, dec;
 };
