@@ -1,6 +1,7 @@
 //
 // LensObjects.h
 //
+
 #ifndef LENSOBJECTS_H
 #define LENSOBJECTS_H
 #include <iostream>
@@ -17,6 +18,14 @@ class LensObjectsError : public MyException {
   MyException("LensObjectsError: " +m) {}
 };
 
+
+/*
+ * class LensObject
+ *
+ * This is the base class for lens objects, and contains minimum information needed to calculate
+ * lensing signal around the lens.
+ *
+ */
 
 class LensObject {
  public:
@@ -40,6 +49,14 @@ class LensObject {
   double ra, dec;
 };
 
+
+/*
+ * class LensObjectList<>
+ *
+ * This is the base class for a list of lens objects, and contains minimum information
+ * needed to calculate lensing signal around the lens.
+ *
+ */
 
 template <class ObjPtr>
 class LensObjectList {
