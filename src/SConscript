@@ -1,0 +1,38 @@
+import os
+import sys
+import glob
+
+Import('env')
+ReadFileList = env['_ReadFileList']
+
+# TODO: This won't work on Windows machines...
+env['OBJPREFIX'] = '.obj/'
+env.Append(CPPPATH=['.','utilities'])
+
+subdirs = ['.','utilities']
+
+lib_files = []
+for d in subdirs:
+    # This file is typically created by:
+    # ls *.cpp > files.txt
+    # in each subdirectory.  But after that, it allows you to remove a file from
+    # being included in the library by just deleting it from files.txt, rather
+    # than having to delete the .cpp file.
+    lib_files1 = ReadFileList(os.path.join(d,'files.txt'))
+    for f in lib_files1:
+        lib_files += [os.path.join(d,f)]
+
+# build the objects
+env.Object('GGLens.cpp')
+env.Object('LensObjects.cpp')
+env.Object('StarMaskObjects.cpp')
+env.Object('SourceObjects.cpp')
+env.Object('Shear.cpp')
+
+env.Object('utilities/Bins.cpp')
+env.Object('utilities/Mesh.cpp')
+env.Object('utilities/StringStuff.cpp')
+
+# Library file containing generic code
+#obj_lib = env.SharedObject(lib_files)
+
