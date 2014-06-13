@@ -35,7 +35,6 @@ env['_ReadFileList'] = ReadFileList
 
 # build the sub-objects
 Export("env")
-SConscript("src/utilities/SConscript")
 SConscript("src/SConscript")
 
 # append options specific to the head node
