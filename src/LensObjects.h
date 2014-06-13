@@ -54,7 +54,7 @@ class LensObject {
  * class LensObjectList<>
  *
  * This is the base class for a list of lens objects, and contains minimum information
- * needed to calculate lensing signal around the lens.
+ * needed to calculate the tangential shear signal around the lenses.
  *
  */
 

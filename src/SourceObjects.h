@@ -20,9 +20,14 @@ class SourceObjectsError : public MyException {
 };
 
 
-//
-// Base Source Object Class
-//
+/*
+ * class SourceObject
+ *
+ * This is the base class for source objects, and contains minimum information needed to calculate
+ * lensing signal around the lens.
+ *
+ */
+
 class SourceObject {
 
  public:
@@ -66,7 +71,7 @@ class SourceObject {
   float e1, e2;    // measured shape
   float shapeerr;  // shape measurement error
   float eRMS;      // shape noise (calculated from rmag)
-  float res;       //resolution
+  float res;       // resolution
 
   mutable double vare;     // shapeerr^2
   mutable double varSN;    // eRMS^2
@@ -83,9 +88,14 @@ class SourceObject {
 
 
 
-//
-// Base Source Object List Class
-//
+/*
+ * class SourceObjectList<>
+ *
+ * This is the base class for a list of source objects, and contains minimum information
+ * needed to calculate a tangential shear signal around any given lens.
+ *
+ */
+
 template <class ObjPtr>
 class SourceObjectList {
  public:
