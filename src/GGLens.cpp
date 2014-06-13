@@ -16,7 +16,7 @@ GGLensObject::GGLensObject(const int num_radial_bins) :
 
 
 GGLensObjectList::GGLensObjectList(LensObjectList<LensObject*> lens_list,
-				   SourceObjectList source_list,
+				   SourceObjectList<SourceObject*> source_list,
 				   GenericBins _radial_bin,
 				   geometry _geom,
 				   double _mesh_size) :
@@ -32,7 +32,7 @@ GGLensObjectList::GGLensObjectList(LensObjectList<LensObject*> lens_list,
   }
 
   Bounds<double> srcbounds = source_list.getBounds();
-  vector<SourceObject*> srcvector = source_list.getVectorForm();
+  vector<SourceObject*> source_vector = source_list.getVectorForm();
   double ramin = srcbounds.getXMin();
   double ramax = srcbounds.getXMax();
   double decmin = srcbounds.getYMin();
@@ -40,8 +40,8 @@ GGLensObjectList::GGLensObjectList(LensObjectList<LensObject*> lens_list,
   const int meshdimX = static_cast<int>((ramax-ramin) / mesh_size);
   const int meshdimY = static_cast<int>((decmax-decmin) / mesh_size);
   const bool isPeriodic = false;          // we want a non-periodic mesh
-  Mesh<SourceObject*> srcmesh(meshdimX, meshdimY, 1, srcvector, isPeriodic,
-			    ramin, ramax, decmin, decmax);
+  Mesh<SourceObject*> srcmesh(meshdimX, meshdimY, 1, source_vector, isPeriodic,
+			      ramin, ramax, decmin, decmax);
 
 
   //
@@ -100,7 +100,7 @@ GGLensObjectList::GGLensObjectList(LensObjectList<LensObject*> lens_list,
 	//
 	// calculate tangential/skew shear
 	//
-	SourceObject* srcobj = srcvector[isrc->second];
+	SourceObject* srcobj = source_vector[isrc->second];
 	double sra = srcobj->getRA();   // in pixels
 	double sdec = srcobj->getDec(); // in pixels
 	double dra = sra - lensra;

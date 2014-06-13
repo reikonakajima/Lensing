@@ -59,7 +59,7 @@ class GGLensObjectList {
   enum geometry { Flat, SphericalSurface };
   GGLensObjectList() {}  // empty list
   GGLensObjectList(LensObjectList<LensObject*> lens_list,
-		   SourceObjectList source_list,  // FIXME!!  with sourceObjectList
+		   SourceObjectList<SourceObject*> source_list,
 		   GenericBins radial_bin,
 		   geometry = Flat,             // FIXME!! Change default to SphericalSurface
 		   double mesh_size = 30.);     // FIXME!! mesh_size will default to width / 100

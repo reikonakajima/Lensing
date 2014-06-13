@@ -1,42 +1,34 @@
-#include <iostream>
-using namespace std;
-#include "Std.h"
-#include "StringStuff.h"
+//
+// SourceObjects.cpp
+//
 #include "SourceObjects.h"
-#include "AstronomicalConstants.h"
+using namespace std;
 
 
-
-bool Compare_Source_RA(SourceObject* rhs, SourceObject* lhs) {
-  return rhs->getRA() < lhs->getRA(); // sort in increasing order
-}
-
-
+template <class ObjPtr>
 void 
-SourceObjectList::sortByRA() {
-  this->sort(Compare_Source_RA);  // check?
-  return;
-}
-
-bool Compare_Source_Dec(SourceObject* lhs, SourceObject* rhs) {
-  return lhs->getDec() < rhs->getDec(); // sort in increasing order
-}
-
-void 
-SourceObjectList::sortByDec() {
-  this->sort(Compare_Source_Dec);  // check?
+SourceObjectList<ObjPtr>::sortByRA() {
+  std::sort(source_list.begin(), source_list.end(), SourceObjectList<ObjPtr>::Compare_Source_RA);
   return;
 }
 
 
-
+template <class ObjPtr>
 void 
-SourceObjectList::setBounds() {
+SourceObjectList<ObjPtr>::sortByDec() {
+  std::sort(source_list.begin(), source_list.end(), SourceObjectList<ObjPtr>::Compare_Source_Dec);
+  return;
+}
+
+
+template <class ObjPtr>
+void 
+SourceObjectList<ObjPtr>::findBounds() {
 
   double minra, maxra, mindec, maxdec;
 
   this->sortByRA();
-  SourceObjectList::const_iterator i = this->begin();
+  typename vector<ObjPtr>::const_iterator i = this->begin();
   minra = (*i)->getRA();
   i = this->end();  --i;
   maxra = (*i)->getRA();
@@ -56,25 +48,14 @@ SourceObjectList::setBounds() {
 }
 
 
-
-vector<SourceObject*>
-SourceObjectList::getVectorForm() {
-
-  vector<SourceObject*> vectorform;
-  SourceObjectList::const_iterator i = this->begin();
-  for (; i != this->end(); ++i) {
-    vectorform.push_back(*i);
-  }
-  return vectorform;
-}
-
-
 SourceObject::SourceObject(ifstream& ifs) {
 
   wt = -1.;          // indicate that the weight has not been set (if < 0)
   responsiv = -10.;  // indicate that the responsivity has not been set (if < -1)
 
 }
+
+
 
 /*
 void
@@ -116,3 +97,9 @@ SourceObject::printLineInBinary(ofstream& ofs) const {
 
 
 */
+
+//
+// explicit instantiations
+//
+
+template class SourceObjectList<SourceObject*>;

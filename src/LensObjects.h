@@ -61,7 +61,7 @@ class LensObject {
 template <class ObjPtr>
 class LensObjectList {
  public:
-  LensObjectList(istream& is);
+  LensObjectList(istream& ifs);
 
   Bounds<double> getBounds() { if (!bounds) findBounds(); return bounds;}
   void findBounds();  // finds the bounds of the objects in this list and saves it
@@ -79,7 +79,7 @@ class LensObjectList {
   LensObjectList() {}
 
   vector<ObjPtr> lens_list;
-  Bounds<double> bounds;  // run findBounds() to set value
+  mutable Bounds<double> bounds;
   typename vector<ObjPtr>::iterator searchRA(typename vector<ObjPtr>::iterator first,
 					     typename vector<ObjPtr>::iterator last,
 					     const double ra);

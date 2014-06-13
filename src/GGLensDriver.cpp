@@ -98,14 +98,14 @@ main(int argc, char* argv[]) {
     //   list(==vector):  bounds, 
     //   each object: position, magnitude, (optional: redshift, sed type)
     //                may have multiple bands
-    LensObjectList<LensObject*> master_lens_list(lensf);    // TODO:  MAKE ME  !!!
+    LensObjectList<LensObject*> master_lens_list(lensf);
     LensObjectList<LensObject*> lens_list(lensf);     // TODO:  FIXME  !!!
     // Needs: 
     //   list(==vector):  bounds, 
     //   each object: position, shear, resolution, (optional: redshift, magnitude)
     //                may have multiple bands
-    SourceObjectList master_source_list(sourcef);  // TODO:  MAKE ME  !!!
-    SourceObjectList source_list(sourcef);    // TODO:  FIXME  !!!
+    SourceObjectList<SourceObject*> master_source_list(sourcef);
+    SourceObjectList<SourceObject*> source_list(sourcef);    // TODO:  FIXME  !!!
 
 
     //
