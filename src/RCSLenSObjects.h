@@ -69,6 +69,8 @@ class RCSLenSObject : public SourceObject {
   float getE2() const { checkShearIndex(index); return shear[index].getE2(); }
   float getESq() const { checkShearIndex(index); return shear[index].getESq(); }
 
+  void printLine(ostream& os) const;
+
   // these static members will be set when the object list is generated
   static bool usePixelCoords; // to keep track of which coordinates we use
   static int index;  // to keep track of which shear to return

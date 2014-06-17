@@ -96,7 +96,7 @@ RCSLenSObjectList::RCSLenSObjectList(const string fits_filename) {
 
   valarray<float> sn;
   CCfits::Column& column18 = table.column("SNratio");
-  column17.read( sn, 1, column18.rows() );
+  column18.read( sn, 1, column18.rows() );
 
   // append objects to this list
   source_list.reserve(column1.rows());
@@ -119,3 +119,19 @@ RCSLenSObjectList::RCSLenSObjectList(const string fits_filename) {
   return;
 }
 
+
+void
+RCSLenSObject::printLine(ostream& os) const {
+  os << setprecision(5) << setw(10)
+     << ra << " " << setw(10) << dec << " "
+     << setprecision(3) << setw(10)
+     << e1 << " " << e2 << " "
+     << wt << " " << mag << " "
+     << xpos << " " << ypos << " "
+     << fwhm << " " << sn << " ";
+  for (int i=0; i<NUM_SHEAR; ++i) {
+    os << shear[i] << " ";
+  }
+  os << endl;
+  return;
+}
