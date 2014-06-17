@@ -26,56 +26,89 @@ RCSLenSObjectList::RCSLenSObjectList(const string fits_filename) {
   // goto OBJECTS extension
   CCfits::ExtHDU& table = pInfile->extension(obj_extension);
 
-  // read the following columns
+  // read the following columns (annoyingly, only one column can be read at a time):
   //  e1/2_A/B/C/D, ALPHA_J2000/DELTA_J2000, Xpos/Ypos, CANDIDATEMASK, MAG_BEST, MAGERR_BEST,
   //  FWHM_IMAGE, weight, and assign it to SourceObject
 
-  vector< valarray<float> > e1a;
-  table.column("e1_A").readArrays( e1a, 0, 0 );
-  vector< valarray<float> > e2a;
-  table.column("e2_A").readArrays( e2a, 0, 0 );
-  vector< valarray<float> > e1b;
-  table.column("e1_B").readArrays( e1b, 0, 0 );
-  vector< valarray<float> > e2b;
-  table.column("e2_B").readArrays( e2b, 0, 0 );
-  vector< valarray<float> > e1c;
-  table.column("e1_C").readArrays( e1c, 0, 0 );
-  vector< valarray<float> > e2c;
-  table.column("e2_C").readArrays( e2c, 0, 0 );
-  vector< valarray<float> > e1d;
-  table.column("e1_D").readArrays( e1d, 0, 0 );
-  vector< valarray<float> > e2d;
-  table.column("e2_D").readArrays( e2d, 0, 0 );
+  valarray<float> e1a;
+  CCfits::Column& column1 = table.column("e1_A");
+  column1.read( e1a, 1, column1.rows() );
+  valarray<float> e2a;
+  CCfits::Column& column2 = table.column("e2_A");
+  column2.read( e2a, 1, column2.rows() );
+  valarray<float> e1b;
+  CCfits::Column& column3 = table.column("e1_B");
+  column3.read( e1b, 1, column3.rows() );
+  valarray<float> e2b;
+  CCfits::Column& column4 = table.column("e2_B");
+  column4.read( e2b, 1, column4.rows() );
+  valarray<float> e1c;
+  CCfits::Column& column5 = table.column("e1_C");
+  column5.read( e1c, 1, column5.rows() );
+  valarray<float> e2c;
+  CCfits::Column& column6 = table.column("e2_C");
+  column6.read( e2c, 1, column6.rows() );
+  valarray<float> e1d;
+  CCfits::Column& column7 = table.column("e1_D");
+  column7.read( e1d, 1, column7.rows() );
+  valarray<float> e2d;
+  CCfits::Column& column8 = table.column("e2_D");
+  column8.read( e2d, 1, column8.rows() );
 
-  vector< valarray<double> > ra;
-  table.column("ALPHA_J2000").readArrays( ra, 0, 0 );
-  vector< valarray<double> > dec;
-  table.column("DELTA_J2000").readArrays( dec, 0, 0 );
+  valarray<double> ra;
+  CCfits::Column& column9 = table.column("ALPHA_J2000");
+  column9.read( ra, 1, column9.rows() );
+  valarray<double> dec;
+  CCfits::Column& column10 = table.column("DELTA_J2000");
+  column10.read( dec, 1, column10.rows() );
 
-  vector< valarray<float> > xpos;
-  table.column("Xpos").readArrays( xpos, 0, 0 );
-  vector< valarray<float> > ypos;
-  table.column("Ypos").readArrays( ypos, 0, 0 );
+  valarray<float> xpos;
+  CCfits::Column& column11 = table.column("Xpos");
+  column11.read( xpos, 1, column11.rows() );
+  valarray<float> ypos;
+  CCfits::Column& column12 = table.column("Ypos");
+  column12.read( ypos, 1, column12.rows() );
 
-  vector< valarray<float> > mask;
-  table.column("CANDIDATEMASK").readArrays( mask, 0, 0 );
+  valarray<float> mask;
+  CCfits::Column& column13 = table.column("MASK");
+  column13.read( mask, 1, column13.rows() );
 
-  vector< valarray<float> > mag;
-  table.column("MAG_BEST").readArrays( mag, 0, 0 );
-  vector< valarray<float> > magerr;
-  table.column("MAGERR_BEST").readArrays( magerr, 0, 0 );
+  valarray<float> mag;
+  CCfits::Column& column14 = table.column("MAG_BEST");
+  column14.read( mag, 1, column14.rows() );
+  valarray<float> magerr;
+  CCfits::Column& column15 = table.column("MAGERR_BEST");
+  column15.read( magerr, 1, column15.rows() );
 
-  vector< valarray<float> > fwhm;
-  table.column("FWHM_IMAGE").readArrays( fwhm, 0, 0 );
+  valarray<float> fwhm;
+  CCfits::Column& column16 = table.column("FWHM_IMAGE");
+  column16.read( fwhm, 1, column16.rows() );
 
-  vector< valarray<float> > weight;
-  table.column("weight").readArrays( weight, 0, 0 );
+  valarray<float> weight;
+  CCfits::Column& column17 = table.column("weight");
+  column17.read( weight, 1, column17.rows() );
 
-  // append object to this list
+  valarray<float> sn;
+  CCfits::Column& column18 = table.column("SNratio");
+  column17.read( sn, 1, column18.rows() );
+
+  // DEBUG
   for (int i=0; i<5; ++i) {
-      cout << weight[0][i] << " ";
+      cerr << e1a[i] << " ";
   }
-  cout << endl;
+  cerr << endl;
 
+  // append objects to this list
+  source_list.reserve(column1.rows());
+  for (int i=0; i<column1.rows(); ++i) {
+      if (weight[i] == 0) continue;
+      RCSLenSObject* ptr = new RCSLenSObject(ra[i], dec[i], mag[i], xpos[i], ypos[i], fwhm[i],
+					     e1a[i], e2a[i], e1b[i], e2b[i],
+					     e1c[i], e2c[i], e1d[i], e2d[i],
+					     sn[i], weight[i]);
+      source_list.push_back(ptr);
+  }
+
+  return;
 }
 

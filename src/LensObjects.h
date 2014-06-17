@@ -61,7 +61,14 @@ class LensObject {
 template <class ObjPtr>
 class LensObjectList {
  public:
-  Bounds<double> getBounds() { if (!bounds) findBounds(); return bounds;}
+  ~LensObjectList() {
+    for (int i=0; i<size(); ++i) delete lens_list[i];
+  }
+
+  Bounds<double> getBounds() {
+    if (size() <= 0) throw LensObjectsError("bounds undefined for empty lens list");
+    if (!bounds) findBounds(); return bounds;
+  }
   void findBounds();  // finds the bounds of the objects in this list and saves it
 
   typename vector<ObjPtr>::iterator begin() { return lens_list.begin(); }

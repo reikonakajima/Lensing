@@ -118,9 +118,14 @@ class SourceObject {
 template <class ObjPtr>
 class SourceObjectList {
  public:
-  SourceObjectList(ifstream& ifs) {};
+  ~SourceObjectList() {
+    for (int i=0; i<size(); ++i) delete source_list[i];
+  }
 
-  Bounds<double> getBounds() { if (!bounds) findBounds(); return bounds; }
+  Bounds<double> getBounds() {
+    if (size() <= 0) throw SourceObjectsError("bounds undefined for empty source list");
+    if (!bounds) findBounds(); return bounds;
+  }
   void findBounds();
 
   typename vector<ObjPtr>::iterator begin() { return source_list.begin(); }
