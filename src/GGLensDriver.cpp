@@ -68,7 +68,7 @@ main(int argc, char* argv[]) {
     //
     ifstream radialbinf("r.txt");
     double min_theta = 5.0;
-    double max_theta = 300.0;
+    double max_theta = 400.0;
     int rad_nbin = 21;
     if (radialbinf) {
       if (!(radialbinf >> min_theta >> max_theta >> rad_nbin))
