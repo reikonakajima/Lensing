@@ -5,6 +5,12 @@
 using namespace std;
 
 
+// The following variables are static members of the RCSLenSObject class.
+// They need to be defined outside the scope of the class in order to be accessible from outside.
+bool RCSLenSObject::usePixelCoords;
+int RCSLenSObject::index;
+
+
 RCSLenSObjectList::RCSLenSObjectList(const string fits_filename) {
 
   // open FITS file
@@ -92,12 +98,6 @@ RCSLenSObjectList::RCSLenSObjectList(const string fits_filename) {
   CCfits::Column& column18 = table.column("SNratio");
   column17.read( sn, 1, column18.rows() );
 
-  // DEBUG
-  for (int i=0; i<5; ++i) {
-      cerr << e1a[i] << " ";
-  }
-  cerr << endl;
-
   // append objects to this list
   source_list.reserve(column1.rows());
   for (int i=0; i<column1.rows(); ++i) {
@@ -108,6 +108,13 @@ RCSLenSObjectList::RCSLenSObjectList(const string fits_filename) {
 					     sn[i], weight[i]);
       source_list.push_back(ptr);
   }
+
+  // The following two commands needs to be set after the RCSLenSObject list has been filled:
+  // - initially set shear to "A" (driver code can change this)
+  setShearIndex(0);
+  // - initially set coordinates to use ra/dec
+  //   (driver code must specify if pixel coordinate is to be used)
+  usePixelCoord(false);
 
   return;
 }
