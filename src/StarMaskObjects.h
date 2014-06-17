@@ -48,7 +48,6 @@ class StarMaskObject : public LensObject {
 class StarMaskObjectList : public LensObjectList<StarMaskObject*> {
 
  public:
-  StarMaskObjectList() {}
   StarMaskObjectList(istream& is);
 
  private:

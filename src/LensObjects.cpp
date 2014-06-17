@@ -22,15 +22,6 @@ LensObject::printLine(ostream& os) const{
   return;
 }
 
-template <class ObjPtr>
-LensObjectList<ObjPtr>::LensObjectList(istream& is) {
-  string buffer;
-  while (getlineNoComment(is, buffer)) {
-    ObjPtr ptr = new LensObject(buffer);
-    lens_list.push_back(ptr);
-  }
-}
-
 
 template <class ObjPtr>
 void 
@@ -129,3 +120,5 @@ LensObjectList<ObjPtr>::findBounds() {
 //
 
 template class LensObjectList<LensObject*>;
+#include "StarMaskObjects.h"
+template class LensObjectList<StarMaskObject*>;

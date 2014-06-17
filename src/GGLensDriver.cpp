@@ -6,6 +6,7 @@
 #include "StringStuff.h"
 #include "Bounds.h"
 #include "LensObjects.h"
+#include "StarMaskObjects.h"
 #include "SourceObjects.h"
 #include "RCSLenSObjects.h"
 #include "GGLens.h"
@@ -99,8 +100,8 @@ main(int argc, char* argv[]) {
     //   list(==vector):  bounds, 
     //   each object: position, magnitude, (optional: redshift, sed type)
     //                may have multiple bands
-    LensObjectList<LensObject*> master_lens_list(lensf);
-    LensObjectList<LensObject*> lens_list(lensf);     // TODO:  FIXME  !!!
+    StarMaskObjectList master_lens_list(lensf);
+    StarMaskObjectList lens_list(lensf);     // TODO:  FIXME  !!!
     // Needs: 
     //   list(==vector):  bounds, 
     //   each object: position, shear, resolution, (optional: redshift, magnitude)
@@ -139,7 +140,7 @@ main(int argc, char* argv[]) {
     //
     // create GGLensObjectList from lens_list and source_list
     //
-    GGLensObjectList<LensObject*, RCSLenSObject*> gglens_list(lens_list, source_list, radial_bin);
+    GGLensObjectList<StarMaskObject*, RCSLenSObject*> gglens_list(lens_list, source_list, radial_bin);
 
   } catch (MyException& m) {
     m.dump(cerr);

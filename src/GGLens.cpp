@@ -201,4 +201,5 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 //
 
 #include "RCSLenSObjects.h"
-template class GGLensObjectList<LensObject*, RCSLenSObject*>;
+#include "StarMaskObjects.h"
+template class GGLensObjectList<StarMaskObject*, RCSLenSObject*>;

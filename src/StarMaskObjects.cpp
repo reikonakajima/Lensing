@@ -27,3 +27,14 @@ StarMaskObject::printLine(ostream& os) const{
      << endl;
   return;
 }
+
+
+StarMaskObjectList::StarMaskObjectList(istream& is) {
+  string buffer;
+  int id = 0;
+  while (getlineNoComment(is, buffer)) {
+    StarMaskObject* ptr = new StarMaskObject(buffer, id);
+    lens_list.push_back(ptr);
+    ++id;
+  }
+}

@@ -61,8 +61,6 @@ class LensObject {
 template <class ObjPtr>
 class LensObjectList {
  public:
-  LensObjectList(istream& ifs);
-
   Bounds<double> getBounds() { if (!bounds) findBounds(); return bounds;}
   void findBounds();  // finds the bounds of the objects in this list and saves it
 
@@ -76,7 +74,7 @@ class LensObjectList {
   LensObjectList cullByDec(double mindec, double maxdec);
 
  protected:
-  LensObjectList() {}
+  LensObjectList() {}  // hide default constructor: must be defined in derived classes
 
   vector<ObjPtr> lens_list;
   mutable Bounds<double> bounds;
