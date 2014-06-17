@@ -441,3 +441,5 @@ Mesh<Ttype, Tpos>::closemeshes(int ix, int iy, int iz,
 template class Mesh<LensObject*, double>;
 #include "SourceObjects.h"
 template class Mesh<SourceObject*, double>;
+#include "RCSLenSObjects.h"
+template class Mesh<RCSLenSObject*, double>;

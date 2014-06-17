@@ -48,11 +48,11 @@ SourceObjectList<ObjPtr>::findBounds() {
 }
 
 
-SourceObject::SourceObject(ifstream& ifs) {
+SourceObject::SourceObject() {
 
   wt = -1.;          // indicate that the weight has not been set (if < 0)
   responsiv = -10.;  // indicate that the responsivity has not been set (if < -1)
-  vare = varSN = -1.;  // indicate that these quantities have not been set
+  //vare = varSN = -1.;  // indicate that these quantities have not been set
 
 }
 
@@ -104,3 +104,5 @@ SourceObject::printLineInBinary(ofstream& ofs) const {
 //
 
 template class SourceObjectList<SourceObject*>;
+#include "RCSLenSObjects.h"
+template class SourceObjectList<RCSLenSObject*>;

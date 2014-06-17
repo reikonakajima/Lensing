@@ -31,15 +31,22 @@ class SourceObjectsError : public MyException {
 class SourceObject {
 
  public:
-  SourceObject(ifstream& ifs);
+  SourceObject();
+  SourceObject(double _ra, double _dec, float _e1, float _e2, double _wt=1.) : 
+  ra(_ra), dec(_dec), e1(_e1), e2(_e2), wt(_wt) {}
+
 
   double getRA() const { return ra; }
   double getDec() const { return dec; }
 
-  Shear getShear() const {return Shear(e1,e2);}  // parity change
-  float getE1() const {return e1;}               // parity change
-  float getE2() const {return e2;}
-  float getESq() const {return e1*e1 + e2*e2;}
+  Shear getShear() const { return Shear(e1,e2); }
+  float getE1() const { return e1; }
+  float getE2() const { return e2; }
+  float getESq() const { return e1*e1 + e2*e2; }
+
+  double getWeight() const { return wt; }
+  void setWeight(double _wt) const { wt = _wt; return; }
+  /*
   float getShapeError() const  { return 2.*shapeerr; }  // ask rachel...
   float getResolution() const  { return res; }
   float getERms() const  { return eRMS; }
@@ -51,13 +58,21 @@ class SourceObject {
     wt = 1. / invshapeweight;
     return;
   }
-  double getResponsivity(double et) { if (responsiv < -1.) setResponsivity(et); return responsiv; }
-  void setResponsivity(double et) {
+  */
+  double getResponsivity(double et) const {
+    if (responsiv < -1.) setResponsivity(et);
+    return responsiv;
+  }
+  void setResponsivity(double et) const {
+    /*
     setVars();
     double k0 = varSN*vare / (varSN+vare);
     double k1 = varSN / (varSN+vare);
     k1 *= k1;
-    responsiv = getLensingWeight() * (1. - k0 - k1*et*et);
+    */
+    double k0 = 0.;
+    double k1 = 1.;
+    responsiv = getWeight() * (1. - k0 - k1*et*et);
     return;
   }
 
@@ -69,6 +84,8 @@ class SourceObject {
  protected:
   double ra, dec;  // position
   float e1, e2;    // measured shape
+  mutable double wt;         // calculated weight
+/*
   float shapeerr;  // shape measurement error
   float eRMS;      // shape noise (calculated from rmag)
   float res;       // resolution
@@ -82,7 +99,9 @@ class SourceObject {
     }
     return;
   }
-  mutable double wt;         // calculated weight
+*/
+  void setVars() const {
+  }
   mutable double responsiv;  // responsivity
 };
 

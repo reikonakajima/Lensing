@@ -15,11 +15,12 @@ GGLensObject::GGLensObject(const int num_radial_bins) :
   tangential_shears(num_radial_bins) {} // initialize the vector object
 
 
-GGLensObjectList::GGLensObjectList(LensObjectList<LensObject*> lens_list,
-				   SourceObjectList<SourceObject*> source_list,
-				   GenericBins _radial_bin,
-				   geometry _geom,
-				   double _mesh_size) :
+template<class lensObjPtr, class srcObjPtr>
+GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObjPtr> lens_list,
+							  SourceObjectList<srcObjPtr> source_list,
+							  GenericBins _radial_bin,
+							  geometry _geom,
+							  double _mesh_size) :
   radial_bin(_radial_bin) , geom(_geom), mesh_size(_mesh_size) {
 
   //
@@ -32,7 +33,7 @@ GGLensObjectList::GGLensObjectList(LensObjectList<LensObject*> lens_list,
   }
 
   Bounds<double> srcbounds = source_list.getBounds();
-  vector<SourceObject*> source_vector = source_list.getVectorForm();
+  vector<srcObjPtr> source_vector = source_list.getVectorForm();
   double ramin = srcbounds.getXMin();
   double ramax = srcbounds.getXMax();
   double decmin = srcbounds.getYMin();
@@ -40,7 +41,7 @@ GGLensObjectList::GGLensObjectList(LensObjectList<LensObject*> lens_list,
   const int meshdimX = static_cast<int>((ramax-ramin) / mesh_size);
   const int meshdimY = static_cast<int>((decmax-decmin) / mesh_size);
   const bool isPeriodic = false;          // we want a non-periodic mesh
-  Mesh<SourceObject*> srcmesh(meshdimX, meshdimY, 1, source_vector, isPeriodic,
+  Mesh<srcObjPtr> srcmesh(meshdimX, meshdimY, 1, source_vector, isPeriodic,
 			      ramin, ramax, decmin, decmax);
 
 
@@ -51,10 +52,10 @@ GGLensObjectList::GGLensObjectList(LensObjectList<LensObject*> lens_list,
   /// each GGLensObject will have some number of radial bins
   int rad_nbin = radial_bin.size() - 1;  // radial_bin contains bin edges, so nbin is one less
 
-  vector<LensObject*>::iterator it = lens_list.begin();
+  typename vector<lensObjPtr>::iterator it = lens_list.begin();
   for (; it != lens_list.end(); ++it) {
 
-    LensObject* lensobj = *it;
+    lensObjPtr lensobj = *it;
 
     double lensra = lensobj->getRA();    // FIXME: if SphericalSurface, convert to radians
     double lensdec = lensobj->getDec();
@@ -100,7 +101,7 @@ GGLensObjectList::GGLensObjectList(LensObjectList<LensObject*> lens_list,
 	//
 	// calculate tangential/skew shear
 	//
-	SourceObject* srcobj = source_vector[isrc->second];
+	srcObjPtr srcobj = source_vector[isrc->second];
 	double sra = srcobj->getRA();   // in pixels
 	double sdec = srcobj->getDec(); // in pixels
 	double dra = sra - lensra;
@@ -136,15 +137,17 @@ GGLensObjectList::GGLensObjectList(LensObjectList<LensObject*> lens_list,
 	  bad_et++;
 	  continue;
 	}
+	/*
 	if (srcobj->getERms() <= 0. || srcobj->getShapeError() <= 0.) {
 	  bad_src++;
 	  continue;
 	}
+	*/
 
 	//
 	// calculate weights, responsivities, shears and shear errors
 	//
-	double weight = srcobj->getLensingWeight();
+	double weight = srcobj->getWeight();
 	double responsiv = srcobj->getResponsivity(et);
 	double weightedsignal_t = et * weight;
 	double weightedsignal_s = es * weight;
@@ -191,3 +194,11 @@ GGLensObjectList::GGLensObjectList(LensObjectList<LensObject*> lens_list,
   cerr << "The size of the input LensObjectList is: " << lens_list.size() << endl;
   cerr << "The size of this GGLensObjectList is: " << this->size() << endl;
 }
+
+
+//
+// explicit instantiations
+//
+
+#include "RCSLenSObjects.h"
+template class GGLensObjectList<LensObject*, RCSLenSObject*>;

@@ -7,6 +7,7 @@
 #include "Bounds.h"
 #include "LensObjects.h"
 #include "SourceObjects.h"
+#include "RCSLenSObjects.h"
 #include "GGLens.h"
 #include "Bins.h"
 using std::ostringstream;
@@ -104,8 +105,8 @@ main(int argc, char* argv[]) {
     //   list(==vector):  bounds, 
     //   each object: position, shear, resolution, (optional: redshift, magnitude)
     //                may have multiple bands
-    SourceObjectList<SourceObject*> master_source_list(sourcef);
-    SourceObjectList<SourceObject*> source_list(sourcef);    // TODO:  FIXME  !!!
+    RCSLenSObjectList master_source_list(source_filename);
+    RCSLenSObjectList source_list(source_filename);  // TODO: add any extra cuts
 
 
     //
@@ -138,7 +139,7 @@ main(int argc, char* argv[]) {
     //
     // create GGLensObjectList from lens_list and source_list
     //
-    GGLensObjectList gglens_list(lens_list, source_list, radial_bin);
+    GGLensObjectList<LensObject*, RCSLenSObject*> gglens_list(lens_list, source_list, radial_bin);
 
   } catch (MyException& m) {
     m.dump(cerr);

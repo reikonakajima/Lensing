@@ -10,7 +10,7 @@ home_dir = os.getcwd()
 env = Environment()
 env.Append(CPPPATH=['/vol/software/software/tools/tmv/tmv0.72/x86_64/include'])
 env.Append(CPPPATH=[os.path.join(home_dir,'src'), os.path.join(home_dir,'src','utilities'),])
-env.Append(LIBS=['tmv', 'blas',])
+env.Append(LIBS=['tmv', 'blas', 'CCfits'])
 env.Append(LIBPATH = ['/vol/software/software/tools/tmv/tmv0.72/x86_64/lib', '/usr/local/lib'])
 
 
@@ -49,6 +49,7 @@ sub_objects = '''
 	    src/.obj/LensObjects.o
 	    src/.obj/StarMaskObjects.o
 	    src/.obj/SourceObjects.o
+	    src/.obj/RCSLenSObjects.o
 	    src/.obj/Shear.o
 	    '''.split()
 

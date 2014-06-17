@@ -54,12 +54,13 @@ class GGLensObject {
  * The driver will sort through these objects and then stack the shear signals as desired.
  *
  */
+template<class lensObjPtr, class srcObjPtr>
 class GGLensObjectList {
  public:
   enum geometry { Flat, SphericalSurface };
   GGLensObjectList() {}  // empty list
-  GGLensObjectList(LensObjectList<LensObject*> lens_list,
-		   SourceObjectList<SourceObject*> source_list,
+  GGLensObjectList(LensObjectList<lensObjPtr> lens_list,
+		   SourceObjectList<srcObjPtr> source_list,
 		   GenericBins radial_bin,
 		   geometry = Flat,             // FIXME!! Change default to SphericalSurface
 		   double mesh_size = 30.);     // FIXME!! mesh_size will default to width / 100
