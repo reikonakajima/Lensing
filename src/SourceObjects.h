@@ -77,8 +77,8 @@ class SourceObject {
   }
 
   // for use with Mesh object
-  double getX() const { return ra; }
-  double getY() const { return dec; }
+  double getX() const { return getRA(); }
+  double getY() const { return getDec(); }
   double getZ() const { return 0.; }
 
  protected:

@@ -20,29 +20,36 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 							  SourceObjectList<srcObjPtr> source_list,
 							  GenericBins _radial_bin,
 							  geometry _geom,
-							  double _mesh_size) :
-  radial_bin(_radial_bin) , geom(_geom), mesh_size(_mesh_size) {
+							  double mesh_frac) :
+  radial_bin(_radial_bin) , geom(_geom) {
 
   //
   // create source mesh list, for fast iteration over lens-source pairs
   //
 
-  if (mesh_size == 0.) {
-    double mesh_frac = DEFAULT_MESH_FRAC;   // TODO: FIXME!!  calculate
-    mesh_size = 30.;
+  if (mesh_frac == 0.) {
+    mesh_frac = DEFAULT_MESH_FRAC;
   }
 
   Bounds<double> srcbounds = source_list.getBounds();
   vector<srcObjPtr> source_vector = source_list.getVectorForm();
+
   double ramin = srcbounds.getXMin();
   double ramax = srcbounds.getXMax();
   double decmin = srcbounds.getYMin();
   double decmax = srcbounds.getYMax();
+
+  mesh_size = (ramax-ramin) / mesh_frac;
+  double temp = (decmax-decmin) / mesh_frac;
+  if (mesh_size > temp)
+      mesh_size = temp;
+
   const int meshdimX = static_cast<int>((ramax-ramin) / mesh_size);
   const int meshdimY = static_cast<int>((decmax-decmin) / mesh_size);
+
   const bool isPeriodic = false;          // we want a non-periodic mesh
   Mesh<srcObjPtr> srcmesh(meshdimX, meshdimY, 1, source_vector, isPeriodic,
-			      ramin, ramax, decmin, decmax);
+			  ramin, ramax, decmin, decmax);
 
 
   //
@@ -59,6 +66,9 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 
     double lensra = lensobj->getRA();    // FIXME: if SphericalSurface, convert to radians
     double lensdec = lensobj->getDec();
+
+    if (!srcbounds.includes(Position<double>(lensra, lensdec)))
+	continue;
 
     // DEBUG
     cerr << " === lens radec: " << lensra << ", " << lensdec << endl;
@@ -186,6 +196,9 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     //
 
     gglens_object_list.push_back(this_gglens);
+
+    // DEBUG
+    //exit(1);
 
   }  // END: lens_list loop
 

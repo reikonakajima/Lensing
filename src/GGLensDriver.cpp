@@ -101,13 +101,14 @@ main(int argc, char* argv[]) {
     //   each object: position, magnitude, (optional: redshift, sed type)
     //                may have multiple bands
     StarMaskObjectList master_lens_list(lensf);
-    StarMaskObjectList lens_list(lensf);     // TODO:  FIXME  !!!
+    StarMaskObjectList lens_list(master_lens_list);     // TODO:  FIXME  !!!
     // Needs: 
     //   list(==vector):  bounds, 
     //   each object: position, shear, resolution, (optional: redshift, magnitude)
     //                may have multiple bands
     RCSLenSObjectList master_source_list(source_filename);
-    RCSLenSObjectList source_list(source_filename);  // TODO: add any extra cuts
+    RCSLenSObjectList source_list(master_source_list);  // TODO: add any extra cuts
+    source_list.usePixelCoord(true);  // use pixel coordinates
 
 
     //
@@ -117,7 +118,6 @@ main(int argc, char* argv[]) {
     cerr << "lens catalog ...... " << lens_filename << endl;
     cerr << "     count ........ " << lens_list.size() << "/" << master_lens_list.size() << endl;
     cerr << "     bounds ....... " << lens_list.getBounds() << endl;
-    //cerr << "     rmag range ... " << lens_list.getMaxMag << endl;
 
     if (lens_list.size() == 0) {
       return(9);
@@ -140,7 +140,8 @@ main(int argc, char* argv[]) {
     //
     // create GGLensObjectList from lens_list and source_list
     //
-    GGLensObjectList<StarMaskObject*, RCSLenSObject*> gglens_list(lens_list, source_list, radial_bin);
+    GGLensObjectList<StarMaskObject*, RCSLenSObject*> gglens_list(lens_list, source_list,
+								  radial_bin);
 
   } catch (MyException& m) {
     m.dump(cerr);

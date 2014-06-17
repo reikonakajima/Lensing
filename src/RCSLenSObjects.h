@@ -57,6 +57,10 @@ class RCSLenSObject : public SourceObject {
   double getRA() const { if (usePixelCoords) return xpos; else return SourceObject::ra; }
   double getDec() const { if (usePixelCoords) return ypos; else return SourceObject::dec; }
 
+  // for use with Mesh object: important to override the SourceObject::getX() and getY()!!
+  double getX() const { return getRA(); }
+  double getY() const { return getDec(); }
+
   void setShearIndex(int i) { index = i; return; }
   int getShearIndex() const { return index; }
 
