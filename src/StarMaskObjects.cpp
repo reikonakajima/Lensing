@@ -23,7 +23,10 @@ StarMaskObject::printLine(ostream& os) const{
      << setprecision(5) << setw(10)
      << ra << " " << setw(10) << dec << " "
      << setprecision(1) << setw(10)
-     << mag
+     << mag << " "
+     << rhalo << " "
+     << xstar << " "
+     << ystar << " "
      << endl;
   return;
 }

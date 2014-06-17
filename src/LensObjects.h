@@ -31,7 +31,7 @@ class LensObject {
  public:
   LensObject(const string buffer);
 
-  string getId() const {return id;}
+  int getId() const {return id;}
   double getRA() const {return ra;}
   double getDec() const {return dec;}
   Position<double> getRADec() const {return Position<double>(ra,dec);}
@@ -45,7 +45,7 @@ class LensObject {
 
  protected:
   LensObject() {}
-  string id;
+  int id;
   double ra, dec;
 };
 
