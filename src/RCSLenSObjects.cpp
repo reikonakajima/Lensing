@@ -122,7 +122,8 @@ RCSLenSObjectList::RCSLenSObjectList(const string fits_filename) {
 
 void
 RCSLenSObject::printLine(ostream& os) const {
-  os << setprecision(5) << setw(10)
+  os << id << " "
+     << setprecision(5) << setw(10)
      << ra << " " << setw(10) << dec << " "
      << setprecision(3) << setw(10)
      << e1 << " " << e2 << " "
