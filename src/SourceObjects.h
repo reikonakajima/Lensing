@@ -35,6 +35,8 @@ class SourceObject {
   SourceObject(long int _id, double _ra, double _dec, float _e1, float _e2, double _wt=1.) :
   id(_id), ra(_ra), dec(_dec), e1(_e1), e2(_e2), wt(_wt) {}
 
+  long int getId() const { return id; }
+
   double getRA() const { return ra; }
   double getDec() const { return dec; }
 
