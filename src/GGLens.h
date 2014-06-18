@@ -38,7 +38,7 @@ class GGLensObject {
     lens_ptr(lensptr), tangential_shears(num_radial_bins) {}
 
   ggLensSum& operator[](int i_rad) {
-    if (i_rad < 0 || i_rad >= tangential_shears.size()) {
+    if (i_rad < 0 || i_rad > tangential_shears.size()) {
       throw GGLensError("radial bin index error");
     }
     return tangential_shears[i_rad];

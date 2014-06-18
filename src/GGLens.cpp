@@ -56,7 +56,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
   //
 
   /// each GGLensObject will have some number of radial bins
-  int rad_nbin = radial_bin.size() - 1;  // radial_bin contains bin edges, so nbin is one less
+  int rad_nbin = radial_bin.size();  // size() returns number of bins
 
   typename vector<lensObjPtr>::iterator it = lens_list.begin();
   for (; it != lens_list.end(); ++it) {
@@ -84,12 +84,6 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
       } else if (geom == SphericalSurface) {
 	bglist[irad] = srcmesh.getNearAngleMap(lensra, lensdec, 0.,
 					       radial_bin[irad+1], radial_bin[irad]);
-      }
-      // DEBUG radial_bin
-      if (bglist[irad].size() > 0) {
-	  source_vector[bglist[irad].begin()->second]->printLine(cerr);
-	  cerr << irad << "th radial bin, bg obj count: " << bglist[irad].size() << endl;
-	  cerr << "limits are " << radial_bin[irad] << " to " << radial_bin[irad+1] << endl;
       }
     }
 
@@ -188,7 +182,6 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     //
     // reject lenses without enough background source objects
     //
-
     if (bg_count < MINIMUM_SOURCE_COUNT_PER_LENS) {
       lost_bgcount++;
       delete this_gglens;
@@ -198,14 +191,10 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     //
     // add GGLens object to the list
     //
-
     gglens_object_list.push_back(this_gglens);
 
-    // DEBUG
-    cerr << "breaking (debug)" << endl;
-    break;
-
   }  // END: lens_list loop
+
 
   /// At this point, the GGLensObjectList should be full
   cerr << "All lens objects loaded and paired with source objects." << endl;
