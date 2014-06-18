@@ -32,8 +32,8 @@ class SourceObject {
 
  public:
   SourceObject();
-  SourceObject(long int _id, double _ra, double _dec, float _e1, float _e2, double _wt=1.) :
-  id(_id), ra(_ra), dec(_dec), e1(_e1), e2(_e2), wt(_wt) {}
+  SourceObject(long int _id, double _ra, double _dec, double _e1, double _e2, double _wt=1.) :
+  id(_id), ra(_ra), dec(_dec), e1(_e1), e2(_e2), wt(_wt), responsiv(-10.) {}
 
   long int getId() const { return id; }
 
@@ -41,16 +41,16 @@ class SourceObject {
   double getDec() const { return dec; }
 
   Shear getShear() const { return Shear(e1,e2); }
-  float getE1() const { return e1; }
-  float getE2() const { return e2; }
-  float getESq() const { return e1*e1 + e2*e2; }
+  double getE1() const { return e1; }
+  double getE2() const { return e2; }
+  double getESq() const { return e1*e1 + e2*e2; }
 
   double getWeight() const { return wt; }
   void setWeight(double _wt) const { wt = _wt; return; }
   /*
-  float getShapeError() const  { return 2.*shapeerr; }  // ask rachel...
-  float getResolution() const  { return res; }
-  float getERms() const  { return eRMS; }
+  double getShapeError() const  { return 2.*shapeerr; }  // ask rachel...
+  double getResolution() const  { return res; }
+  double getERms() const  { return eRMS; }
 
   double getLensingWeight() const { if (wt < 0) setLensingWeight(); return wt; }
   void setLensingWeight() const {
@@ -85,12 +85,12 @@ class SourceObject {
  protected:
   long int id;
   double ra, dec;  // position
-  float e1, e2;    // measured shape
+  double e1, e2;    // measured shape
   mutable double wt;         // calculated weight
 /*
-  float shapeerr;  // shape measurement error
-  float eRMS;      // shape noise (calculated from rmag)
-  float res;       // resolution
+  double shapeerr;  // shape measurement error
+  double eRMS;      // shape noise (calculated from rmag)
+  double res;       // resolution
 
   mutable double vare;     // shapeerr^2
   mutable double varSN;    // eRMS^2
@@ -121,9 +121,14 @@ class SourceObject {
 template <class ObjPtr>
 class SourceObjectList {
  public:
+
+  /* Currently, the destructor is not properly implemented (the following will give run-time errors)
+   * The proper implementation will keep track of pointer counts, and will delete only when
+   * the pointer count goes to zero.
   ~SourceObjectList() {
     for (int i=0; i<size(); ++i) delete source_list[i];
   }
+   */
 
   Bounds<double> getBounds() {
     if (size() <= 0) throw SourceObjectsError("bounds undefined for empty source list");

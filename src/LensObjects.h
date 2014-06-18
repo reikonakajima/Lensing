@@ -61,9 +61,13 @@ class LensObject {
 template <class ObjPtr>
 class LensObjectList {
  public:
+  /* Currently, the destructor is not properly implemented (the following will give run-time errors)
+   * The proper implementation will keep track of pointer counts, and will delete only when
+   * the counter goes to zero.
   ~LensObjectList() {
     for (int i=0; i<size(); ++i) delete lens_list[i];
   }
+   */
 
   Bounds<double> getBounds() {
     if (size() <= 0) throw LensObjectsError("bounds undefined for empty lens list");

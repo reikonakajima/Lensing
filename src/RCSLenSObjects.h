@@ -40,8 +40,8 @@ class RCSLenSObject : public SourceObject {
   RCSLenSObject() {}
   RCSLenSObject(long int _id, double ra, double dec, float _mag, float _xpos, float _ypos,
 		float _fwhm_image,
-		float _e1_A, float _e2_A, float _e1_B, float _e2_B,
-		float _e1_C, float _e2_C, float _e1_D, float _e2_D,
+		double _e1_A, double _e2_A, double _e1_B, double _e2_B,
+		double _e1_C, double _e2_C, double _e1_D, double _e2_D,
 		float sn_ratio, double _wt=1.) :
   SourceObject(_id, ra, dec, _e1_A, _e2_A, _wt),
       mag(_mag), xpos(_xpos), ypos(_ypos), fwhm(_fwhm_image), sn(sn_ratio) {
@@ -66,9 +66,11 @@ class RCSLenSObject : public SourceObject {
   int getShearIndex() const { return index; }
 
   const Shear& getShear() const { checkShearIndex(index); return shear[index]; }
-  float getE1() const { checkShearIndex(index); return shear[index].getE1(); }
-  float getE2() const { checkShearIndex(index); return shear[index].getE2(); }
-  float getESq() const { checkShearIndex(index); return shear[index].getESq(); }
+  double getE1() const { checkShearIndex(index); return shear[index].getE1(); }
+  double getE2() const { checkShearIndex(index); return shear[index].getE2(); }
+  double getESq() const { checkShearIndex(index); return shear[index].getESq(); }
+
+  float getSNratio() const { return sn; }
 
   void printLine(ostream& os) const;
 
