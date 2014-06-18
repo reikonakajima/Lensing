@@ -33,8 +33,8 @@ class StarMaskObjectsError : public MyException {
 class StarMaskObject : public LensObject {
 
  public:
-    StarMaskObject(const string buffer, int id);
-  float getMag() const {return mag;}
+  StarMaskObject(const string buffer, int id);
+  float getMag() const { return mag; }
   void printLine(ostream& os) const;
 
  private:

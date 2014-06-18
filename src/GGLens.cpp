@@ -214,6 +214,21 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 }
 
 
+template<class lensObjPtr, class srcObjPtr>
+vector<GGLensObjectList<lensObjPtr, srcObjPtr> >
+GGLensObjectList<lensObjPtr, srcObjPtr>::splitList(const int nSplit) {
+  vector<GGLensObjectList<lensObjPtr, srcObjPtr> > split_lists(nSplit);
+
+  // initialize each GGLensObjectList as the same as the parent
+  for (int i = 0; i < nSplit; ++i) {
+    split_lists[i].geom = this->geom;
+    split_lists[i].mesh_size = this->mesh_size;
+    split_lists[i].radial_bin = this->radial_bin;
+  }
+  return split_lists;
+}
+
+
 //
 // explicit instantiations
 //

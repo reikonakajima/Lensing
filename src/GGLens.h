@@ -33,14 +33,17 @@ class GGLensError : public MyException {
 template<class lensObjPtr>
 class GGLensObject {
  public:
+
   GGLensObject(lensObjPtr lensptr, const int num_radial_bins) :
     lens_ptr(lensptr), tangential_shears(num_radial_bins) {}
+
   ggLensSum& operator[](int i_rad) {
     if (i_rad < 0 || i_rad >= tangential_shears.size()) {
       throw GGLensError("radial bin index error");
     }
     return tangential_shears[i_rad];
   }
+
   lensObjPtr getLensPtr() { return lens_ptr; };
 
  private:
@@ -66,8 +69,17 @@ class GGLensObjectList {
 		   GenericBins radial_bin,
 		   geometry = Flat,             // FIXME!! Change default to SphericalSurface
 		   double mesh_frac = 0.);
+
   int size() { return gglens_object_list.size(); }
+
   GGLensObject<lensObjPtr>* operator[](int ilens) { return gglens_object_list[ilens]; }
+
+  vector<GGLensObjectList<lensObjPtr, srcObjPtr> > splitList(int nSplit);
+
+  void push_back(GGLensObject<lensObjPtr>* gglensPtr) {
+    gglens_object_list.push_back(gglensPtr); return;
+  }
+
   /*
   void sortByRA();
   void sortByDec();

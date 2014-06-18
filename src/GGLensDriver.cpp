@@ -89,7 +89,7 @@ main(int argc, char* argv[]) {
       mvec[i] = i + 10;
     }
     ArbitraryWidthBins magnitude_bin(mvec);
-    const int nmagbin = magnitude_bin.size(); // remove?
+    const int nmagbin = magnitude_bin.size();  // returns the number of bins
 
 
     //
@@ -101,7 +101,7 @@ main(int argc, char* argv[]) {
     //   each object: position, magnitude, (optional: redshift, sed type)
     //                may have multiple bands
     StarMaskObjectList master_lens_list(lensf);
-    StarMaskObjectList lens_list(master_lens_list);     // TODO:  FIXME  !!!
+    StarMaskObjectList lens_list(master_lens_list);     // TODO: add any extra cuts
     // Needs: 
     //   list(==vector):  bounds, 
     //   each object: position, shear, resolution, (optional: redshift, magnitude)
@@ -134,14 +134,56 @@ main(int argc, char* argv[]) {
     cerr << "radial bin range .. " << radial_bin[0] << " ... " 
 	 << radial_bin[radial_bin.size()-1] << endl;
     cerr << "magnitude bin range " << magnitude_bin[0] << " ... " 
-	 << magnitude_bin[magnitude_bin.size()-1] << endl;
+	 << magnitude_bin[nmagbin] << endl;
 
 
     //
-    // create GGLensObjectList from lens_list and source_list
+    // create GGLensObjectList from lens_list and source_list (sums tangential shears for each lens)
     //
     GGLensObjectList<StarMaskObject*, RCSLenSObject*> gglens_list(lens_list, source_list,
 								  radial_bin);
+
+    /*/ DEBUG: print tangential shear
+    cerr << "pair weights responsivity  et ex   var(et) var(ex)" << endl;
+    for (int ilens=0; ilens<gglens_list.size(); ++ilens) {
+      cerr << "ilens: " << ilens << endl;
+      for (int irad=0; irad<radial_bin.size()-1; ++irad) {
+	cerr << "irad: " << irad << endl;
+	cerr << (*gglens_list[ilens])[irad].getPairCounts() << " "
+	     << (*gglens_list[ilens])[irad].getWeights() << " "
+	     << (*gglens_list[ilens])[irad].getResponsivity() << " "
+	     << (*gglens_list[ilens])[irad].getDeltaSigma_t() << " "
+	     << (*gglens_list[ilens])[irad].getDeltaSigma_s() << " "
+	     << (*gglens_list[ilens])[irad].getVariance_t() << " "
+	     << (*gglens_list[ilens])[irad].getVariance_s() << endl;
+      }
+    }
+    /*/
+
+
+    //
+    // sort each lens into binned_lists
+    //
+    vector<GGLensObjectList<StarMaskObject*, RCSLenSObject*> > binned_lists
+	= gglens_list.splitList(nmagbin);
+
+    for (int ilens = 0; ilens < gglens_list.size(); ++ilens) {
+      int index = magnitude_bin.getIndex(gglens_list[ilens]->getLensPtr()->getMag());
+      if (index != -1) {
+	binned_lists[index].push_back(gglens_list[ilens]);
+      }
+    }
+
+
+    //
+    // sum tangential shear according to the given lens binning
+    //
+
+
+    /// provide output per bin
+
+
+
 
   } catch (MyException& m) {
     m.dump(cerr);
