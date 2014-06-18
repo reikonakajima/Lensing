@@ -81,15 +81,8 @@ main(int argc, char* argv[]) {
     //
     // setup bins (magnitude)
     //
-
-    /// create lens magnitude bins (r-band magnitude)
-    int mag_nbins = 3;
-    vector<double> mvec(mag_nbins+1);
-    for (int i=0; i<=mag_nbins; ++i) {  // TODO:  FIXME  !!!
-      mvec[i] = i + 10;
-    }
-    ArbitraryWidthBins magnitude_bin(mvec);
-    const int nmagbin = magnitude_bin.size();  // returns the number of bins
+    ifstream magbinf("mag.txt");
+    ArbitraryWidthBins magnitude_bin(magbinf);
 
 
     //
@@ -132,9 +125,9 @@ main(int argc, char* argv[]) {
     }
 
     cerr << "radial bin range .. " << radial_bin[0] << " ... " 
-	 << radial_bin[radial_bin.size()-1] << endl;
+	 << radial_bin[radial_bin.size()] << endl;
     cerr << "magnitude bin range " << magnitude_bin[0] << " ... " 
-	 << magnitude_bin[nmagbin] << endl;
+	 << magnitude_bin[magnitude_bin.size()] << endl;
 
 
     //
@@ -143,29 +136,11 @@ main(int argc, char* argv[]) {
     GGLensObjectList<StarMaskObject*, RCSLenSObject*> gglens_list(lens_list, source_list,
 								  radial_bin);
 
-    /*/ DEBUG: print tangential shear
-    cerr << "pair weights responsivity  et ex   var(et) var(ex)" << endl;
-    for (int ilens=0; ilens<gglens_list.size(); ++ilens) {
-      cerr << "ilens: " << ilens << endl;
-      for (int irad=0; irad<radial_bin.size()-1; ++irad) {
-	cerr << "irad: " << irad << endl;
-	cerr << (*gglens_list[ilens])[irad].getPairCounts() << " "
-	     << (*gglens_list[ilens])[irad].getWeights() << " "
-	     << (*gglens_list[ilens])[irad].getResponsivity() << " "
-	     << (*gglens_list[ilens])[irad].getDeltaSigma_t() << " "
-	     << (*gglens_list[ilens])[irad].getDeltaSigma_s() << " "
-	     << (*gglens_list[ilens])[irad].getVariance_t() << " "
-	     << (*gglens_list[ilens])[irad].getVariance_s() << endl;
-      }
-    }
-    /*/
-
-
     //
     // sort each lens into binned_lists
     //
     vector<GGLensObjectList<StarMaskObject*, RCSLenSObject*> > binned_lists
-	= gglens_list.splitList(nmagbin);
+	= gglens_list.splitList(magnitude_bin.size());
 
     for (int ilens = 0; ilens < gglens_list.size(); ++ilens) {
       int index = magnitude_bin.getIndex(gglens_list[ilens]->getLensPtr()->getMag());
@@ -178,11 +153,63 @@ main(int argc, char* argv[]) {
     //
     // sum tangential shear according to the given lens binning
     //
+    vector<vector<ggLensSum> > radial_shears(magnitude_bin.size());
+    for (int imag = 0; imag < magnitude_bin.size(); ++imag) {
+      /// initialize radial_shears
+      vector<ggLensSum> temp(radial_bin.size());
+      radial_shears[imag] = temp;
+      /// sum tangential shear quantities over all lenses
+      for (int ilens = 0; ilens < binned_lists[imag].size(); ++ilens) {
+	for (int irad = 0; irad < radial_bin.size(); ++irad) {
+	  radial_shears[imag][irad].addPairCounts(
+	      (*binned_lists[imag][ilens])[irad].getPairCounts());
+	  radial_shears[imag][irad].addWeight(
+	      (*binned_lists[imag][ilens])[irad].getWeights());
+	  radial_shears[imag][irad].addResponsivity(
+	      (*binned_lists[imag][ilens])[irad].getResponsivity());
+	  radial_shears[imag][irad].addDeltaSigma_t(
+	      (*binned_lists[imag][ilens])[irad].getDeltaSigma_t());
+	  radial_shears[imag][irad].addDeltaSigma_s(
+	      (*binned_lists[imag][ilens])[irad].getDeltaSigma_s());
+	  radial_shears[imag][irad].addVariance_t(
+	      (*binned_lists[imag][ilens])[irad].getVariance_t());
+	  radial_shears[imag][irad].addVariance_s(
+	      (*binned_lists[imag][ilens])[irad].getVariance_s());
+	}
+      }
+    }
 
 
-    /// provide output per bin
+    //
+    // provide output per bin
+    //
+    cout << "#imag irad pairs sum(weights) sum(responsivity) sum(w*et) sum(w*ex)"
+	 << "sum(w^2*var(et)) sum(w^2*var(ex))" << endl;
 
+    cout << "#magbins: ";
+    for (int imag=0; imag<magnitude_bin.vectorSize(); ++imag) {
+      cout << magnitude_bin[imag] << " ";
+    }
+    cout << endl;
 
+    cout << "#radbins: ";
+    for (int irad=0; irad<radial_bin.size(); ++irad) {
+      cout << radial_bin[irad] << " ";
+    }
+    cout << endl;
+
+    for (int imag=0; imag<magnitude_bin.size(); ++imag) {
+      for (int irad=0; irad<radial_bin.size(); ++irad) {
+	cout << imag << " " << irad << "  ";
+	cout << radial_shears[imag][irad].getPairCounts() << " "
+	     << radial_shears[imag][irad].getWeights() << " "
+	     << radial_shears[imag][irad].getResponsivity() << " "
+	     << radial_shears[imag][irad].getDeltaSigma_t() << " "
+	     << radial_shears[imag][irad].getDeltaSigma_s() << " "
+	     << radial_shears[imag][irad].getVariance_t() << " "
+	     << radial_shears[imag][irad].getVariance_s() << endl;
+      }
+    }
 
 
   } catch (MyException& m) {
