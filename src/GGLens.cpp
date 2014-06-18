@@ -8,11 +8,7 @@ using std::fixed;
 using std::setprecision;
 
 const double DEFAULT_MESH_FRAC = 100.;
-const int MINIMUM_SOURCE_COUNT_PER_LENS = 10;
-
-
-GGLensObject::GGLensObject(const int num_radial_bins) :
-  tangential_shears(num_radial_bins) {} // initialize the vector object
+const int MINIMUM_SOURCE_COUNT_PER_LENS = 1;
 
 
 template<class lensObjPtr, class srcObjPtr>
@@ -28,7 +24,10 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
   //
 
   if (mesh_frac == 0.) {
+    cerr << "setting mesh_frac to " << DEFAULT_MESH_FRAC << endl;
     mesh_frac = DEFAULT_MESH_FRAC;
+  } else if (mesh_frac < 0.) {
+    throw GGLensError("mesh_frac set to negative value");
   }
 
   Bounds<double> srcbounds = source_list.getBounds();
@@ -66,16 +65,15 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 
     double lensra = lensobj->getRA();    // FIXME: if SphericalSurface, convert to radians
     double lensdec = lensobj->getDec();
-
     if (!srcbounds.includes(Position<double>(lensra, lensdec)))
 	continue;
 
     // DEBUG
-    cerr << " === lens radec: " << lensra << ", " << lensdec << endl;
-
+    //cerr << " === ";
+    //lensobj->printLine(cerr);
 
     //
-    // find all possible matching sources (get their indicies of srcvector) in radial bins
+    // collect all matching sources (get their indicies of srcvector) in radial bins
     //
 
     vector<multimap<double, int> > bglist(rad_nbin);
@@ -88,21 +86,23 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 					       radial_bin[irad+1], radial_bin[irad]);
       }
       // DEBUG radial_bin
-      if (bglist[irad].size() > 0)
-        cerr << irad << "th radial bin, bg obj count: " << bglist[irad].size() << endl;
-      cerr << "limits are " << radial_bin[irad] << " to " << radial_bin[irad+1] << endl;
+      if (bglist[irad].size() > 0) {
+	  source_vector[bglist[irad].begin()->second]->printLine(cerr);
+	  cerr << irad << "th radial bin, bg obj count: " << bglist[irad].size() << endl;
+	  cerr << "limits are " << radial_bin[irad] << " to " << radial_bin[irad+1] << endl;
+      }
     }
 
     //
-    // LOOP over sources for this lens object, accumulate data
+    // LOOP over all sources (by radial bins) for this lens object, accumulate data
     //
 
-    GGLensObject* this_gglens = new GGLensObject(rad_nbin);
+    GGLensObject<lensObjPtr> *this_gglens = new GGLensObject<lensObjPtr>(lensobj, rad_nbin);
 
-    int bg_count = 0;  // source object count for this lens object
+    int bg_count = 0;      // source object count for this lens object
     int bad_et = 0;
     int bad_src = 0;
-    int lost_bgcount = 0;  // not enough BG count
+    int lost_bgcount = 0;  // lens objects lost through "not enough BG object count"
 
     multimap<double, int>::const_iterator isrc;
     for (int irad = 0; irad < rad_nbin; ++irad) {
@@ -112,8 +112,8 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	// calculate tangential/skew shear
 	//
 	srcObjPtr srcobj = source_vector[isrc->second];
-	double sra = srcobj->getRA();   // in pixels
-	double sdec = srcobj->getDec(); // in pixels
+	double sra = srcobj->getRA();
+	double sdec = srcobj->getDec();
 	double dra = sra - lensra;
 	double ddec = sdec - lensdec;
 	double theta;   // is in RADIANS (output of atan2)
@@ -121,6 +121,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	  theta = atan2(ddec, dra);
 	} else if (geom == SphericalSurface) {
 	  // FIXME!!  convert everything into RADIANs
+	  throw GGLensError(" FIXME!!  convert everything into RADIANs");
 	  theta = atan2(cos(lensdec)*sin(sdec)-sin(lensdec)*cos(sdec)*cos(dra),
 			cos(sdec)*sin(dra));      // spherical surface
 	}
@@ -133,21 +134,28 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	double et = -c2t * srcobj->getE1() - s2t * srcobj->getE2();
 	double es =  s2t * srcobj->getE1() - c2t * srcobj->getE2();
 
-	// DEBUG
-	cerr << bg_count << "   "
+	/// increment available source objects for this lens
+	++bg_count;
+
+	/*/ DEBUG
+	cerr << bg_count << "   " << irad << " " << sqrt(isrc->first) << "  "
 	     << fixed << setprecision(6)
 	     << lensra << " " << lensdec << "   "
+	     << fixed << setprecision(3)
+	     << srcobj->getId() << " " << srcobj->getSNratio() << " " << srcobj->getWeight() << "  "
+	     << fixed << setprecision(6)
 	     << srcobj->getRA() << " " << srcobj->getDec() << "  "
 	     << srcobj->getE1() << " " << srcobj->getE2() << "  "
 	     << et << " " << es << "   "
 	     << theta / DEGREE << " "
 	     << endl;
+        /*/
 
 	if (std::isnan(et)) {
 	  bad_et++;
 	  continue;
 	}
-	/*
+	/*   TODO:  transfer: these will need to be included for SDSS sources...
 	if (srcobj->getERms() <= 0. || srcobj->getShapeError() <= 0.) {
 	  bad_src++;
 	  continue;
@@ -161,26 +169,22 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	double responsiv = srcobj->getResponsivity(et);
 	double weightedsignal_t = et * weight;
 	double weightedsignal_s = es * weight;
-	double weightederror_t = weight * weight * et * et;
-	double weightederror_s = weight * weight * es * es;
+	double weightedVariance_t = weight * weight * et * et;
+	double weightedVariance_s = weight * weight * es * es;
 
 	/// add source object to sm bin 
-	(*this_gglens)(irad).addPairCounts();
-	(*this_gglens)(irad).addWeight(weight);
-	(*this_gglens)(irad).addResponsivity(responsiv);
-	(*this_gglens)(irad).addDeltaSigma_t(weightedsignal_t);
-	(*this_gglens)(irad).addDeltaSigma_s(weightedsignal_s);
-	(*this_gglens)(irad).addError_t(weightederror_t);
-	(*this_gglens)(irad).addError_s(weightederror_s);
+	(*this_gglens)[irad].addPairCounts();
+	(*this_gglens)[irad].addWeight(weight);
+	(*this_gglens)[irad].addResponsivity(responsiv);
+	(*this_gglens)[irad].addDeltaSigma_t(weightedsignal_t);
+	(*this_gglens)[irad].addDeltaSigma_s(weightedsignal_s);
+	(*this_gglens)[irad].addVariance_t(weightedVariance_t);
+	(*this_gglens)[irad].addVariance_s(weightedVariance_s);
 
       } // END: source object (within bglist[irad]) 'for' loop
 
-	/// count available source objects for this lens
-      bg_count += (*this_gglens)(irad).getPairCounts();
-
     } // END: irad 'for' loop
     
-
     //
     // reject lenses without enough background source objects
     //
@@ -198,7 +202,8 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     gglens_object_list.push_back(this_gglens);
 
     // DEBUG
-    //exit(1);
+    cerr << "breaking (debug)" << endl;
+    break;
 
   }  // END: lens_list loop
 

@@ -4,7 +4,6 @@
 #ifndef GGLENS_H
 #define GGLENS_H
 #include <iostream>
-#include <list>
 #include <vector>
 #include "Bounds.h"
 #include "Bins.h"
@@ -25,25 +24,28 @@ class GGLensError : public MyException {
 /*
  * GGLensObject
  *
- * This is an AstronomicalObject which keeps track of the shear signal around itself in radial bins.
- * The actual bin range is not specified here; it is specified in the GGLensObjectList.
- * The AstronomicalObject properties should be inherited from AstronomicalObject.   FIXME!! :  TODO
+ * This is an LensObject which keeps track of the shear signal by (specified) radial bins.
+ *
+ * The actual bin range is specified in the GGLensObjectList.
+ * The LensObject properties should be inherited from the LensObject.
+ *
  */
+template<class lensObjPtr>
 class GGLensObject {
  public:
-  GGLensObject(const int num_radial_bins);
-  ggLensSum& operator()(int i_rad) {
+  GGLensObject(lensObjPtr lensptr, const int num_radial_bins) :
+    lens_ptr(lensptr), tangential_shears(num_radial_bins) {}
+  ggLensSum& operator[](int i_rad) {
     if (i_rad < 0 || i_rad >= tangential_shears.size()) {
       throw GGLensError("radial bin index error");
     }
     return tangential_shears[i_rad];
   }
+  lensObjPtr getLensPtr() { return lens_ptr; };
 
  private:
+  lensObjPtr lens_ptr;
   vector<ggLensSum> tangential_shears;
-  string id;
-  double ra, dec;
-  float mag;
 };
 
 
@@ -65,6 +67,7 @@ class GGLensObjectList {
 		   geometry = Flat,             // FIXME!! Change default to SphericalSurface
 		   double mesh_frac = 0.);
   int size() { return gglens_object_list.size(); }
+  GGLensObject<lensObjPtr>* operator[](int ilens) { return gglens_object_list[ilens]; }
   /*
   void sortByRA();
   void sortByDec();
@@ -72,7 +75,7 @@ class GGLensObjectList {
   void findBounds();  // finds the bounds of the objects in this list and saves it
   */
  private:
-  list<GGLensObject*> gglens_object_list;
+  vector<GGLensObject<lensObjPtr>*> gglens_object_list;
   geometry geom;      // geometry as to detemine distance between two points
   double mesh_size;
   GenericBins radial_bin;  // stores the radial bin edges
