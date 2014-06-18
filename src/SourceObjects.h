@@ -32,9 +32,8 @@ class SourceObject {
 
  public:
   SourceObject();
-  SourceObject(double _ra, double _dec, float _e1, float _e2, double _wt=1.) : 
-  ra(_ra), dec(_dec), e1(_e1), e2(_e2), wt(_wt) {}
-
+  SourceObject(long int _id, double _ra, double _dec, float _e1, float _e2, double _wt=1.) :
+  id(_id), ra(_ra), dec(_dec), e1(_e1), e2(_e2), wt(_wt) {}
 
   double getRA() const { return ra; }
   double getDec() const { return dec; }
@@ -82,6 +81,7 @@ class SourceObject {
   double getZ() const { return 0.; }
 
  protected:
+  long int id;
   double ra, dec;  // position
   float e1, e2;    // measured shape
   mutable double wt;         // calculated weight
@@ -113,6 +113,7 @@ class SourceObject {
  * This is the base class for a list of source objects, and contains minimum information
  * needed to calculate a tangential shear signal around any given lens.
  *
+ * Note that the constructor is not implemented; this is a virutual base class at the moment.
  */
 
 template <class ObjPtr>

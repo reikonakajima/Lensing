@@ -38,11 +38,12 @@ class RCSLenSObject : public SourceObject {
   static const int NUM_SHEAR=4;
   
   RCSLenSObject() {}
-  RCSLenSObject(double ra, double dec, float _mag, float _xpos, float _ypos, float _fwhm_image,
+  RCSLenSObject(long int _id, double ra, double dec, float _mag, float _xpos, float _ypos,
+		float _fwhm_image,
 		float _e1_A, float _e2_A, float _e1_B, float _e2_B,
 		float _e1_C, float _e2_C, float _e1_D, float _e2_D,
 		float sn_ratio, double _wt=1.) :
-  SourceObject(ra, dec, _e1_A, _e2_A, _wt), 
+  SourceObject(_id, ra, dec, _e1_A, _e2_A, _wt),
       mag(_mag), xpos(_xpos), ypos(_ypos), fwhm(_fwhm_image), sn(sn_ratio) {
       shear[0] = Shear(_e1_A, _e2_A);
       shear[1] = Shear(_e1_B, _e2_B);

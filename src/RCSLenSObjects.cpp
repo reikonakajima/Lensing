@@ -102,7 +102,7 @@ RCSLenSObjectList::RCSLenSObjectList(const string fits_filename) {
   source_list.reserve(column1.rows());
   for (int i=0; i<column1.rows(); ++i) {
       if (weight[i] == 0) continue;
-      RCSLenSObject* ptr = new RCSLenSObject(ra[i], dec[i], mag[i], xpos[i], ypos[i], fwhm[i],
+      RCSLenSObject* ptr = new RCSLenSObject(i, ra[i], dec[i], mag[i], xpos[i], ypos[i], fwhm[i],
 					     e1a[i], e2a[i], e1b[i], e2b[i],
 					     e1c[i], e2c[i], e1d[i], e2d[i],
 					     sn[i], weight[i]);
