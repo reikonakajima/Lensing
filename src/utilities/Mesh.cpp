@@ -109,17 +109,16 @@ template <class Ttype, class Tpos>
 multimap<double, int> 
 Mesh<Ttype, Tpos>::getNearMeshMap(Tpos x, Tpos y, Tpos z, Tpos rmax, Tpos rmin) {
   std::multimap<double, int> nbr;   // the return list
-  nbr.clear();          // clear list
-  int ix,iy,iz,ii,p;
+  nbr.clear();  // clear list
+  int p;
   Tpos dst2;
-  ix = int((x - xmin)/dx);     // calculate index of point
-  iy = int((y - ymin)/dy);              
-  iz = int((z - zmin)/dz);
+  int ix = int((x - xmin)/dx); // calculate index of point
+  int iy = int((y - ymin)/dy);
+  int iz = int((z - zmin)/dz);
   int srx = int(rmax/dx)+1;    // calculate radius in terms of mesh indicies
   int sry = int(rmax/dy)+1;
   int srz = int(rmax/dz)+1;
   std::vector<int> close = closemeshes(ix,iy,iz,srx,sry,srz);
-  for (int i = 0; i < close.size(); ++i) {
   for (std::vector<int>::iterator ii=close.begin(); ii!=close.end(); ii++) {
     if ( (p=head[*ii])>=0 ) {
       do {
@@ -129,7 +128,6 @@ Mesh<Ttype, Tpos>::getNearMeshMap(Tpos x, Tpos y, Tpos z, Tpos rmax, Tpos rmin) 
 	}
       } while( (p=next[p])>=0 );
     }
-  }
   }
   return(nbr);
 }
