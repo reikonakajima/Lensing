@@ -18,6 +18,7 @@ class ggLensSum {
     stmass(0.), amag(0.) {}
   inline void addPairCounts(int pcount = 1) { paircounts += pcount; return; }
   inline void addWeight(double weight) { weights += weight; return; }
+  inline void addWeightSq(double _wsq) { wsq += _wsq; return; }
   inline void addResponsivity(double resp) { responsivity += resp; return; }
   inline void addDeltaSigma_t(double delsig) { DeltaSigma_t += delsig; return; }
   inline void addDeltaSigma_s(double delsig) { DeltaSigma_s += delsig; return; }
@@ -31,6 +32,7 @@ class ggLensSum {
   inline void addApparentMag(double am) { amag += am; return; }
   inline int    getPairCounts() const { return paircounts; } 
   inline double getWeights() const { return weights; }
+  inline double getWeightSq() const { return wsq; }
   inline double getResponsivity() const { return responsivity; }
   inline double getDeltaSigma_t() const { return DeltaSigma_t; }
   inline double getDeltaSigma_s() const { return DeltaSigma_s; }
@@ -45,6 +47,7 @@ class ggLensSum {
  private:
   int    paircounts;   // numb   (pair counts)
   double weights;      // wtotw  (total weight)
+  double wsq;          // w^2
   double responsivity; // sshup  (sum for shear responsivity)
   double DeltaSigma_t; // sigup  (weighted tangent shear -- weight should include SigmaCrit)
   double DeltaSigma_s; //        (weighted cross shear -- weight should include SigmaCrit)

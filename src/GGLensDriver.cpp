@@ -163,8 +163,9 @@ main(int argc, char* argv[]) {
 	for (int irad = 0; irad < radial_bin.binSize(); ++irad) {
 	  radial_shears[imag][irad].addPairCounts(
 	      (*binned_lists[imag][ilens])[irad].getPairCounts());
-	  radial_shears[imag][irad].addWeight(
-	      (*binned_lists[imag][ilens])[irad].getWeights());
+	  double w = (*binned_lists[imag][ilens])[irad].getWeights();
+	  radial_shears[imag][irad].addWeight(w);
+	  radial_shears[imag][irad].addWeightSq(w*w);
 	  radial_shears[imag][irad].addResponsivity(
 	      (*binned_lists[imag][ilens])[irad].getResponsivity());
 	  radial_shears[imag][irad].addDeltaSigma_t(
@@ -183,7 +184,7 @@ main(int argc, char* argv[]) {
     //
     // provide output per bin
     //
-    cout << "#imag irad pairs sum(weights) sum(responsivity) sum(w*et) sum(w*ex) "
+    cout << "#imag irad pairs sum(weights) sum(w^2) sum(responsivity) sum(w*et) sum(w*ex) "
 	 << "sum(w^2*var(et)) sum(w^2*var(ex))" << endl;
 
     cout << "#magbins: ";
@@ -205,6 +206,7 @@ main(int argc, char* argv[]) {
 	cout << imag << " " << irad << "  ";
 	cout << radial_shears[imag][irad].getPairCounts() << " "
 	     << radial_shears[imag][irad].getWeights() << " "
+	     << radial_shears[imag][irad].getWeightSq() << " "
 	     << radial_shears[imag][irad].getResponsivity() << " "
 	     << radial_shears[imag][irad].getDeltaSigma_t() << " "
 	     << radial_shears[imag][irad].getDeltaSigma_s() << " "
