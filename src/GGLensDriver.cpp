@@ -193,7 +193,7 @@ main(int argc, char* argv[]) {
     cout << endl;
 
     cout << "#radbins: ";
-    for (int irad=0; irad<radial_bin.binSize(); ++irad) {
+    for (int irad=0; irad<radial_bin.vectorSize(); ++irad) {
       cout << radial_bin[irad] << " ";
     }
     cout << endl;
