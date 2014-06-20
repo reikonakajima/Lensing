@@ -200,6 +200,8 @@ main(int argc, char* argv[]) {
 
     for (int imag=0; imag<magnitude_bin.binSize(); ++imag) {
       for (int irad=0; irad<radial_bin.binSize(); ++irad) {
+	if (radial_shears[imag][irad].getPairCounts() == 0)
+	  continue;
 	cout << imag << " " << irad << "  ";
 	cout << radial_shears[imag][irad].getPairCounts() << " "
 	     << radial_shears[imag][irad].getWeights() << " "
