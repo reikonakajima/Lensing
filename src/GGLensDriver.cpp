@@ -183,7 +183,7 @@ main(int argc, char* argv[]) {
     //
     // provide output per bin
     //
-    cout << "#imag irad pairs sum(weights) sum(responsivity) sum(w*et) sum(w*ex)"
+    cout << "#imag irad pairs sum(weights) sum(responsivity) sum(w*et) sum(w*ex) "
 	 << "sum(w^2*var(et)) sum(w^2*var(ex))" << endl;
 
     cout << "#magbins: ";
