@@ -25,7 +25,7 @@ class GenericBins {
   GenericBins() : reverseOrder(false) {}
   int getIndex(double val) { return findIndex(val); }
   int binSize() { return nbin; }
-  int vectorSize() { return (nbin + 1); }
+  int vectorSize() { return binEdges.size(); }
   double getMin() { return min; }
   double getMax() { return max; }
   void setReverse(bool b) { reverseOrder = b; return; }
