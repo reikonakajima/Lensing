@@ -20,17 +20,19 @@ class BinsError : public MyException {
 //
 class MultipleBins;
 
-class GenericBins : public vector<double> {
+class GenericBins {
  public:
   GenericBins() : reverseOrder(false) {}
   int getIndex(double val) { return findIndex(val); }
-  int size() { return nbin; }
+  int binSize() { return nbin; }
   int vectorSize() { return (nbin + 1); }
   double getMin() { return min; }
   double getMax() { return max; }
   void setReverse(bool b) { reverseOrder = b; return; }
   bool isReverse() { return reverseOrder; }
+  double operator[](int index) { return binEdges[index]; }
  protected:
+  vector<double> binEdges;
   int findIndex(double val);
   double min;
   double max;

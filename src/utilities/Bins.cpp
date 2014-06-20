@@ -16,7 +16,7 @@ LogarithmicBins::LogarithmicBins(double min_, double max_, int nbin_) {
   // calculate & assign bins
   dlnx = log(max/min)/nbin;  
   for (int i = 0; i <= nbin; ++i) 
-    this->push_back(min*exp(i*dlnx)); 
+    binEdges.push_back(min*exp(i*dlnx));
 }
 
 
@@ -25,11 +25,11 @@ GenericBins::findIndex(double val) {
   int index = 0;
 
   if (!reverseOrder) {
-    while (val >= (*this)[index] && val < (*this)[this->size()])
+    while (val >= binEdges[index] && val < binEdges[binEdges.size()])
       ++index;
   }
   else {
-    while (val < (*this)[index] && val >= (*this)[this->size()])
+    while (val < binEdges[index] && val >= binEdges[binEdges.size()])
       ++index;
   }
   
@@ -45,9 +45,9 @@ GenericBins::findIndex(double val) {
 int
 LogarithmicBins::getIndex(double val) { 
   int index = 0;
-  if (val < (*this)[index])
-    throw BinsError("LogarithmicBin::getIndex() : value out of logarithmic bin range");
-  while ((*this)[index] < val && index < this->size())
+  if (val < binEdges[index])
+    return -1;
+  while (binEdges[index] < val && index < binEdges.size())
     ++index;
     
   return index - 1;
@@ -83,15 +83,15 @@ void
 ArbitraryWidthBins::initArbBins(vector<double> binvec_, double& tempmin, double& tempmax) {
 
   // assign vector
-  this->clear();
-  this->resize(binvec_.size());
+  binEdges.clear();
+  binEdges.resize(binvec_.size());
   for (int i = 0; i < binvec_.size(); ++i) {
-    (*this)[i] = binvec_[i];
+    binEdges[i] = binvec_[i];
   }
   // set bin parameters
-  tempmin = (*this)[0];
-  nbin = binvec_.size() - 1;  // because the vector contains one more element than nbin
-  tempmax = (*this)[nbin]; 
+  tempmin = binEdges[0];
+  nbin = binvec_.size() - 1;  // because binvec_ defines the bin edges
+  tempmax = binEdges[nbin];
 
   reverseOrder = false;
   if (tempmax < tempmin) {
@@ -124,10 +124,8 @@ MultipleBins::MultipleBins(istream& is, int n1, int n2) {
     }
   }
   while (iss >> val) {
-    //cerr << val << " "; // debug
     initvec.push_back(val);
   }
-  //cerr << endl;         // debug
   nbin = initvec.size() - 1;
   if (nbin < 1) {
     cerr << nbin << endl;
@@ -162,14 +160,11 @@ MultipleBins::MultipleBins(istream& is, int n1, int n2) {
       }
     }
     int binindex = getN1N2index(index1, index2);
-    //cerr << index1 << " " << index2 << endl;   // debug
     // get the bin for this set of indicies (index1, index2);
     initvec.clear();
     while (iss >> val) {
-      //cerr << val << " ";      // debug
       initvec.push_back(val);
     }
-    //cerr << endl;              // debug
     if (initvec.size() != nbin+1)
       throw BinsError("input file index and specified format differs in line "+buffer);
     actualbins[binindex].initArbBins(initvec, tmin, tmax);

@@ -56,7 +56,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
   //
 
   /// each GGLensObject will have some number of radial bins
-  int rad_nbin = radial_bin.size();  // size() returns number of bins
+  int rad_nbin = radial_bin.binSize();
 
   typename vector<lensObjPtr>::iterator it = lens_list.begin();
   for (; it != lens_list.end(); ++it) {

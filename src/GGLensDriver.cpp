@@ -125,9 +125,9 @@ main(int argc, char* argv[]) {
     }
 
     cerr << "radial bin range .. " << radial_bin[0] << " ... " 
-	 << radial_bin[radial_bin.size()] << endl;
+	 << radial_bin[radial_bin.binSize()] << endl;
     cerr << "magnitude bin range " << magnitude_bin[0] << " ... " 
-	 << magnitude_bin[magnitude_bin.size()] << endl;
+	 << magnitude_bin[magnitude_bin.binSize()] << endl;
 
 
     //
@@ -140,7 +140,7 @@ main(int argc, char* argv[]) {
     // sort each lens into binned_lists
     //
     vector<GGLensObjectList<StarMaskObject*, RCSLenSObject*> > binned_lists
-	= gglens_list.splitList(magnitude_bin.size());
+	= gglens_list.splitList(magnitude_bin.binSize());
 
     for (int ilens = 0; ilens < gglens_list.size(); ++ilens) {
       int index = magnitude_bin.getIndex(gglens_list[ilens]->getLensPtr()->getMag());
@@ -153,14 +153,14 @@ main(int argc, char* argv[]) {
     //
     // sum tangential shear according to the given lens binning
     //
-    vector<vector<ggLensSum> > radial_shears(magnitude_bin.size());
-    for (int imag = 0; imag < magnitude_bin.size(); ++imag) {
+    vector<vector<ggLensSum> > radial_shears(magnitude_bin.binSize());
+    for (int imag = 0; imag < magnitude_bin.binSize(); ++imag) {
       /// initialize radial_shears
-      vector<ggLensSum> temp(radial_bin.size());
+      vector<ggLensSum> temp(radial_bin.binSize());
       radial_shears[imag] = temp;
       /// sum tangential shear quantities over all lenses
       for (int ilens = 0; ilens < binned_lists[imag].size(); ++ilens) {
-	for (int irad = 0; irad < radial_bin.size(); ++irad) {
+	for (int irad = 0; irad < radial_bin.binSize(); ++irad) {
 	  radial_shears[imag][irad].addPairCounts(
 	      (*binned_lists[imag][ilens])[irad].getPairCounts());
 	  radial_shears[imag][irad].addWeight(
@@ -193,13 +193,13 @@ main(int argc, char* argv[]) {
     cout << endl;
 
     cout << "#radbins: ";
-    for (int irad=0; irad<radial_bin.size(); ++irad) {
+    for (int irad=0; irad<radial_bin.binSize(); ++irad) {
       cout << radial_bin[irad] << " ";
     }
     cout << endl;
 
-    for (int imag=0; imag<magnitude_bin.size(); ++imag) {
-      for (int irad=0; irad<radial_bin.size(); ++irad) {
+    for (int imag=0; imag<magnitude_bin.binSize(); ++imag) {
+      for (int irad=0; irad<radial_bin.binSize(); ++irad) {
 	cout << imag << " " << irad << "  ";
 	cout << radial_shears[imag][irad].getPairCounts() << " "
 	     << radial_shears[imag][irad].getWeights() << " "
