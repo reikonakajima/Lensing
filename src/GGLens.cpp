@@ -169,7 +169,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	/// add source object to sm bin 
 	(*this_gglens)[irad].addPairCounts();
 	(*this_gglens)[irad].addWeight(weight);
-	(*this_gglens)[irad].addWeightsq(weight*weight);
+	(*this_gglens)[irad].addWeightSq(weight*weight);
 	(*this_gglens)[irad].addResponsivity(responsiv);
 	(*this_gglens)[irad].addDeltaSigma_t(weightedsignal_t);
 	(*this_gglens)[irad].addDeltaSigma_s(weightedsignal_s);
