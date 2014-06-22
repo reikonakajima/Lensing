@@ -22,8 +22,8 @@ class ggLensSum {
   inline void addResponsivity(double resp) { responsivity += resp; return; }
   inline void addDeltaSigma_t(double delsig) { DeltaSigma_t += delsig; return; }
   inline void addDeltaSigma_s(double delsig) { DeltaSigma_s += delsig; return; }
-  inline void addVariance_t(double err) { variance_t += err; return; }
-  inline void addVariance_s(double err) { variance_s += err; return; }
+  inline void addVariance_t(double var) { variance_t += var; return; }
+  inline void addVariance_s(double var) { variance_s += var; return; }
   inline void addInvSigmaCrit(double invsc) {invsigmacrit += invsc; return; }
   inline void addLum(double lum_) { lum += lum_; return; }
   inline void addZ(double z_) { z += z_; return; }
