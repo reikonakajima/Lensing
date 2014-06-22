@@ -185,7 +185,7 @@ main(int argc, char* argv[]) {
     // provide output per bin
     //
     cout << "#imag irad pairs sum(weights) sum(w^2) sum(responsivity) sum(w*et) sum(w*ex) "
-	 << "sum(w^2*var(et)) sum(w^2*var(ex))" << endl;
+	 << "sum(w*var(et)) sum(w*var(ex))" << endl;
 
     cout << "#magbins: ";
     for (int imag=0; imag<magnitude_bin.vectorSize(); ++imag) {
