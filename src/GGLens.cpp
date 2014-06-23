@@ -163,8 +163,8 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	double responsiv = srcobj->getResponsivity(et);
 	double weightedsignal_t = et * weight;
 	double weightedsignal_s = es * weight;
-	double weightedVariance_t = weight * et * et;
-	double weightedVariance_s = weight * es * es;
+	double weightedVariance_t = weight * weight* et * et;
+	double weightedVariance_s = weight * weight* es * es;
 
 	/// add source object to sm bin 
 	(*this_gglens)[irad].addPairCounts();
