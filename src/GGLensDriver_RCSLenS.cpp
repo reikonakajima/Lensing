@@ -8,7 +8,7 @@
 #include "LensObjects.h"
 #include "StarMaskObjects.h"
 #include "SourceObjects.h"
-#include "KiDSObjects.h"
+#include "RCSLenSObjects.h"
 #include "GGLens.h"
 #include "Bins.h"
 using std::ostringstream;
@@ -99,8 +99,8 @@ main(int argc, char* argv[]) {
     //   list(==vector):  bounds, 
     //   each object: position, shear, resolution, (optional: redshift, magnitude)
     //                may have multiple bands
-    KiDSObjectList master_source_list(source_filename);
-    KiDSObjectList source_list(master_source_list);  // TODO: add any extra cuts
+    RCSLenSObjectList master_source_list(source_filename);
+    RCSLenSObjectList source_list(master_source_list);  // TODO: add any extra cuts
     source_list.usePixelCoord(true);  // use pixel coordinates
 
 
@@ -113,7 +113,6 @@ main(int argc, char* argv[]) {
     cerr << "     bounds ....... " << lens_list.getBounds() << endl;
 
     if (lens_list.size() == 0) {
-      cerr << "no lens objects, exiting" << endl;
       return(9);
     }
 
@@ -122,7 +121,6 @@ main(int argc, char* argv[]) {
     cerr << "     bounds ....... " << source_list.getBounds() << endl;
 
     if (source_list.size() == 0) {
-      cerr << "no source objects, exiting" << endl;
       return(9);
     }
 
@@ -135,12 +133,13 @@ main(int argc, char* argv[]) {
     //
     // create GGLensObjectList from lens_list and source_list (sums tangential shears for each lens)
     //
-    GGLensObjectList<StarMaskObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin);
+    GGLensObjectList<StarMaskObject*, RCSLenSObject*> gglens_list(lens_list, source_list,
+								  radial_bin);
 
     //
     // sort each lens into binned_lists
     //
-    vector<GGLensObjectList<StarMaskObject*, KiDSObject*> > binned_lists
+    vector<GGLensObjectList<StarMaskObject*, RCSLenSObject*> > binned_lists
 	= gglens_list.splitList(magnitude_bin.binSize());
 
     for (int ilens = 0; ilens < gglens_list.size(); ++ilens) {

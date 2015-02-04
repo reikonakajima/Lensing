@@ -50,6 +50,7 @@ sub_objects = '''
 	    src/.obj/StarMaskObjects.o
 	    src/.obj/SourceObjects.o
 	    src/.obj/RCSLenSObjects.o
+	    src/.obj/KiDSObjects.o
 	    src/.obj/Shear.o
 	    '''.split()
 

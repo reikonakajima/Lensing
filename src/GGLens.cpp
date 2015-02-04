@@ -65,8 +65,9 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 
     double lensra = lensobj->getRA();    // FIXME: if SphericalSurface, convert to radians
     double lensdec = lensobj->getDec();
+
     if (!srcbounds.includes(Position<double>(lensra, lensdec)))
-	continue;
+       continue;
 
     // DEBUG
     //cerr << " === ";
@@ -224,5 +225,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::splitList(const int nSplit) {
 //
 
 #include "RCSLenSObjects.h"
+#include "KiDSObjects.h"
 #include "StarMaskObjects.h"
 template class GGLensObjectList<StarMaskObject*, RCSLenSObject*>;
+template class GGLensObjectList<StarMaskObject*, KiDSObject*>;

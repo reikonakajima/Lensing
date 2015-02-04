@@ -106,3 +106,5 @@ SourceObject::printLineInBinary(ofstream& ofs) const {
 template class SourceObjectList<SourceObject*>;
 #include "RCSLenSObjects.h"
 template class SourceObjectList<RCSLenSObject*>;
+#include "KiDSObjects.h"
+template class SourceObjectList<KiDSObject*>;

@@ -1,17 +1,17 @@
 //
-// RCSLenSObjects.cpp
+// KiDSObjects.cpp
 //
-#include "RCSLenSObjects.h"
+#include "KiDSObjects.h"
 using namespace std;
 
 
-// The following variables are static members of the RCSLenSObject class.
+// The following variables are static members of the KiDSObject class.
 // They need to be defined outside the scope of the class in order to be accessible from outside.
-bool RCSLenSObject::usePixelCoords;
-int RCSLenSObject::index;
+bool KiDSObject::usePixelCoords;
+int KiDSObject::index;
 
 
-RCSLenSObjectList::RCSLenSObjectList(const string fits_filename) {
+KiDSObjectList::KiDSObjectList(const string fits_filename) {
 
   // open FITS file
   const string obj_extension = "OBJECTS";
@@ -22,11 +22,11 @@ RCSLenSObjectList::RCSLenSObjectList(const string fits_filename) {
     pInfile.reset(new CCfits::FITS(fits_filename,CCfits::Read, obj_extension));
 
   } catch (CCfits::FITS::CantOpen &fitsError) {
-      throw RCSLenSObjectsError(string("Error opening the file with message: ")+fitsError.message());
+      throw KiDSObjectsError(string("Error opening the file with message: ")+fitsError.message());
   } catch (CCfits::FITS::NoSuchHDU &fitsError) {
-      throw RCSLenSObjectsError(string("Error going to the HDU: ") + fitsError.message());
+      throw KiDSObjectsError(string("Error going to the HDU: ") + fitsError.message());
   } catch (CCfits::FitsException &fitsError) {
-      throw RCSLenSObjectsError(string("Error in FITS: ") + fitsError.message());
+      throw KiDSObjectsError(string("Error in FITS: ") + fitsError.message());
   }
 
   // goto OBJECTS extension
@@ -76,7 +76,7 @@ RCSLenSObjectList::RCSLenSObjectList(const string fits_filename) {
   column12.read( ypos, 1, column12.rows() );
 
   valarray<float> mask;
-  CCfits::Column& column13 = table.column("CANDIDATEMASK");
+  CCfits::Column& column13 = table.column("MAN_MASK");
   column13.read( mask, 1, column13.rows() );
 
   valarray<float> mag;
@@ -102,14 +102,14 @@ RCSLenSObjectList::RCSLenSObjectList(const string fits_filename) {
   source_list.reserve(column1.rows());
   for (int i=0; i<column1.rows(); ++i) {
       if (weight[i] == 0) continue;
-      RCSLenSObject* ptr = new RCSLenSObject(i, ra[i], dec[i], mag[i], xpos[i], ypos[i], fwhm[i],
-					     e1a[i], e2a[i], e1b[i], e2b[i],
-					     e1c[i], e2c[i], e1d[i], e2d[i],
-					     sn[i], weight[i]);
+      KiDSObject* ptr = new KiDSObject(i, ra[i], dec[i], mag[i], xpos[i], ypos[i], fwhm[i],
+				       e1a[i], e2a[i], e1b[i], e2b[i],
+				       e1c[i], e2c[i], e1d[i], e2d[i],
+				       sn[i], weight[i]);
       source_list.push_back(ptr);
   }
 
-  // The following two commands needs to be set after the RCSLenSObject list has been filled:
+  // The following two commands needs to be set after the KiDSObject list has been filled:
   // - initially set shear to "A" (driver code can change this)
   setShearIndex(0);
   // - initially set coordinates to use ra/dec
@@ -121,7 +121,7 @@ RCSLenSObjectList::RCSLenSObjectList(const string fits_filename) {
 
 
 void
-RCSLenSObject::printLine(ostream& os) const {
+KiDSObject::printLine(ostream& os) const {
   os << id << " "
      << setprecision(5) << setw(10)
      << ra << " " << setw(10) << dec << " "

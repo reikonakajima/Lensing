@@ -441,3 +441,5 @@ template class Mesh<LensObject*, double>;
 template class Mesh<SourceObject*, double>;
 #include "RCSLenSObjects.h"
 template class Mesh<RCSLenSObject*, double>;
+#include "KiDSObjects.h"
+template class Mesh<KiDSObject*, double>;
