@@ -1,5 +1,5 @@
 //
-// GGLensDriver.cpp   : For testing the GGLens C++ module
+// gglens_starhalo.cpp   : For measuring the GGLens signal around a stellar reflection halo
 //
 #include <iostream>
 #include "Std.h"
@@ -24,13 +24,12 @@ const string suffix = ".dat";
 
 const string usage =
   "\n"
-  "GGLensDriver: calculate tangential shear around a point (galaxy-galaxy lensing signal)\n"
+  "gglens_starhalo: calculate tangential shear around a given central point (halo center)\n"
   "\n"
-  " usage: GGLensDriver <lens_catalog> <source_catalog>\n"
-  "  lens_catalog:  lens catalog which containts the columns\n"
-  "  r.txt:   radial bin info (3 numbers): [min_theta, max_theta, rad_nbin]\n"
-  "  \n"
+  " usage: gglens_starhalo <lens_catalog> <source_catalog> <radial_bin_info>\n"
+  "  lens_catalog:    lens catalog which contains the columns\n"
   "  source_catalog:  source catalog, which contains the columns\n"
+  "  radial_bin_info: radial bin info (3 numbers): [min_theta, max_theta, rad_nbin]\n"
   "  \n"
   //  " output #1: file name:\" "+outfprefix+suffix+"\"\n"
   " stdin:  (none)\n"
@@ -45,13 +44,14 @@ main(int argc, char* argv[]) {
     //
     // process arguments
     //
-    if (argc != 3) {
+    if (argc != 4) {
       cerr << usage;
       exit(2);
     }
     int iarg = 0;
     const string lens_filename = argv[++iarg];
     const string source_filename = argv[++iarg];
+    const string radial_bin_filename = argv[++iarg];
     
     /// open lens file
     ifstream lensf(lens_filename.c_str());
@@ -66,7 +66,7 @@ main(int argc, char* argv[]) {
     //
     // setup radial bins (in pixel units)
     //
-    ifstream radialbinf("r.txt");
+    ifstream radialbinf(radial_bin_filename.c_str());
     double min_theta = 5.0;
     double max_theta = 400.0;
     int rad_nbin = 21;
