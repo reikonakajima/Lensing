@@ -57,7 +57,8 @@ sub_objects = '''
 # build the main programs
 
 test = env.Program(target='GGLensTest', source=sub_objects+['src/GGLensDriver.cpp',])
-env.Install('bin', [test,])
+starhalo = env.Program(target='gglens_starhalo', source=sub_objects+['src/gglens_starhalo.cpp',])
+env.Install('bin', [test, starhalo])
 env.Alias('install', 'bin')
 
 # (eventually, build a library code)
