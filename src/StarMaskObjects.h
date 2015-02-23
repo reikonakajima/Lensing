@@ -38,6 +38,7 @@ class StarMaskObject : public LensObject {
   void printLine(ostream& os) const;
 
  private:
+  int   type;
   float mag;
   float xstar;  // star centroid (in pixel units)
   float ystar;
