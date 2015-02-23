@@ -108,27 +108,29 @@ main(int argc, char* argv[]) {
     // diagnostic error messages
     //
     cerr << "=== GGLensDriver ===" << endl;
-    cerr << "lens catalog ...... " << lens_filename << endl;
-    cerr << "     count ........ " << lens_list.size() << "/" << master_lens_list.size() << endl;
-    cerr << "     bounds ....... " << lens_list.getBounds() << endl;
+    cerr << "lens catalog ......... " << lens_filename << endl;
+    cerr << "     count ........... " << lens_list.size() << "/"
+	 << master_lens_list.size() << endl;
+    cerr << "     bounds .......... " << lens_list.getBounds() << endl;
 
     if (lens_list.size() == 0) {
       cerr << "no lens objects, exiting" << endl;
       return(9);
     }
 
-    cerr << "source catalog .... " << source_filename << endl;
-    cerr << "     count ........ " << source_list.size() << "/" << master_source_list.size() << endl;
-    cerr << "     bounds ....... " << source_list.getBounds() << endl;
+    cerr << "source catalog ....... " << source_filename << endl;
+    cerr << "     count ........... " << source_list.size() << "/"
+	 << master_source_list.size() << endl;
+    cerr << "     bounds .......... " << source_list.getBounds() << endl;
 
     if (source_list.size() == 0) {
       cerr << "no source objects, exiting" << endl;
       return(9);
     }
 
-    cerr << "radial bin range .. " << radial_bin[0] << " ... " 
+    cerr << "radial bin range (\") .. " << radial_bin[0] << " ... "
 	 << radial_bin[radial_bin.binSize()] << endl;
-    cerr << "magnitude bin range " << magnitude_bin[0] << " ... " 
+    cerr << "magnitude bin range " << magnitude_bin[0] << " ... "
 	 << magnitude_bin[magnitude_bin.binSize()] << endl;
 
 
