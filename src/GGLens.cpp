@@ -70,13 +70,12 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
        continue;
 
     // DEBUG
-    //cerr << " === ";
+    //cerr << " === LENS === ";
     //lensobj->printLine(cerr);
 
     //
     // collect all matching sources (get their indicies of srcvector) in radial bins
     //
-
     vector<multimap<double, int> > bglist(rad_nbin);
     for (int irad = 0; irad < rad_nbin; ++irad) {
       if (geom == Flat) {                  // FIXME!!  make Mesh class take geometry
@@ -112,6 +111,11 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	double dra = sra - lensra;
 	double ddec = sdec - lensdec;
 	double theta;   // is in RADIANS (output of atan2)
+
+	// DEBUG
+	//cerr << " === SRC === ";
+	//srcobj->printLine(cerr);
+
 	if (geom == Flat) {   // 2d euclidean
 	  theta = atan2(ddec, dra);
 	} else if (geom == SphericalSurface) {
