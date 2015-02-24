@@ -25,11 +25,11 @@ GenericBins::findIndex(double val) {
   int index = 0;
 
   if (!reverseOrder) {
-    while (val >= binEdges[index] && val < binEdges[binEdges.size()])
+    while (val >= binEdges[index] && val < binEdges[binEdges.size()-1])
       ++index;
   }
   else {
-    while (val < binEdges[index] && val >= binEdges[binEdges.size()])
+    while (val < binEdges[index] && val >= binEdges[binEdges.size()-1])
       ++index;
   }
   
