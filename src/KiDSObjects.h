@@ -35,7 +35,7 @@ class SourceObject;
 class KiDSObject : public SourceObject {
 
  public:
-  static const int NUM_SHEAR=4;
+  static const int NUM_SHEAR=4;  // number of blindings
   
   KiDSObject() {}
   KiDSObject(long int _id, double ra, double dec, float _mag, float _xpos, float _ypos,

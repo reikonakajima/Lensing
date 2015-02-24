@@ -126,7 +126,7 @@ KiDSObject::printLine(ostream& os) const {
      << setprecision(5) << setw(10)
      << ra << " " << setw(10) << dec << " "
      << setprecision(3) << setw(10)
-     << e1 << " " << e2 << " "
+     << this->getE1() << " " << this->getE2() << " "
      << wt << " " << mag << " "
      << xpos << " " << ypos << " "
      << fwhm << " " << sn << " ";
