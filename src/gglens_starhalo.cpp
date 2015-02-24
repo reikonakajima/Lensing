@@ -29,7 +29,7 @@ const string usage =
   " usage: gglens_starhalo <lens_catalog> <source_catalog> <radial_bin_info>\n"
   "  lens_catalog:    lens catalog which contains the columns\n"
   "  source_catalog:  source catalog, which contains the columns\n"
-  "  radial_bin_info: radial bin info (3 numbers): [min_theta, max_theta, rad_nbin]\n"
+  "  radial_bin_info: radial bin info (3 numbers, in arcseconds): [min_theta, max_theta, rad_nbin]\n"
   "  \n"
   //  " output #1: file name:\" "+outfprefix+suffix+"\"\n"
   " stdin:  (none)\n"
@@ -64,7 +64,7 @@ main(int argc, char* argv[]) {
       throw MyException("source catalog file " + source_filename + " not found");
 
     //
-    // setup radial bins (in pixel units)
+    // setup radial bins (in arcsec)
     //
     ifstream radialbinf(radial_bin_filename.c_str());
     double min_theta = 5.0;
@@ -77,6 +77,7 @@ main(int argc, char* argv[]) {
 	throw MyException("radialbin file specification error");
     }
     LogarithmicBins radial_bin(min_theta, max_theta, rad_nbin);
+    radial_bin.rescale(1./3600.);  // convert arcsec to degree
 
     //
     // setup bins (magnitude)
@@ -130,7 +131,7 @@ main(int argc, char* argv[]) {
 
     cerr << "radial bin range (\") .. " << radial_bin[0] << " ... "
 	 << radial_bin[radial_bin.binSize()] << endl;
-    cerr << "magnitude bin range " << magnitude_bin[0] << " ... "
+    cerr << "magnitude bin range ... " << magnitude_bin[0] << " ... "
 	 << magnitude_bin[magnitude_bin.binSize()] << endl;
 
 
