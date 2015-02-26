@@ -74,6 +74,7 @@ class GGLensObjectList {
 
   GGLensObject<lensObjPtr>* operator[](int ilens) { return gglens_object_list[ilens]; }
 
+  // this initializes a GGLensObjectList to be split into nSplit parts
   vector<GGLensObjectList<lensObjPtr, srcObjPtr> > splitList(int nSplit);
 
   void push_back(GGLensObject<lensObjPtr>* gglensPtr) {

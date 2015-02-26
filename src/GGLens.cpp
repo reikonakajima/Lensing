@@ -58,6 +58,9 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
   /// each GGLensObject will have some number of radial bins
   int rad_nbin = radial_bin.binSize();
 
+  // lens objects lost through "not enough BG object count"
+  int lost_bgcount = 0;
+
   typename vector<lensObjPtr>::iterator it = lens_list.begin();
   for (; it != lens_list.end(); ++it) {
 
@@ -96,7 +99,6 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     int bg_count = 0;      // source object count for this lens object
     int bad_et = 0;
     int bad_src = 0;
-    int lost_bgcount = 0;  // lens objects lost through "not enough BG object count"
 
     multimap<double, int>::const_iterator isrc;
     for (int irad = 0; irad < rad_nbin; ++irad) {
@@ -205,6 +207,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
   /// At this point, the GGLensObjectList should be full
   cerr << "All lens objects loaded and paired with source objects." << endl;
   cerr << "The size of the input LensObjectList is: " << lens_list.size() << endl;
+  cerr << "Rejected lenses withoug enough background source objects: " << lost_bgcount << endl;
   cerr << "The size of this GGLensObjectList is: " << this->size() << endl;
 }
 
