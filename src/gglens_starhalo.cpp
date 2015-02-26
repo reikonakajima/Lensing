@@ -68,14 +68,15 @@ main(int argc, char* argv[]) {
     //
     ifstream radialbinf(radial_bin_filename.c_str());
     double min_theta = 5.0;
-    double max_theta = 400.0;
-    int rad_nbin = 21;
+    double max_theta = 4000.0;
+    int rad_nbin = 50;
     if (radialbinf) {
       if (!(radialbinf >> min_theta >> max_theta >> rad_nbin))
 	throw MyException("radialbin file type error");
       if (rad_nbin < 2 || min_theta < 0 || max_theta < min_theta)
 	throw MyException("radialbin file specification error");
     }
+    LogarithmicBins radial_bin_arcsec(min_theta, max_theta, rad_nbin);  // for debug/info
     LogarithmicBins radial_bin(min_theta, max_theta, rad_nbin);
     radial_bin.rescale(1./3600.);  // convert arcsec to degree
 
@@ -129,8 +130,8 @@ main(int argc, char* argv[]) {
       return(9);
     }
 
-    cerr << "radial bin range (deg)  " << radial_bin[0] << " ... "
-	 << radial_bin[radial_bin.binSize()] << endl;
+    cerr << "radial bin range (\") .. " << radial_bin_arcsec[0] << " ... "
+	 << radial_bin[radial_bin_arcsec.binSize()] << endl;
     cerr << "magnitude bin range ... " << magnitude_bin[0] << " ... "
 	 << magnitude_bin[magnitude_bin.binSize()] << endl;
 
@@ -197,9 +198,9 @@ main(int argc, char* argv[]) {
     }
     cout << endl;
 
-    cout << "#radbins: ";
-    for (int irad=0; irad<radial_bin.vectorSize(); ++irad) {
-      cout << radial_bin[irad] << " ";
+    cout << "#radbins(arcsec): ";
+    for (int irad=0; irad<radial_bin_arcsec.vectorSize(); ++irad) {
+      cout << radial_bin_arcsec[irad] << " ";
     }
     cout << endl;
 
