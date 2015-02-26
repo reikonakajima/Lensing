@@ -144,8 +144,8 @@ main(int argc, char* argv[]) {
     // sort each lens into binned_lists
     //
     vector<GGLensObjectList<StarMaskObject*, KiDSObject*> > binned_lists
-	= gglens_list.splitList(magnitude_bin.binSize());
-
+        = gglens_list.splitList(magnitude_bin.binSize());  // initialize the split lists
+    // fill in the split lists
     for (int ilens = 0; ilens < gglens_list.size(); ++ilens) {
       int index = magnitude_bin.getIndex(gglens_list[ilens]->getLensPtr()->getMag());
       if (index != -1) {
