@@ -43,12 +43,14 @@ class RCSLenSObject : public SourceObject {
 		double _e1_A, double _e2_A, double _e1_B, double _e2_B,
 		double _e1_C, double _e2_C, double _e1_D, double _e2_D,
 		float sn_ratio, double _wt=1.) :
-  SourceObject(_id, ra, dec, _e1_A, _e2_A, _wt),
-      mag(_mag), xpos(_xpos), ypos(_ypos), fwhm(_fwhm_image), sn(sn_ratio) {
-      shear[0] = Shear(_e1_A, _e2_A);
-      shear[1] = Shear(_e1_B, _e2_B);
-      shear[2] = Shear(_e1_C, _e2_C);
-      shear[3] = Shear(_e1_D, _e2_D);
+  SourceObject(_id, ra, dec, 99., 99., _wt),
+    mag(_mag), xpos(_xpos), ypos(_ypos), fwhm(_fwhm_image), sn(sn_ratio) {
+    shear[0] = Shear().setG1G2(_e1_A, _e2_A);
+    shear[1] = Shear().setG1G2(_e1_B, _e2_B);
+    shear[2] = Shear().setG1G2(_e1_C, _e2_C);
+    shear[3] = Shear().setG1G2(_e1_D, _e2_D);
+    SourceObject::e1 = this->getE1();
+    SourceObject::e2 = this->getE2();
   }
 
 
