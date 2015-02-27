@@ -147,7 +147,7 @@ main(int argc, char* argv[]) {
     //
 
     /// first, sort by halo type
-    const int num_i_type = 5;
+    const int num_i_type = 5;    /// THIS IS A HARD-CODED ITEM; SHOULD BE FIXED
     for (int i_type = 0; i_type < num_i_type; ++i_type) {
 
       std::stringstream sstm;
@@ -160,7 +160,8 @@ main(int argc, char* argv[]) {
       // fill in the split lists
       for (int ilens = 0; ilens < gglens_list.size(); ++ilens) {
 	int index = magnitude_bin.getIndex(gglens_list[ilens]->getLensPtr()->getMag());
-	if (index != -1) {
+	long int halo_type = gglens_list[ilens]->getLensPtr()->getType();
+	if (index != -1 and halo_type == i_type) {
 	  binned_lists[index].push_back(gglens_list[ilens]);
 	}
       }

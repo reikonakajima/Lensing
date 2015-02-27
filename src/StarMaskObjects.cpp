@@ -12,7 +12,7 @@ StarMaskObject::StarMaskObject(const string buffer, const int _id) {
     cerr << "## " << buffer << endl;
     throw StarMaskObjectsError("error reading StarMaskObject");
   }
-  LensObject::id = type;
+  LensObject::id = _id;
 }
 
 
