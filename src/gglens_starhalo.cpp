@@ -178,7 +178,8 @@ main(int argc, char* argv[]) {
 	/// sum tangential shear quantities over all lenses
 	for (int ilens = 0; ilens < binned_lists[imag].size(); ++ilens) {
 	  for (int irad = 0; irad < radial_bin.binSize(); ++irad) {
-	    radial_shears[imag][irad].addPairCounts(
+	    radial_shears[imag][irad].addLensCounts();  // increment by one lens
+	    radial_shears[imag][irad].addPairCounts(    // increment by source counts
 	      (*binned_lists[imag][ilens])[irad].getPairCounts());
 	    double w = (*binned_lists[imag][ilens])[irad].getWeights();
 	    radial_shears[imag][irad].addWeight(w);
@@ -202,7 +203,7 @@ main(int argc, char* argv[]) {
       // provide output per bin
       //
       ofs << "#imag irad pairs sum(weights) sum(w^2) sum(responsivity) sum(w*et) sum(w*ex) "
-	  << "sum(w^2*var(et)) sum(w^2*var(ex))" << endl;
+	  << "sum(w^2*var(et)) sum(w^2*var(ex)) n_lens" << endl;
 
       ofs << "#magbins: ";
       for (int imag=0; imag<magnitude_bin.vectorSize(); ++imag) {
@@ -228,7 +229,8 @@ main(int argc, char* argv[]) {
 	      << radial_shears[imag][irad].getDeltaSigma_t() << " "
 	      << radial_shears[imag][irad].getDeltaSigma_s() << " "
 	      << radial_shears[imag][irad].getVariance_t() << " "
-	      << radial_shears[imag][irad].getVariance_s() << endl;
+	      << radial_shears[imag][irad].getVariance_s() << " "
+	      << radial_shears[imag][irad].getLensCounts() << endl;
 	}
       }
 

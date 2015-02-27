@@ -16,6 +16,7 @@ class ggLensSum {
   paircounts(0), weights(0.), DeltaSigma_t(0.), DeltaSigma_s(0.), responsivity(0.), 
     variance_t(0.), variance_s(0.), invsigmacrit(0.), lum(0.), z(0.), zwidth(0.),
     stmass(0.), amag(0.) {}
+  inline void addLensCounts(int lcount = 1) { lenscounts += lcount; return; }
   inline void addPairCounts(int pcount = 1) { paircounts += pcount; return; }
   inline void addWeight(double weight) { weights += weight; return; }
   inline void addWeightSq(double _wsq) { wsq += _wsq; return; }
@@ -30,7 +31,8 @@ class ggLensSum {
   inline void addZWidth(double zw) { zwidth += zw; return; }
   inline void addStellarMass(double sm) { stmass += sm; return; }
   inline void addApparentMag(double am) { amag += am; return; }
-  inline int    getPairCounts() const { return paircounts; } 
+  inline int    getLensCounts() const { return lenscounts; }
+  inline int    getPairCounts() const { return paircounts; }
   inline double getWeights() const { return weights; }
   inline double getWeightSq() const { return wsq; }
   inline double getResponsivity() const { return responsivity; }
@@ -45,6 +47,7 @@ class ggLensSum {
   inline double getStellarMass() const { return stmass; }
   inline double getApparentMag() const { return amag; }
  private:
+  int    lenscounts;   // the number of lens contributing to this sum
   int    paircounts;   // numb   (pair counts)
   double weights;      // wtotw  (total weight)
   double wsq;          // w^2
