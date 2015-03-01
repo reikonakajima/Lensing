@@ -150,6 +150,7 @@ main(int argc, char* argv[]) {
     const int num_i_type = 5;    /// THIS IS A HARD-CODED ITEM; SHOULD BE FIXED
     for (int i_type = 0; i_type < num_i_type; ++i_type) {
 
+      // make output filename
       std::stringstream sstm;
       sstm << outf_prefix << "_type" << i_type << ".dat";
       string out_filename = sstm.str();
