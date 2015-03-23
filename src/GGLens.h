@@ -48,7 +48,7 @@ class GGLensObject {
 
  private:
   lensObjPtr lens_ptr;
-  vector<ggLensSum> tangential_shears;
+  vector<ggLensSum> tangential_shears;  // vector over <radial bins>
 };
 
 
@@ -74,6 +74,7 @@ class GGLensObjectList {
 
   GGLensObject<lensObjPtr>* operator[](int ilens) { return gglens_object_list[ilens]; }
 
+  // this initializes a GGLensObjectList to be split into nSplit parts
   vector<GGLensObjectList<lensObjPtr, srcObjPtr> > splitList(int nSplit);
 
   void push_back(GGLensObject<lensObjPtr>* gglensPtr) {
@@ -87,7 +88,7 @@ class GGLensObjectList {
   void findBounds();  // finds the bounds of the objects in this list and saves it
   */
  private:
-  vector<GGLensObject<lensObjPtr>*> gglens_object_list;
+  vector<GGLensObject<lensObjPtr>*> gglens_object_list;  // vector over <lenses>
   geometry geom;      // geometry as to detemine distance between two points
   double mesh_size;
   GenericBins radial_bin;  // stores the radial bin edges

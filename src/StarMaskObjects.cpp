@@ -8,7 +8,7 @@ using namespace std;
 
 StarMaskObject::StarMaskObject(const string buffer, const int _id) {
   istringstream iss(buffer);
-  if (!(iss >> mag >> LensObject::ra >> LensObject::dec >> rhalo >> xstar >> ystar)) {
+  if (!(iss >> type >> mag >> xstar >> ystar >> LensObject::ra >> LensObject::dec >> rhalo)) {
     cerr << "## " << buffer << endl;
     throw StarMaskObjectsError("error reading StarMaskObject");
   }
@@ -25,8 +25,8 @@ StarMaskObject::printLine(ostream& os) const{
      << setprecision(1) << setw(10)
      << mag << " "
      << rhalo << " "
-     << xstar << " "
-     << ystar << " "
+     << setprecision(5) << setw(10)
+     << xstar << " " << ystar << " "
      << endl;
   return;
 }

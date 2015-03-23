@@ -35,9 +35,11 @@ class StarMaskObject : public LensObject {
  public:
   StarMaskObject(const string buffer, int id);
   float getMag() const { return mag; }
+  int   getType() const { return type; }
   void printLine(ostream& os) const;
 
  private:
+  int   type;
   float mag;
   float xstar;  // star centroid (in pixel units)
   float ystar;
