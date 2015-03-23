@@ -4,3 +4,4 @@ LensObjects.cpp
 Shear.cpp
 SourceObjects.cpp
 StarMaskObjects.cpp
+GAMAObjects.cpp

@@ -1,12 +1,12 @@
 //
-// gglens_starhalo.cpp   : For measuring the GGLens signal around a stellar reflection halo
+// gglens_gama_kids.cpp   : For measuring the GGLens signal around a stellar reflection halo
 //
 #include <iostream>
 #include "Std.h"
 #include "StringStuff.h"
 #include "Bounds.h"
 #include "LensObjects.h"
-#include "StarMaskObjects.h"
+#include "GAMAObjects.h"
 #include "SourceObjects.h"
 #include "KiDSObjects.h"
 #include "GGLens.h"
@@ -24,9 +24,9 @@ const string suffix = ".dat";
 
 const string usage =
   "\n"
-  "gglens_starhalo: calculate tangential shear around a given central point (halo center)\n"
+  "gglens_gama_kids: calculate tangential shear around a given central point (halo center)\n"
   "\n"
-  " usage: gglens_starhalo <lens_catalog> <source_catalog> <radial_bin_info> <outfile_prefix>\n"
+  " usage: gglens_gama_kids <lens_catalog> <source_catalog> <radial_bin_info> <outfile_prefix>\n"
   "  lens_catalog:    lens catalog which contains the columns\n"
   "  source_catalog:  source catalog, which contains the columns\n"
   "  radial_bin_info: radial bin info (3 numbers, in arcseconds): [min_theta, max_theta, rad_nbin]\n"
@@ -96,8 +96,8 @@ main(int argc, char* argv[]) {
     //   list(==vector):  bounds, 
     //   each object: position, magnitude, (optional: redshift, sed type)
     //                may have multiple bands
-    StarMaskObjectList master_lens_list(lensf);
-    StarMaskObjectList lens_list(master_lens_list);     // TODO: add any extra cuts
+    GAMAObjectList master_lens_list(lensf);
+    GAMAObjectList lens_list(master_lens_list);     // TODO: add any extra cuts
     // Needs: 
     //   list(==vector):  bounds, 
     //   each object: position, shear, resolution, (optional: redshift, magnitude)
@@ -140,7 +140,7 @@ main(int argc, char* argv[]) {
     //
     // create GGLensObjectList from lens_list and source_list (sums tangential shears for each lens)
     //
-    GGLensObjectList<StarMaskObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin);
+    GGLensObjectList<GAMAObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin);
 
     //
     // sort each lens into binned_lists
@@ -156,7 +156,7 @@ main(int argc, char* argv[]) {
       string out_filename = sstm.str();
       ofstream ofs(out_filename.c_str());
 
-      vector<GGLensObjectList<StarMaskObject*, KiDSObject*> > binned_lists  // vector over <mags>
+      vector<GGLensObjectList<GAMAObject*, KiDSObject*> > binned_lists  // vector over <mags>
         = gglens_list.splitList(magnitude_bin.binSize());  // initialize the split lists
       // fill in the split lists
       for (int ilens = 0; ilens < gglens_list.size(); ++ilens) {

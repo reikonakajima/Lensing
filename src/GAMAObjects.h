@@ -1,19 +1,19 @@
 //
-// StarMaskObjects.h
+// GAMAObjects.h
 //
-#ifndef STARMASKOBJECTS_H
-#define STARMASKOBJECTS_H
+#ifndef GAMAOBJECTS_H
+#define GAMAOBJECTS_H
 #include "LensObjects.h"
 
-class StarMaskObjectsError : public MyException {
+class GAMAObjectsError : public MyException {
  public:
-  StarMaskObjectsError(const string& m="") :
-  MyException("StarMaskObjectsError: " +m) {}
+  GAMAObjectsError(const string& m="") :
+  MyException("GAMAObjectsError: " +m) {}
 };
 
 
 /*
- * class StarMaskObject
+ * class GAMAObject
  *
  * This class reads a file with star positions (in pixels) as well as halo center (which may be
  * offset from the star position), and sets it up as a "lens" in galaxy-galaxy lensing format.
@@ -30,10 +30,10 @@ class StarMaskObjectsError : public MyException {
  *
  */
 
-class StarMaskObject : public LensObject {
+class GAMAObject : public LensObject {
 
  public:
-  StarMaskObject(const string buffer, int id);
+  GAMAObject(const string buffer, int id);
   float getMag() const { return mag; }
   int   getType() const { return type; }
   void printLine(ostream& os) const;
@@ -47,10 +47,10 @@ class StarMaskObject : public LensObject {
 };
 
 
-class StarMaskObjectList : public LensObjectList<StarMaskObject*> {
+class GAMAObjectList : public LensObjectList<GAMAObject*> {
 
  public:
-  StarMaskObjectList(istream& is);
+  GAMAObjectList(istream& is);
 
  private:
   // none
@@ -58,4 +58,4 @@ class StarMaskObjectList : public LensObjectList<StarMaskObject*> {
 };
 
 
-#endif // STARMASKOBJECTS_H
+#endif // GAMAOBJECTS_H

@@ -122,3 +122,5 @@ LensObjectList<ObjPtr>::findBounds() {
 template class LensObjectList<LensObject*>;
 #include "StarMaskObjects.h"
 template class LensObjectList<StarMaskObject*>;
+#include "GAMAObjects.h"
+template class LensObjectList<GAMAObject*>;
