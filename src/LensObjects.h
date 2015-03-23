@@ -34,6 +34,7 @@ class LensObject {
   long int getId() const {return id;}
   double getRA() const {return ra;}
   double getDec() const {return dec;}
+  float  getMag() const {return mag;}
   Position<double> getRADec() const {return Position<double>(ra,dec);}
 
   void printLine(ostream& os) const;
@@ -47,6 +48,8 @@ class LensObject {
   LensObject() {}
   long int id;
   double ra, dec;
+  double z;
+  float  mag;
 };
 
 

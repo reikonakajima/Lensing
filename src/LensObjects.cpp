@@ -5,7 +5,7 @@ using namespace std;
 
 LensObject::LensObject(const string buffer) {
   istringstream iss(buffer);
-  if (!(iss >> id >> ra >> dec)) {
+  if (!(iss >> id >> ra >> dec >> z >> mag)) {
     cerr << "## " << buffer << endl;
     throw LensObjectsError("error reading LensObject");
   }
