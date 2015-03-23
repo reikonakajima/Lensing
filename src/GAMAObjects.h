@@ -15,35 +15,45 @@ class GAMAObjectsError : public MyException {
 /*
  * class GAMAObject
  *
- * This class reads a file with star positions (in pixels) as well as halo center (which may be
+ * This class reads the GAMA data file with galaxy positions as well as halo center (which may be
  * offset from the star position), and sets it up as a "lens" in galaxy-galaxy lensing format.
- * The columns are formatted: mag, x (of halo center), y (of halo center), rhalo, xstar, ystar
- * 
- * [Note: files named <field>.tight.dat have x==xstar, and y==ystar, as they are star mask files.
- * files named <field>.wide.dat have x and y as the halo center, as they are stellar halo masks.
- * The x and y values are stored in the LensObject::RA/Dec variables.]
- * 
- * The purpose is to estimate systematic tangential shear around a star, or about a stellar "halo"
- * (the reflection ghost of a star).
  *
- * For use in systematic test analysis for lensing.
+ * The columns are formatted:
+ *   0 -  4 CATAID, GROUPIDA, RA, DEC, Z,
+ *   5 -  9 ABSMAG_R, DELABSMAG_R, LOGMSTAR, DELLOGMSTAR, UMINUSR,
+ *  10 - 14 DELUMINUSR, RPETRO, LOGMOVERL, DELLOGMOVERL, LOGLWAGE,
+ *  15 - 19 DELLOGLWAGE, METAL, DELMETAL, LOGTAU, DELLOGTAU,
+ *  20 - 24 LOGMREMNANTS, DELLOGMREMNATS, RANKBCG, NFOF, ZMAX_19P8,
+ *  25      ZMAX_19P4
  *
  */
 
 class GAMAObject : public LensObject {
 
  public:
-  GAMAObject(const string buffer, int id);
-  float getMag() const { return mag; }
-  int   getType() const { return type; }
+  GAMAObject(const string buffer);
+  float getAbsMagR() const { return absmag_r; }
+  float getAbsMagRErr() const { return d_absmag_r; }
+  //float get() const { return ; }
+  //int   get() const { return ; }
+  float getRankBCG() const { return rankbcg; }
+  int   getNfof() const { return Nfof; }
   void printLine(ostream& os) const;
 
  private:
-  int   type;
-  float mag;
-  float xstar;  // star centroid (in pixel units)
-  float ystar;
-  float rhalo;
+  int   group_id;
+  float absmag_r, d_absmag_r;
+  float logmstar, d_logmstar;
+  float uminusr, d_uminusr;
+  float rpetro;
+  float logmoverl, d_logmoverl;
+  float loglwage, d_loglwage;
+  float metal, d_metal;
+  float logtau, d_logtau;
+  float logmremnants, d_logmremnants;
+  float rankbcg;
+  int   Nfof;
+  float Zmax_19P8, Zmax_19P4;
 };
 
 

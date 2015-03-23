@@ -161,8 +161,7 @@ main(int argc, char* argv[]) {
       // fill in the split lists
       for (int ilens = 0; ilens < gglens_list.size(); ++ilens) {
 	int index = magnitude_bin.getIndex(gglens_list[ilens]->getLensPtr()->getMag());
-	long int halo_type = gglens_list[ilens]->getLensPtr()->getType();
-	if (index != -1 and halo_type == i_type) {
+	if (index != -1) {
 	  binned_lists[index].push_back(gglens_list[ilens]);
 	}
       }
