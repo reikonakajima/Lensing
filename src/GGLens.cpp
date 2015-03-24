@@ -207,7 +207,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
   /// At this point, the GGLensObjectList should be full
   cerr << "All lens objects loaded and paired with source objects." << endl;
   cerr << "The size of the input LensObjectList is: " << lens_list.size() << endl;
-  cerr << "Rejected lenses withoug enough background source objects: " << lost_bgcount << endl;
+  cerr << "Rejected lenses without enough background source objects: " << lost_bgcount << endl;
   cerr << "The size of this GGLensObjectList is: " << this->size() << endl;
 }
 
