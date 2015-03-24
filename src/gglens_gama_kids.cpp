@@ -108,7 +108,7 @@ main(int argc, char* argv[]) {
     //
     // diagnostic error messages
     //
-    cerr << "=== gglens_starhalo ===" << endl;
+    cerr << "=== " << argv[0] << " ===" << endl;
     cerr << "lens catalog .......... " << lens_filename << endl;
     cerr << "     count ............ " << lens_list.size() << "/"
 	 << master_lens_list.size() << endl;
