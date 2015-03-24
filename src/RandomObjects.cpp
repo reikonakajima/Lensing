@@ -5,7 +5,7 @@
 using namespace std;
 
 
-RandomObjectList::RandomObjectList(const string fits_filename) {
+RandomObjectList::RandomObjectList(const string fits_filename, int max_count) {
 
   // open FITS file
   const string obj_extension = "OBJECTS";
@@ -48,8 +48,13 @@ RandomObjectList::RandomObjectList(const string fits_filename) {
   column5.read( mask, 1, column5.rows() );
 
   // append objects to this list
-  lens_list.reserve(column1.rows());
-  for (long int i=0; i<column1.rows(); ++i) {
+  if (max_count < 0)
+    max_count = column1.rows();
+  else if (column1.rows() < max_count)
+    max_count = column1.rows();
+
+  lens_list.reserve(max_count);
+  for (long int i=0; i<max_count; ++i) {
       RandomObject* ptr = new RandomObject(i, ra[i], dec[i], xpos[i], ypos[i], mask[i]);
       lens_list.push_back(ptr);
   }

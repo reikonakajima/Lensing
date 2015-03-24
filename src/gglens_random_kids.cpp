@@ -24,10 +24,11 @@ const string usage =
   "\n"
   "gglens_random_kids: calculate tangential shear around a given central point (halo center)\n"
   "\n"
-  " usage: gglens_random_kids <lens_catalog> <source_catalog> <radial_bin_info> <outfile_prefix>\n"
+  " usage: gglens_random_kids <lens_catalog> <source_catalog> <radial_bin_info> <outfile_prefix> <max_num_randoms>\n"
   "  lens_catalog:    lens catalog which contains the columns\n"
   "  source_catalog:  source catalog, which contains the columns\n"
   "  radial_bin_info: radial bin info (3 numbers, in arcseconds): [min_theta, max_theta, rad_nbin]\n"
+  "  max_num_randoms: maximum number of randoms to use to calculate signal\n"
   "  \n"
   //  " output #1: file name:\" "+outfprefix+suffix+"\"\n"
   " stdin:  (none)\n"
@@ -42,7 +43,7 @@ main(int argc, char* argv[]) {
     //
     // process arguments
     //
-    if (argc != 5) {
+    if (argc != 6) {
       cerr << usage;
       exit(2);
     }
@@ -51,6 +52,7 @@ main(int argc, char* argv[]) {
     const string source_filename = argv[++iarg];
     const string radial_bin_filename = argv[++iarg];
     const string outf_prefix = argv[++iarg];
+    const int    max_lens_count = atoi(argv[++iarg]);
     
     /// construct source filenames, open files
     ifstream sourcef(source_filename.c_str());
@@ -78,7 +80,7 @@ main(int argc, char* argv[]) {
     //
     // setup lens/source samples
     //
-    RandomObjectList master_lens_list(lens_filename.c_str());
+    RandomObjectList master_lens_list(lens_filename.c_str(), max_lens_count);
     RandomObjectList lens_list(master_lens_list);     // TODO: add any extra cuts
 
     KiDSObjectList master_source_list(source_filename);

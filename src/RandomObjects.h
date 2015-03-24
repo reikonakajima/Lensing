@@ -56,7 +56,7 @@ class RandomObject : public LensObject {
 class RandomObjectList : public LensObjectList<RandomObject*> {
 
  public:
-  RandomObjectList(const string fits_filename);
+  RandomObjectList(const string fits_filename, int max_count=-1);
 
  private:
   // none
