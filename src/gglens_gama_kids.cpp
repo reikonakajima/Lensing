@@ -108,7 +108,7 @@ main(int argc, char* argv[]) {
     //
     // diagnostic error messages
     //
-    cerr << "=== GGLensDriver ===" << endl;
+    cerr << "=== gglens_starhalo ===" << endl;
     cerr << "lens catalog .......... " << lens_filename << endl;
     cerr << "     count ............ " << lens_list.size() << "/"
 	 << master_lens_list.size() << endl;
