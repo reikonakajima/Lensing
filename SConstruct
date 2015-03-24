@@ -50,6 +50,7 @@ sub_objects = '''
 	    src/.obj/LensObjects.o
 	    src/.obj/StarMaskObjects.o
 	    src/.obj/GAMAObjects.o
+	    src/.obj/RandomObjects.o
 	    src/.obj/SourceObjects.o
 	    src/.obj/RCSLenSObjects.o
 	    src/.obj/KiDSObjects.o
@@ -61,7 +62,8 @@ sub_objects = '''
 test = env.Program(target='GGLensTest', source=sub_objects+['src/GGLensDriver.cpp',])
 starhalo = env.Program(target='gglens_starhalo', source=sub_objects+['src/gglens_starhalo.cpp',])
 gama_kids = env.Program(target='gglens_gama_kids', source=sub_objects+['src/gglens_gama_kids.cpp',])
-env.Install('bin', [test, starhalo, gama_kids])
+random_kids = env.Program(target='gglens_random_kids', source=sub_objects+['src/gglens_random_kids.cpp',])
+env.Install('bin', [test, starhalo, gama_kids, random_kids])
 env.Alias('install', 'bin')
 
 # (eventually, build a library code)

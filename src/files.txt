@@ -1,7 +1,8 @@
 GGLens.cpp
 GGLensDriver.cpp
 LensObjects.cpp
+GAMAObjects.cpp
+RandomObjects.cpp
 Shear.cpp
 SourceObjects.cpp
 StarMaskObjects.cpp
-GAMAObjects.cpp

@@ -1,5 +1,5 @@
 //
-// gglens_gama_kids.cpp   : For measuring the GGLens signal around a stellar reflection halo
+// gglens_gama_kids.cpp   : For measuring the GGLens signal around gama objects
 //
 #include <iostream>
 #include "Std.h"
