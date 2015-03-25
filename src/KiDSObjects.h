@@ -57,10 +57,10 @@ class KiDSObject : public SourceObject {
 		float sn_ratio, double _wt=1.) :
   SourceObject(_id, ra, dec, 99., 99., _wt),  // temporarily fill in e1 and e2 in base source object
     mag(_mag), xpos(_xpos), ypos(_ypos), fwhm(_fwhm_image), sn(sn_ratio) {
-    shear[0] = Shear().setG1G2(_e1_A, _e2_A);
-    shear[1] = Shear().setG1G2(_e1_B, _e2_B);
-    shear[2] = Shear().setG1G2(_e1_C, _e2_C);
-    shear[3] = Shear().setG1G2(_e1_D, _e2_D);
+    shear[0] = Shear().setG1G2(_e1_A, -_e2_A);  // ra runs in negative direction,
+    shear[1] = Shear().setG1G2(_e1_B, -_e2_B);  // lensfit flips e2 sign
+    shear[2] = Shear().setG1G2(_e1_C, -_e2_C);  // presumably because it fits in ra/dec space
+    shear[3] = Shear().setG1G2(_e1_D, -_e2_D);
     SourceObject::e1 = this->getE1();
     SourceObject::e2 = this->getE2();
   }
