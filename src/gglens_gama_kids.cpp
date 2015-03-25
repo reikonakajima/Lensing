@@ -89,20 +89,12 @@ main(int argc, char* argv[]) {
     //
     // setup lens/source samples
     //
-
-    // Needs: 
-    //   list(==vector):  bounds, 
-    //   each object: position, magnitude, (optional: redshift, sed type)
-    //                may have multiple bands
     GAMAObjectList master_lens_list(lensf);
     GAMAObjectList lens_list(master_lens_list);     // TODO: add any extra cuts
-    // Needs: 
-    //   list(==vector):  bounds, 
-    //   each object: position, shear, resolution, (optional: redshift, magnitude)
-    //                may have multiple bands
+
     KiDSObjectList master_source_list(source_filename);
     KiDSObjectList source_list(master_source_list);  // TODO: add any extra cuts
-    //source_list.usePixelCoord(true);  // must use ra/dec for lens and source
+    //source_list.applyMask();  // apply MASK == 0 criteria
 
 
     //
