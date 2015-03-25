@@ -33,6 +33,13 @@ class KiDSObjectsError : public MyException {
  *
  * Upon generation, lensfit weight == 0 objects are automatically excluded from this list.
  *
+ *
+ * TODO:
+ *   read Massimo's paper, see if any additional KiDS catalog info is necessary
+ *   add applyMask() function
+ *   correct KiDS catalog entries (such as magnitudes)
+ *   add photometric redshift information
+ *
  */
 
 class SourceObject;
@@ -58,7 +65,10 @@ class KiDSObject : public SourceObject {
     SourceObject::e2 = this->getE2();
   }
 
+  // apply mask such that objects with "MAN_MASK > mask_thres" are excluded
+  int applyMask(int mask_thres);
 
+  // do we want to use pixel coordinates, instead of ra/dec?
   void usePixCoord(bool _usePix) { usePixelCoords = _usePix; return; }
   bool isPixCoordUsed() const { return usePixelCoords; }
 
