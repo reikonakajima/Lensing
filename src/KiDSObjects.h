@@ -28,6 +28,11 @@ class KiDSObjectsError : public MyException {
  * This is the KiDS object class, containing minimum information needed to calculate
  * the tangential shear around the lens for systematic test purposes (i.e., no redshift info). 
  *
+ *
+ * class KiDSObjectList
+ *
+ * Upon generation, lensfit weight == 0 objects are automatically excluded from this list.
+ *
  */
 
 class SourceObject;
