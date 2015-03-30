@@ -72,10 +72,6 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     if (!srcbounds.includes(Position<double>(lensra, lensdec)))
        continue;
 
-    // DEBUG
-    //cerr << " === LENS === ";
-    //lensobj->printLine(cerr);
-
     //
     // collect all matching sources (get their indicies of srcvector) in radial bins
     //
@@ -107,27 +103,21 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	// calculate tangential/skew shear on Spherical Surface
 	//
 	srcObjPtr srcobj = source_vector[isrc->second];
-	double sra = srcobj->getRA();
-	double sdec = srcobj->getDec();
-	double dra = sra - lensra;
-	double ddec = sdec - lensdec;
-	double sep_angle = isrc->first;  // separation angle (=="radius") is in degrees
+	double ldec = lensdec * DEGREE;
+	double sra = srcobj->getRA() * DEGREE;
+	double sdec = srcobj->getDec() * DEGREE;
+	double dra = (sra - lensra) * DEGREE;
 	double theta;
-
-	// DEBUG
-	//cerr << " === SRC === ";
-	//srcobj->printLine(cerr);
 
 	if (geom == Flat) {   // 2d euclidean
 	  throw GGLensError("GGLens should not take Flat geometry");
 	} else if (geom == SphericalSurface) {
-	  theta = atan2(cos(lensdec*DEGREE)*sin(sdec*DEGREE)
-			-sin(lensdec*DEGREE)*cos(sdec*DEGREE)*cos(dra*DEGREE),
-			cos(sdec*DEGREE)*sin(dra*DEGREE));      // spherical surface
+	  theta = atan2(cos(ldec)*sin(sdec) - sin(ldec)*cos(sdec)*cos(dra),
+			cos(sdec)*sin(dra));      // spherical surface
 	}
 
-	double ct = cos(theta); //dra * cos(lensdec) / sep_angle;  //cos(theta);
-	double st = sin(theta); //ddec / sep_angle;                //sin(theta);
+	double ct = cos(theta);
+	double st = sin(theta);
 	double c2t = ct*ct-st*st;
 	double s2t = 2.*ct*st;
 
@@ -137,30 +127,10 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	/// increment available source objects for this lens
 	++bg_count;
 
-	/*/ DEBUG
-	cerr << bg_count << "   " << irad << " " << sqrt(isrc->first) << "  "
-	     << fixed << setprecision(6)
-	     << lensra << " " << lensdec << "   "
-	     << fixed << setprecision(3)
-	     << srcobj->getId() << " " << srcobj->getSNratio() << " " << srcobj->getWeight() << "  "
-	     << fixed << setprecision(6)
-	     << srcobj->getRA() << " " << srcobj->getDec() << "  "
-	     << srcobj->getE1() << " " << srcobj->getE2() << "  "
-	     << et << " " << es << "   "
-	     << theta / DEGREE << " "
-	     << endl;
-        /*/
-
 	if (std::isnan(et)) {
 	  bad_et++;
 	  continue;
 	}
-	/*   TODO:  transfer: these will need to be included for SDSS sources...
-	if (srcobj->getERms() <= 0. || srcobj->getShapeError() <= 0.) {
-	  bad_src++;
-	  continue;
-	}
-	*/
 
 	//
 	// calculate weights, responsivities, shears and shear errors
