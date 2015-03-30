@@ -68,6 +68,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 
     double lensra = lensobj->getRA();
     double lensdec = lensobj->getDec();
+    double ldec = lensdec * DEGREE;
 
     if (!srcbounds.includes(Position<double>(lensra, lensdec)))
        continue;
@@ -103,8 +104,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	// calculate tangential/skew shear on Spherical Surface
 	//
 	srcObjPtr srcobj = source_vector[isrc->second];
-	double ldec = lensdec * DEGREE;
-	double sra = srcobj->getRA() * DEGREE;
+	double sra = srcobj->getRA();
 	double sdec = srcobj->getDec() * DEGREE;
 	double dra = (sra - lensra) * DEGREE;
 	double theta;

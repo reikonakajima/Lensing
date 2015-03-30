@@ -12,10 +12,10 @@
 //
 class ggLensSum {
  public:
- ggLensSum() : 
-  paircounts(0), weights(0.), DeltaSigma_t(0.), DeltaSigma_s(0.), responsivity(0.), 
-    variance_t(0.), variance_s(0.), invsigmacrit(0.), lum(0.), z(0.), zwidth(0.),
-    stmass(0.), amag(0.) {}
+ ggLensSum() :
+  lenscounts(0), paircounts(0), weights(0.), wsq(0.), DeltaSigma_t(0.), DeltaSigma_s(0.),
+    responsivity(0.), variance_t(0.), variance_s(0.), invsigmacrit(0.), lum(0.), z(0.),
+    zwidth(0.), stmass(0.), amag(0.) {}
   inline void addLensCounts(int lcount = 1) { lenscounts += lcount; return; }
   inline void addPairCounts(int pcount = 1) { paircounts += pcount; return; }
   inline void addWeight(double weight) { weights += weight; return; }
