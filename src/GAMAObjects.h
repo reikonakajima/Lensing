@@ -34,6 +34,8 @@ class GAMAObject : public LensObject {
   GAMAObject(const string buffer);
   float getAbsMagR() const { return absmag_r; }
   float getAbsMagRErr() const { return d_absmag_r; }
+  float getLogMStar() const { return logmstar; }
+  float getLogMStarErr() const { return d_logmstar; }
   float getRankBCG() const { return rankbcg; }
   int   getNfof() const { return Nfof; }
   void printLine(ostream& os) const;

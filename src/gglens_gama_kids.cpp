@@ -85,6 +85,11 @@ main(int argc, char* argv[]) {
     ifstream magbinf("absmag.txt");
     ArbitraryWidthBins magnitude_bin(magbinf);
 
+    //
+    // setup bins (magnitude)
+    //
+    ifstream logmstarf("logmstar.txt");
+    ArbitraryWidthBins logmstar_bin(logmstarf);
 
     //
     // setup lens/source samples
@@ -123,8 +128,12 @@ main(int argc, char* argv[]) {
 
     cerr << "radial bin range ...... " << radial_bin_arcsec[0] << " ... "
 	 << radial_bin_arcsec[radial_bin_arcsec.binSize()] << " (arcsec)" << endl;
+    /*
     cerr << "magnitude bin range ... " << magnitude_bin[0] << " ... "
 	 << magnitude_bin[magnitude_bin.binSize()] << endl;
+    */
+    cerr << "log(mstar) bin range ... " << logmstar_bin[0] << " ... "
+	 << logmstar_bin[logmstar_bin.binSize()] << endl;
 
 
     //
@@ -143,10 +152,10 @@ main(int argc, char* argv[]) {
     ofstream ofs(out_filename.c_str());
 
     vector<GGLensObjectList<GAMAObject*, KiDSObject*> > binned_lists  // vector over <mags>
-      = gglens_list.splitList(magnitude_bin.binSize());  // initialize the split lists
+      = gglens_list.splitList(logmstar_bin.binSize());  // initialize the split lists
     // fill in the split lists
     for (int ilens = 0; ilens < gglens_list.size(); ++ilens) {
-      int index = magnitude_bin.getIndex(gglens_list[ilens]->getLensPtr()->getAbsMagR());
+      int index = logmstar_bin.getIndex(gglens_list[ilens]->getLensPtr()->getLogMStar());
       if (index != -1) {
 	binned_lists[index].push_back(gglens_list[ilens]);
       }
@@ -156,9 +165,9 @@ main(int argc, char* argv[]) {
     //
     // sum tangential shear according to the given lens binning
     //
-    vector<vector<ggLensSum> > radial_shears(magnitude_bin.binSize(),
+    vector<vector<ggLensSum> > radial_shears(logmstar_bin.binSize(),
 					     vector<ggLensSum>(radial_bin.binSize()));
-    for (int imag = 0; imag < magnitude_bin.binSize(); ++imag) {
+    for (int imag = 0; imag < logmstar_bin.binSize(); ++imag) {
       /// sum tangential shear quantities over all lenses
       for (int ilens = 0; ilens < binned_lists[imag].size(); ++ilens) {
 	for (int irad = 0; irad < radial_bin.binSize(); ++irad) {
@@ -190,8 +199,8 @@ main(int argc, char* argv[]) {
 	<< "sum(w^2*var(et)) sum(w^2*var(ex)) n_lens" << endl;
 
     ofs << "#magbins: ";
-    for (int imag=0; imag<magnitude_bin.vectorSize(); ++imag) {
-      ofs << magnitude_bin[imag] << " ";
+    for (int imag=0; imag<logmstar_bin.vectorSize(); ++imag) {
+      ofs << logmstar_bin[imag] << " ";
     }
     ofs << endl;
 
@@ -201,7 +210,7 @@ main(int argc, char* argv[]) {
     }
     ofs << endl;
 
-    for (int imag=0; imag<magnitude_bin.binSize(); ++imag) {
+    for (int imag=0; imag<logmstar_bin.binSize(); ++imag) {
       for (int irad=0; irad<radial_bin.binSize(); ++irad) {
 	if (radial_shears[imag][irad].getPairCounts() == 0)
 	  continue;
