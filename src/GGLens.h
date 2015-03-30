@@ -67,7 +67,7 @@ class GGLensObjectList {
   GGLensObjectList(LensObjectList<lensObjPtr> lens_list,
 		   SourceObjectList<srcObjPtr> source_list,
 		   GenericBins radial_bin,
-		   geometry = Flat,             // FIXME!! Change default to SphericalSurface
+		   geometry = SphericalSurface,
 		   double mesh_frac = 0.);
 
   int size() { return gglens_object_list.size(); }

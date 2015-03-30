@@ -140,7 +140,9 @@ Mesh<Ttype, Tpos>::getNearAngleMap(Tpos ra, Tpos dec, Tpos z, Tpos thetamax, Tpo
   nbr.clear();                       // clear list
   int ix,iy,iz,ii,p;
   Tpos angsep, cosangsep;
-  Tpos cosa, sina, cosb, sinb, cosC;
+  Tpos cosa, sina, cosC;
+  Tpos cosb = cos(dec*DEGREE);
+  Tpos sinb = sin(dec*DEGREE);
   ix = int((ra - xmin)/dx);          // calculate index of point
   iy = int((dec - ymin)/dy);              
   iz = int((z - zmin)/dz);
@@ -159,8 +161,6 @@ Mesh<Ttype, Tpos>::getNearAngleMap(Tpos ra, Tpos dec, Tpos z, Tpos thetamax, Tpo
   for (std::vector<int>::iterator ii=close.begin(); ii!=close.end(); ii++) {
     if ( (p=head[*ii])>=0 ) {
       do {                           // calculate spherical angle separation
-	cosb = cos(dec*DEGREE);
-	sinb = sin(dec*DEGREE);
 	cosa = cos((*dat)[p]->getY()*DEGREE);
 	sina = sin((*dat)[p]->getY()*DEGREE);
 	cosC = cos((ra - (*dat)[p]->getX()) * DEGREE);

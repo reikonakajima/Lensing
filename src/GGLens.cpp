@@ -66,7 +66,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 
     lensObjPtr lensobj = *it;
 
-    double lensra = lensobj->getRA();    // FIXME: if SphericalSurface, convert to radians
+    double lensra = lensobj->getRA();
     double lensdec = lensobj->getDec();
 
     if (!srcbounds.includes(Position<double>(lensra, lensdec)))
@@ -81,9 +81,8 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     //
     vector<multimap<double, int> > bglist(rad_nbin);
     for (int irad = 0; irad < rad_nbin; ++irad) {
-      if (geom == Flat) {                  // FIXME!!  make Mesh class take geometry
-	bglist[irad] = srcmesh.getNearMeshMap(lensra, lensdec, 0.,
-					      radial_bin[irad+1], radial_bin[irad]);
+      if (geom == Flat) {
+	throw GGLensError("GGLens should not take Flat geometry");
       } else if (geom == SphericalSurface) {
 	bglist[irad] = srcmesh.getNearAngleMap(lensra, lensdec, 0.,
 					       radial_bin[irad+1], radial_bin[irad]);
@@ -105,30 +104,30 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
       for (isrc = bglist[irad].begin(); isrc != bglist[irad].end(); ++isrc) {
 
 	//
-	// calculate tangential/skew shear
+	// calculate tangential/skew shear on Spherical Surface
 	//
 	srcObjPtr srcobj = source_vector[isrc->second];
 	double sra = srcobj->getRA();
 	double sdec = srcobj->getDec();
 	double dra = sra - lensra;
 	double ddec = sdec - lensdec;
-	double theta;   // is in RADIANS (output of atan2)
+	double sep_angle = isrc->first;  // separation angle (=="radius") is in degrees
+	double theta;
 
 	// DEBUG
 	//cerr << " === SRC === ";
 	//srcobj->printLine(cerr);
 
 	if (geom == Flat) {   // 2d euclidean
-	  theta = atan2(ddec, dra);
+	  throw GGLensError("GGLens should not take Flat geometry");
 	} else if (geom == SphericalSurface) {
-	  // FIXME!!  convert everything into RADIANs
-	  throw GGLensError(" FIXME!!  convert everything into RADIANs");
-	  theta = atan2(cos(lensdec)*sin(sdec)-sin(lensdec)*cos(sdec)*cos(dra),
-			cos(sdec)*sin(dra));      // spherical surface
+	  theta = atan2(cos(lensdec*DEGREE)*sin(sdec*DEGREE)
+			-sin(lensdec*DEGREE)*cos(sdec*DEGREE)*cos(dra*DEGREE),
+			cos(sdec*DEGREE)*sin(dra*DEGREE));      // spherical surface
 	}
 
-	double ct = cos(theta);
-	double st = sin(theta);
+	double ct = cos(theta); //dra * cos(lensdec) / sep_angle;  //cos(theta);
+	double st = sin(theta); //ddec / sep_angle;                //sin(theta);
 	double c2t = ct*ct-st*st;
 	double s2t = 2.*ct*st;
 
