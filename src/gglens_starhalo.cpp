@@ -130,9 +130,11 @@ main(int argc, char* argv[]) {
     }
 
     cerr << "radial bin range (\") .. " << radial_bin_arcsec[0] << " ... "
-	 << radial_bin[radial_bin_arcsec.binSize()] << endl;
-    cerr << "magnitude bin range ... " << magnitude_bin[0] << " ... "
-	 << magnitude_bin[magnitude_bin.binSize()] << endl;
+	 << radial_bin_arcsec[radial_bin_arcsec.binSize()] << endl;
+
+    cerr << "magnitude bin range ... ";
+    for (int i=0; i<magnitude_bin.vectorSize(); ++i)  cerr << magnitude_bin[i] << " ";
+    cerr << endl;
 
 
     //
