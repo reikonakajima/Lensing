@@ -69,6 +69,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     double lensra = lensobj->getRA();
     double lensdec = lensobj->getDec();
     double ldec = lensdec * DEGREE;
+    double zlens = lensobj->getRedshift();
 
     if (!srcbounds.includes(Position<double>(lensra, lensdec)))
        continue;
@@ -121,8 +122,8 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	double c2t = ct*ct-st*st;
 	double s2t = 2.*ct*st;
 
-	double et = -c2t * srcobj->getE1() - s2t * srcobj->getE2();
-	double es =  s2t * srcobj->getE1() - c2t * srcobj->getE2();
+	double et = -c2t * srcobj->getG1() - s2t * srcobj->getG2();
+	double es =  s2t * srcobj->getG1() - c2t * srcobj->getG2();
 
 	/// increment available source objects for this lens
 	++bg_count;
@@ -135,7 +136,11 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	//
 	// calculate weights, responsivities, shears and shear errors
 	//
-	double weight = srcobj->getWeight();
+	// src_pz = srcobj->getPz();  TODO TODO TODO
+	// src_zbins = srcobj->getPzBins();  TODO TODO TODO
+	// double Sigma_crit = cosmo.getSigmaCrit(zlens, src_pz, src_zbins, min_lens_src_sep);
+	// double geom_weight = 1.0/Sigma_crit/Sigma_crit;   TODO TODO TODO
+	double weight = srcobj->getWeight();  // * geom_weight   TODO TODO TODO
 	double responsiv = srcobj->getResponsivity(et);
 	double weightedsignal_t = et * weight;
 	double weightedsignal_s = es * weight;
