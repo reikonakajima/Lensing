@@ -53,7 +53,7 @@ class KiDSObject : public SourceObject {
 	     float _fwhm_image,
 	     double _g1_A, double _g2_A, double _g1_B, double _g2_B,
 	     double _g1_C, double _g2_C, double _g1_D, double _g2_D,
-	     float sn_ratio, double _wt=1.) :
+	     float sn_ratio, double _zB, valarray<float> _pz_full, double _wt=1.) :
   SourceObject(_id, ra, dec, 99., 99., _wt),  // temporarily fill in g1 and g2 in base source object
     mag(_mag), xpos(_xpos), ypos(_ypos), fwhm(_fwhm_image), sn(sn_ratio) {
     shear[0] = Shear().setG1G2(_g1_A, -_g2_A);  // ra runs in negative direction,
@@ -89,6 +89,8 @@ class KiDSObject : public SourceObject {
   float fwhm;
   Shear shear[NUM_SHEAR];
   float sn;
+  float z;
+  valarray<float> pz;
 
   // make sure the shear is set in the base SourceObject class
   void setShearAndG1G2(Shear s_new, double _g1, double _g2) {

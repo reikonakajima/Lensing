@@ -99,6 +99,14 @@ KiDSObjectList::KiDSObjectList(const string fits_filename) {
   CCfits::Column& column18 = table.column("SNratio");
   column18.read( sn, 1, column18.rows() );
 
+  valarray<double> z_B;
+  CCfits::Column& column19 = table.column("Z_B");
+  column19.read( z_B, 1, column19.rows() );
+
+  vector<valarray<float> > pz_full;
+  CCfits::Column& column20 = table.column("PZ_full");
+  column20.readArrays( pz_full, 1, column20.rows() );
+
   // append objects to this list
   source_list.reserve(column1.rows());
   for (int i=0; i<column1.rows(); ++i) {
@@ -106,7 +114,7 @@ KiDSObjectList::KiDSObjectList(const string fits_filename) {
       KiDSObject* ptr = new KiDSObject(i, ra[i], dec[i], mag[i], xpos[i], ypos[i], fwhm[i],
 				       e1a[i], e2a[i], e1b[i], e2b[i],
 				       e1c[i], e2c[i], e1d[i], e2d[i],
-				       sn[i], weight[i]);
+				       sn[i], z_B[i], pz_full[i], weight[i]);
       source_list.push_back(ptr);
   }
 
