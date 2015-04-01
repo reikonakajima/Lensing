@@ -37,30 +37,30 @@ KiDSObjectList::KiDSObjectList(const string fits_filename) {
   //  PZ_full, Z_B, (Z_B_MIN, Z_B_MAX)
   //  FWHM_IMAGE, weight, and assign it to SourceObject
 
-  valarray<float> e1a;
+  valarray<float> g1a;
   CCfits::Column& column1 = table.column("e1_A");
-  column1.read( e1a, 1, column1.rows() );
-  valarray<float> e2a;
+  column1.read( g1a, 1, column1.rows() );
+  valarray<float> g2a;
   CCfits::Column& column2 = table.column("e2_A");
-  column2.read( e2a, 1, column2.rows() );
-  valarray<float> e1b;
+  column2.read( g2a, 1, column2.rows() );
+  valarray<float> g1b;
   CCfits::Column& column3 = table.column("e1_B");
-  column3.read( e1b, 1, column3.rows() );
-  valarray<float> e2b;
+  column3.read( g1b, 1, column3.rows() );
+  valarray<float> g2b;
   CCfits::Column& column4 = table.column("e2_B");
-  column4.read( e2b, 1, column4.rows() );
-  valarray<float> e1c;
+  column4.read( g2b, 1, column4.rows() );
+  valarray<float> g1c;
   CCfits::Column& column5 = table.column("e1_C");
-  column5.read( e1c, 1, column5.rows() );
-  valarray<float> e2c;
+  column5.read( g1c, 1, column5.rows() );
+  valarray<float> g2c;
   CCfits::Column& column6 = table.column("e2_C");
-  column6.read( e2c, 1, column6.rows() );
-  valarray<float> e1d;
+  column6.read( g2c, 1, column6.rows() );
+  valarray<float> g1d;
   CCfits::Column& column7 = table.column("e1_D");
-  column7.read( e1d, 1, column7.rows() );
-  valarray<float> e2d;
+  column7.read( g1d, 1, column7.rows() );
+  valarray<float> g2d;
   CCfits::Column& column8 = table.column("e2_D");
-  column8.read( e2d, 1, column8.rows() );
+  column8.read( g2d, 1, column8.rows() );
 
   valarray<double> ra;
   CCfits::Column& column9 = table.column("ALPHA_J2000");
@@ -112,9 +112,9 @@ KiDSObjectList::KiDSObjectList(const string fits_filename) {
   for (int i=0; i<column1.rows(); ++i) {
       if (weight[i] == 0) continue;
       KiDSObject* ptr = new KiDSObject(i, ra[i], dec[i], mag[i], xpos[i], ypos[i], fwhm[i],
-				       e1a[i], e2a[i], e1b[i], e2b[i],
-				       e1c[i], e2c[i], e1d[i], e2d[i],
-				       sn[i], z_B[i], pz_full[i], weight[i]);
+				       g1a[i], g2a[i], g1b[i], g2b[i],
+				       g1c[i], g2c[i], g1d[i], g2d[i],
+				       sn[i], z_B[i], pz_full[i], mask[i], weight[i]);
       source_list.push_back(ptr);
   }
 
@@ -129,13 +129,39 @@ KiDSObjectList::KiDSObjectList(const string fits_filename) {
 }
 
 
+int
+KiDSObjectList::applyMask(int mask_thres) {
+  for (vector<KiDSObject*>::iterator it = source_list.begin();
+       it != source_list.end(); /* no increment */) {
+    if ((*it)->getMask() > mask_thres) {
+      it = source_list.erase(it);
+    } else {
+      ++it;
+    }
+  }
+}
+
+
+int
+KiDSObjectList::applyBitMask(int bitmask){
+  for (vector<KiDSObject*>::iterator it = source_list.begin();
+       it != source_list.end(); /* no increment */) {
+    if ((*it)->getMask() & bitmask) {
+      it = source_list.erase(it);
+    } else {
+      ++it;
+    }
+  }
+}
+
+
 void
 KiDSObject::printLine(ostream& os) const {
   os << id << " "
      << setprecision(5) << setw(10)
      << ra << " " << setw(10) << dec << " "
      << setprecision(3) << setw(10)
-     << this->getE1() << " " << this->getE2() << " "
+     << this->getG1() << " " << this->getG2() << " "
      << wt << " " << mag << " "
      << xpos << " " << ypos << " "
      << fwhm << " " << sn << " ";
