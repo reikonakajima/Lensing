@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <vector>
+#include <valarray>
 #include "Std.h"
 #include "StringStuff.h"
 #include "Shear.h"
@@ -57,6 +58,9 @@ class SourceObject {
   double getG1() const { return g1; }
   double getG2() const { return g2; }
   Shear  getShear() const { return s; }
+
+  float  getRedshift() const { throw SourceObjectsError("getRedshift() not implemented"); }
+  std::valarray<float>& getPz() { throw SourceObjectsError("getPz() not implemented"); }
 
   double getWeight() const { return wt; }
   void setWeight(double _wt) const { wt = _wt; return; }
@@ -157,6 +161,8 @@ class SourceObjectList {
 
   void sortByRA(); 
   void sortByDec();
+
+  std::valarray<float>& getPzBins() { throw SourceObjectsError("getPz() not implemented"); }
 
   // for use with Mesh object
   const vector<ObjPtr>& getVectorForm() const { return source_list; }

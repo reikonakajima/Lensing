@@ -118,6 +118,16 @@ KiDSObjectList::KiDSObjectList(const string fits_filename) {
       source_list.push_back(ptr);
   }
 
+  // set up the p(z) redshift bins
+  // "a vector of length 70 giving P(z) at redshifts spanning 0<z<3.5 with dz=0.05"
+  const int NUM_PZ_ELEM = 70;
+  const float DELTA_Z = 0.05;
+  float array[NUM_PZ_ELEM];
+  for (int i=0; i<NUM_PZ_ELEM; ++i) {
+    array[i] = i * DELTA_Z;
+  }
+  pzbins = valarray<float>(array, NUM_PZ_ELEM);
+
   // The following two commands needs to be set after the KiDSObject list has been filled:
   // - initially set shear to "A" (driver code can change this)
   // setShearIndex(0);  // TODO -- be able to set to any of the ABCD shears!  (initially set to 0)

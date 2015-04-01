@@ -4,6 +4,7 @@
 #include "GGLens.h"
 #include "Mesh.h"
 #include "Bounds.h"
+#include "KiDSObjects.h"
 using std::fixed;
 using std::setprecision;
 
@@ -136,12 +137,25 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	//
 	// calculate weights, responsivities, shears and shear errors
 	//
-	// src_pz = srcobj->getPz();  TODO TODO TODO
-	// src_zbins = srcobj->getPzBins();  TODO TODO TODO
-	// double Sigma_crit = cosmo.getSigmaCrit(zlens, src_pz, src_zbins, min_lens_src_sep);
-	// double geom_weight = 1.0/Sigma_crit/Sigma_crit;   TODO TODO TODO
-	double weight = srcobj->getWeight();  // * geom_weight   TODO TODO TODO
-	double responsiv = srcobj->getResponsivity(et);
+	double Sigma_crit = 1.; // if we want to stack pure shear signals, keep Sigma_crit 1.
+	double weight = srcobj->getWeight();  // weight for the individual object
+	double responsiv = 1.;  // responsivity for e1/e2; irrelevant if using g1/g2
+	valarray<float> src_pz;
+	valarray<float> src_zbins;
+
+	// if source is a KiDSObject, then integrate over p(z) to calculate Sigma_crit
+	if (typeid(*srcobj) == typeid(KiDSObject)) {
+	  src_pz = srcobj->getPz();
+	  src_zbins = source_list.getPzBins();
+	  //Sigma_crit = cosmo.getSigmaCrit(zlens, src_pz, src_zbins, min_lens_src_sep);
+	  //double geom_weight = 1.0/Sigma_crit/Sigma_crit;
+	  //double weight *= geom_weight;  // update weight to include geometric weighting
+	}
+	else { // FUTURE TODO  // for a class using e1/e2 instead of g1/g2 reduced shear
+	  responsiv = srcobj->getResponsivity(et);
+	}
+
+	// the weighted shears
 	double weightedsignal_t = et * weight;
 	double weightedsignal_s = es * weight;
 	double weightedVariance_t = weight * weight* et * et;

@@ -55,7 +55,8 @@ class KiDSObject : public SourceObject {
 	     double _g1_C, double _g2_C, double _g1_D, double _g2_D,
 	     float sn_ratio, double _zB, valarray<float> _pz_full, int _mask, double _wt) :
   SourceObject(_id, ra, dec, 99., 99., _wt),  // temporarily fill in g1 and g2 in base source object
-    mag(_mag), xpos(_xpos), ypos(_ypos), fwhm(_fwhm_image), sn(sn_ratio), mask(_mask) {
+    mag(_mag), xpos(_xpos), ypos(_ypos), fwhm(_fwhm_image), sn(sn_ratio),
+    zB(_zB), pz(_pz_full), mask(_mask) {
     shear[0] = Shear().setG1G2(_g1_A, -_g2_A);  // ra runs in negative direction,
     shear[1] = Shear().setG1G2(_g1_B, -_g2_B);  // lensfit flips g2 sign
     shear[2] = Shear().setG1G2(_g1_C, -_g2_C);  // presumably because it fits in pixel space
@@ -72,6 +73,9 @@ class KiDSObject : public SourceObject {
   float getSNratio() const { return sn; }
   int getMask() const { return mask; }
 
+  float getRedshift() const { return zB;}
+  valarray<float>& getPz() { return pz; }
+
   // for use with Mesh object: important to override the SourceObject::getX() and getY()!!
   double getX() const { return getRA(); }
   double getY() const { return getDec(); }
@@ -87,7 +91,7 @@ class KiDSObject : public SourceObject {
   float fwhm;
   Shear shear[NUM_SHEAR];
   float sn;            // Signal-to-noise
-  float z;             // z_B of photo-z
+  float zB;             // z_B of photo-z
   valarray<float> pz;  // p(z) of photo-z
   int   mask;
 
@@ -115,8 +119,12 @@ class KiDSObjectList : public SourceObjectList<KiDSObject*> {
   // apply bit mask, so that (MAN_MASK & bitmask)>0 objects are excluded
   int applyBitMask(int bitmask);
 
+  // return the Pz redshift bins corresponding to the p(z) that KiDSObject returns
+  valarray<float>& getPzBins() { return pzbins; }
+
  private:
   mutable int index;  // to keep track of which shear to return
+  valarray<float> pzbins;
 
   // which of the ABCD shears should be used?
   void checkShearIndex(int i) const {
