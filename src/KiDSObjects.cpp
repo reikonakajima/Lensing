@@ -120,8 +120,6 @@ KiDSObjectList::KiDSObjectList(const string fits_filename) {
 
   // set up the p(z) redshift bins
   // "a vector of length 70 giving P(z) at redshifts spanning 0<z<3.5 with dz=0.05"
-  const int NUM_PZ_ELEM = 70;
-  const float DELTA_Z = 0.05;
   float array[NUM_PZ_ELEM];
   for (int i=0; i<NUM_PZ_ELEM; ++i) {
     array[i] = i * DELTA_Z;

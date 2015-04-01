@@ -122,9 +122,13 @@ class KiDSObjectList : public SourceObjectList<KiDSObject*> {
   // return the Pz redshift bins corresponding to the p(z) that KiDSObject returns
   valarray<float>& getPzBins() { return pzbins; }
 
+  static const int NUM_PZ_ELEM = 70;  // parameters to set p(z) bins
+  static const float DELTA_Z = 0.05;
+
  private:
+
   mutable int index;  // to keep track of which shear to return
-  valarray<float> pzbins;
+  valarray<float> pzbins;      // p(z) redshifts values
 
   // which of the ABCD shears should be used?
   void checkShearIndex(int i) const {
