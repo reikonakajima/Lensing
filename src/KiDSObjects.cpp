@@ -32,7 +32,9 @@ KiDSObjectList::KiDSObjectList(const string fits_filename) {
   CCfits::ExtHDU& table = pInfile->extension(obj_extension);
 
   // read the following columns (annoyingly, only one column can be read at a time):
-  //  e1/2_A/B/C/D, ALPHA_J2000/DELTA_J2000, Xpos/Ypos, CANDIDATEMASK, MAG_BEST, MAGERR_BEST,
+  //  e1/2_A/B/C/D, ALPHA_J2000/DELTA_J2000, Xpos/Ypos,
+  //  MAN_MASK, MAG_GAAP_r_CALIB, MAGERR_GAAP_r,
+  //  PZ_full, Z_B, (Z_B_MIN, Z_B_MAX)
   //  FWHM_IMAGE, weight, and assign it to SourceObject
 
   valarray<float> e1a;
@@ -79,10 +81,10 @@ KiDSObjectList::KiDSObjectList(const string fits_filename) {
   column13.read( mask, 1, column13.rows() );
 
   valarray<float> mag;
-  CCfits::Column& column14 = table.column("MAG_BEST");
+  CCfits::Column& column14 = table.column("MAG_GAAP_r_CALIB");
   column14.read( mag, 1, column14.rows() );
   valarray<float> magerr;
-  CCfits::Column& column15 = table.column("MAGERR_BEST");
+  CCfits::Column& column15 = table.column("MAGERR_GAAP_r");
   column15.read( magerr, 1, column15.rows() );
 
   valarray<float> fwhm;
