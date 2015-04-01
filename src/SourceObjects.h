@@ -32,18 +32,31 @@ class SourceObject {
 
  public:
   SourceObject();
-  SourceObject(long int _id, double _ra, double _dec, double _e1, double _e2, double _wt=1.) :
-  id(_id), ra(_ra), dec(_dec), e1(_e1), e2(_e2), wt(_wt), responsiv(-10.) {}
+  SourceObject(long int _id, double _ra, double _dec, double _s1, double _s2,
+	       double _wt=1., bool _shapeIsReducedShear=true) :
+  id(_id), ra(_ra), dec(_dec), wt(_wt), responsiv(-99.), inputIsReducedShear(_shapeIsReducedShear)
+    {
+      if (inputIsReducedShear) {
+	s.setG1G2(_s1,_s2);
+	g1=_s1, g2=_s2;
+      }
+      else {
+	s.setE1E2(_s1,_s2);
+	s.getG1G2(g1,g2);
+      }
+    }
 
   long int getId() const { return id; }
 
   double getRA() const { return ra; }
   double getDec() const { return dec; }
 
-  Shear getShear() const { return Shear(e1,e2); }
-  double getE1() const { return e1; }
-  double getE2() const { return e2; }
-  double getESq() const { return e1*e1 + e2*e2; }
+  double getE1() const { return s.getE1(); }
+  double getE2() const { return s.getE2(); }
+  double getESq() const { return s.getESq(); }
+  double getG1() const { return g1; }
+  double getG2() const { return g2; }
+  Shear  getShear() const { return s; }
 
   double getWeight() const { return wt; }
   void setWeight(double _wt) const { wt = _wt; return; }
@@ -85,8 +98,10 @@ class SourceObject {
  protected:
   long int id;
   double ra, dec;  // position
-  double e1, e2;    // measured shape
+  Shear s;         // shear saves e1,e2 values
+  double g1, g2;   // reduced shear
   mutable double wt;         // calculated weight
+  bool inputIsReducedShear;
 /*
   double shapeerr;  // shape measurement error
   double eRMS;      // shape noise (calculated from rmag)

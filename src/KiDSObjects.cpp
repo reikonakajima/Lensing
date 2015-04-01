@@ -8,7 +8,6 @@ using namespace std;
 // The following variables are static members of the KiDSObject class.
 // They need to be defined outside the scope of the class in order to be accessible from outside.
 bool KiDSObject::usePixelCoords;
-int KiDSObject::index;
 
 
 KiDSObjectList::KiDSObjectList(const string fits_filename) {
@@ -111,7 +110,7 @@ KiDSObjectList::KiDSObjectList(const string fits_filename) {
 
   // The following two commands needs to be set after the KiDSObject list has been filled:
   // - initially set shear to "A" (driver code can change this)
-  setShearIndex(0);
+  // setShearIndex(0);  // TODO -- be able to set to any of the ABCD shears!  (initially set to 0)
   // - initially set coordinates to use ra/dec
   //   (driver code must specify if pixel coordinate is to be used)
   usePixelCoord(false);
