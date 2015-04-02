@@ -17,6 +17,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 							  SourceObjectList<srcObjPtr> source_list,
 							  GenericBins _radial_bin,
 							  cosmology::Cosmology cosmo,
+							  double min_lens_src_delta_z,
 							  bool normalizeToSigmaCrit,
 							  geometry _geom,
 							  double mesh_frac) :
@@ -100,6 +101,9 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     int bad_et = 0;
     int bad_src = 0;
 
+    // get the redshift bins for p(z) of source objects
+    valarray<float> src_zbins = source_list.getPzBins();
+
     multimap<double, int>::const_iterator isrc;
     for (int irad = 0; irad < rad_nbin; ++irad) {
       for (isrc = bglist[irad].begin(); isrc != bglist[irad].end(); ++isrc) {
@@ -143,14 +147,20 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	double weight = srcobj->getWeight();  // weight for the individual object
 	double responsiv = 1.;  // responsivity for e1/e2; irrelevant if using g1/g2
 	valarray<float> src_pz;
-	valarray<float> src_zbins;
 
 	// if source is a KiDSObject, then integrate over p(z) to calculate Sigma_crit
 	if (normalizeToSigmaCrit) {
 	  if (typeid(*srcobj) == typeid(KiDSObject)) {
+
+	    float zsrc = srcobj->getRedshift();
+
+	    // discard src object that is not far enough behind of the lens
+	    if ((zsrc-zlens) < min_lens_src_delta_z)
+	      continue;
+
+	    // integrate over p(z) to get Sigma_crit
 	    src_pz = srcobj->getPz();
-	    src_zbins = source_list.getPzBins();
-	    Sigma_crit = cosmo.getSigmaCrit(zlens, src_pz, src_zbins, min_lens_src_sep);
+	    //Sigma_crit = cosmo.getSigmaCrit(zlens, src_pz, src_zbins, min_lens_src_sep);
 	    //double geom_weight = 1.0/Sigma_crit/Sigma_crit;
 	    //double weight *= geom_weight;  // update weight to include geometric weighting
 	  }

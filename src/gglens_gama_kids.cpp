@@ -150,7 +150,7 @@ main(int argc, char* argv[]) {
     double Om=0.27, Ol=1.-Om;
     cosmology::Cosmology cosmo(Om, Ol);
     GGLensObjectList<GAMAObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin,
-							   cosmo);
+							   cosmo, MIN_LENS_SRC_SEP);
 
     //
     // sort each lens into binned_lists
