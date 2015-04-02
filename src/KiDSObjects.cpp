@@ -124,7 +124,7 @@ KiDSObjectList::KiDSObjectList(const string fits_filename) {
   for (int i=0; i<NUM_PZ_ELEM; ++i) {
     array[i] = i * DELTA_Z;
   }
-  pzbins = valarray<float>(array, NUM_PZ_ELEM);
+  SourceObjectList::pzbins = valarray<float>(array, NUM_PZ_ELEM);
 
   // The following two commands needs to be set after the KiDSObject list has been filled:
   // - initially set shear to "A" (driver code can change this)

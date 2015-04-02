@@ -34,8 +34,9 @@ class SourceObject {
  public:
   SourceObject();
   SourceObject(long int _id, double _ra, double _dec, double _s1, double _s2,
-	       double _wt=1., bool _shapeIsReducedShear=true) :
-  id(_id), ra(_ra), dec(_dec), wt(_wt), responsiv(-99.), inputIsReducedShear(_shapeIsReducedShear)
+	       float _zB, double _wt=1., bool _shapeIsReducedShear=true) :
+  id(_id), ra(_ra), dec(_dec), zB(_zB), wt(_wt), responsiv(-99.),
+  inputIsReducedShear(_shapeIsReducedShear)
     {
       if (inputIsReducedShear) {
 	s.setG1G2(_s1,_s2);
@@ -59,8 +60,13 @@ class SourceObject {
   double getG2() const { return g2; }
   Shear  getShear() const { return s; }
 
-  float  getRedshift() const { throw SourceObjectsError("getRedshift() not implemented"); }
-  std::valarray<float>& getPz() { throw SourceObjectsError("getPz() not implemented"); }
+  float  getRedshift() const { return zB; }
+  std::valarray<float>& getPz() {
+    if (pz.size()==0)
+      throw SourceObjectsError("getPz() not implemented");
+    else
+      return pz;
+  }
 
   double getWeight() const { return wt; }
   void setWeight(double _wt) const { wt = _wt; return; }
@@ -106,6 +112,8 @@ class SourceObject {
   double g1, g2;   // reduced shear
   mutable double wt;         // calculated weight
   bool inputIsReducedShear;
+  float zB;             // z_B of photo-z
+  std::valarray<float> pz;  // p(z) of photo-z
 /*
   double shapeerr;  // shape measurement error
   double eRMS;      // shape noise (calculated from rmag)
@@ -162,7 +170,12 @@ class SourceObjectList {
   void sortByRA(); 
   void sortByDec();
 
-  std::valarray<float>& getPzBins() { throw SourceObjectsError("getPz() not implemented"); }
+  std::valarray<float>& getPzBins() { 
+    if (pzbins.size() == 0)
+      throw SourceObjectsError("getPzBins() not implemented");
+    else
+      return pzbins;
+  }
 
   // for use with Mesh object
   const vector<ObjPtr>& getVectorForm() const { return source_list; }
@@ -170,6 +183,7 @@ class SourceObjectList {
  protected:
   SourceObjectList() {}
 
+  std::valarray<float> pzbins;      // p(z) redshifts values
   vector<ObjPtr> source_list;
   mutable Bounds<double> bounds;
 
