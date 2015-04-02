@@ -174,7 +174,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 
 	    // calculate weights
 	    double geom_weight = 1.0/Sigma_crit/Sigma_crit;
-	    //double weight *= geom_weight;  // update weight to include geometric weighting
+	    weight *= geom_weight;  // update weight to include geometric weighting
 	  }
 	  else { // FUTURE TODO  // for a class using e1/e2 instead of g1/g2 reduced shear
 	    responsiv = srcobj->getResponsivity(et);
