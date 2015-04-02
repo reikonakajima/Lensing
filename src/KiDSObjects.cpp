@@ -152,6 +152,7 @@ KiDSObjectList::applyMask(int mask_thres) {
       ++it;
     }
   }
+  return source_list.size();
 }
 
 
@@ -165,6 +166,7 @@ KiDSObjectList::applyBitMask(int bitmask){
       ++it;
     }
   }
+  return source_list.size();
 }
 
 
