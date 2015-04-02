@@ -1,8 +1,8 @@
-#include "Table.h"
+#include "GTable.h"
 
 // Look up an index.  Use STL binary search; maybe faster to use
 template<class V, class A>
-typename Table<V,A>::iter Table<V,A>::upperIndex(const A a) const {
+typename gtable::Table<V,A>::iter gtable::Table<V,A>::upperIndex(const A a) const {
   setup();
   Entry e(a,0); 
   if (v.size()==0 || a<argMin())  throw TableOutOfRange();
@@ -22,14 +22,14 @@ typename Table<V,A>::iter Table<V,A>::upperIndex(const A a) const {
 
 //new element for table.
 template<class V, class A>
-void Table<V,A>::addEntry(const A _arg, const V _val) {
+void gtable::Table<V,A>::addEntry(const A _arg, const V _val) {
   Entry e(_arg,_val);
   v.push_back(e);
   isReady = false;	//re-sort array next time used
 }
 
 template<class V, class A>
-Table<V,A>::Table(const A* argvec, const V* valvec, int N, 
+gtable::Table<V,A>::Table(const A* argvec, const V* valvec, int N, 
 		  interpolant in): v(), iType(in), y2() {
   v.reserve(N);
   const A* aptr;
@@ -43,7 +43,7 @@ Table<V,A>::Table(const A* argvec, const V* valvec, int N,
 }
 
 template<class V, class A>
-Table<V,A>::Table(const vector<A> &aa, const vector<V> &vv, 
+gtable::Table<V,A>::Table(const vector<A> &aa, const vector<V> &vv, 
 		  interpolant in): v(), iType(in), y2() {
   v.reserve(aa.size());
   if (vv.size()<aa.size()) 
@@ -59,7 +59,7 @@ Table<V,A>::Table(const vector<A> &aa, const vector<V> &vv,
 
 //lookup & interp. function value. - this one returns 0 out of bounds.
 template<class V, class A>
-V Table<V,A>::operator() (const A a) const {
+V gtable::Table<V,A>::operator() (const A a) const {
   try {
     citer p1(upperIndex(a));
     return interpolate(a,p1);
@@ -69,13 +69,13 @@ V Table<V,A>::operator() (const A a) const {
 }
 //lookup & interp. function value.
 template<class V, class A>
-V Table<V,A>::lookup(const A a) const {
+V gtable::Table<V,A>::lookup(const A a) const {
   citer p1(upperIndex(a));
   return interpolate(a,p1);
 }
 
 template<class V, class A>
-V Table<V,A>::interpolate(const A a, const citer p1) const { 
+V gtable::Table<V,A>::interpolate(const A a, const citer p1) const { 
   setup();	//do any necessary prep
   // First case when there is for single-point table
   if (v.size()==1) return p1->val;
@@ -108,7 +108,7 @@ V Table<V,A>::interpolate(const A a, const citer p1) const {
 }
 
 template<class V, class A>
-void Table<V,A>::read(istream &is) {
+void gtable::Table<V,A>::read(istream &is) {
   string line;
   const string comments="#;!";	//starts comment
   V vv;
@@ -131,7 +131,7 @@ void Table<V,A>::read(istream &is) {
 
 // Do any necessary setup of the table before using
 template<class V, class A>
-void Table<V,A>::setup() const {
+void gtable::Table<V,A>::setup() const {
   if (isReady) return;
   sortIt();
   if (v.size()<=1) {
@@ -174,4 +174,4 @@ void Table<V,A>::setup() const {
   }
 }
 
-template class Table<>;
+template class gtable::Table<>;

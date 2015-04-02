@@ -109,9 +109,9 @@ LinearPowerSpectrum::extendTables(double lnK) const {
   }
 }
 
-LinearPowerSpectrum::LinearPowerSpectrum(): sigSqTable(Table<>::spline),
-					    neffTable(Table<>::spline),
-					    CTable(Table<>::spline) {}
+LinearPowerSpectrum::LinearPowerSpectrum(): sigSqTable(gtable::Table<>::spline),
+					    neffTable(gtable::Table<>::spline),
+					    CTable(gtable::Table<>::spline) {}
 
   
 double

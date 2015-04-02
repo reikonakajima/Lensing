@@ -7,9 +7,9 @@ ReadFileList = env['_ReadFileList']
 
 # TODO: This won't work on Windows machines...
 env['OBJPREFIX'] = '.obj/'
-env.Append(CPPPATH=['.','utilities'])
+env.Append(CPPPATH=['.','utilities','cosmology'])
 
-subdirs = ['.','utilities']
+subdirs = ['.','utilities','cosmology']
 
 lib_files = []
 for d in subdirs:
@@ -36,7 +36,7 @@ env.Object('Shear.cpp')
 env.Object('utilities/Bins.cpp')
 env.Object('utilities/Mesh.cpp')
 env.Object('utilities/StringStuff.cpp')
-env.Object('utilities/Table.cpp')
+env.Object('utilities/GTable.cpp')
 env.Object('utilities/odeint.cpp')
 env.Object('utilities/Matrix.cpp')
 

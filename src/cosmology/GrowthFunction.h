@@ -5,20 +5,20 @@
 #define GROWTHFUNCTION_H
 
 #include "Cosmology.h"
-#include "Table.h"
+#include "GTable.h"
 
 namespace cosmology {
 
   class GrowthFunction {
   public:
     GrowthFunction(const Cosmology& c_): c(c_), 
-      lnGTable(Table<>::spline),
-      dlnGdlnATable(Table<>::spline) {
+      lnGTable(gtable::Table<>::spline),
+      dlnGdlnATable(gtable::Table<>::spline) {
       buildTables();
     }
     GrowthFunction(const GrowthFunction& rhs): c(rhs.c), 
-      lnGTable(Table<>::spline),
-      dlnGdlnATable(Table<>::spline) {
+      lnGTable(gtable::Table<>::spline),
+      dlnGdlnATable(gtable::Table<>::spline) {
       buildTables();  // Make clean copies of tables in a copy.
     }
     double operator()(double z) const {return exp(lnG(-log(1.+z)));}
@@ -30,8 +30,8 @@ namespace cosmology {
     const Cosmology& c;
     // The diff eq is solved once at construction, then all values
     // looked up in spline-fit tables.
-    Table<> lnGTable;
-    Table<> dlnGdlnATable;
+    gtable::Table<> lnGTable;
+    gtable::Table<> dlnGdlnATable;
     void buildTables(double aMax=1.1);
     double lnGRecombination;
   };

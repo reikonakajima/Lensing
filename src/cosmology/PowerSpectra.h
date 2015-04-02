@@ -4,7 +4,7 @@
 #ifndef POWERSPECTRA_H
 #define POWERSPECTRA_H
 #include <cmath>
-#include "Table.h"
+#include "GTable.h"
 #include "FisherMatrices.h"
 #include "AstronomicalConstants.h"
 
@@ -27,9 +27,9 @@ namespace cosmology {
 		   double& sigSq, double& neff, double& C) const;
     // All of the integral quantities are cached in spline tables:
     void extendTables(double lnK) const;
-    mutable Table<> sigSqTable;
-    mutable Table<> neffTable;
-    mutable Table<> CTable;
+    mutable gtable::Table<> sigSqTable;
+    mutable gtable::Table<> neffTable;
+    mutable gtable::Table<> CTable;
   };
 
   class NonLinearPowerSpectrum {

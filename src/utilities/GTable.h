@@ -4,8 +4,8 @@
 // D is the value class, which must have + and * operations
 // to permit interpolation.
 // 	$Id: Table.h,v 1.4 2004-03-03 14:26:58 garyb Exp $
-#ifndef TABLE_H
-#define TABLE_H
+#ifndef GTABLE_H
+#define GTABLE_H
 
 #include "Function1d.h"
 #include "Std.h"
@@ -15,6 +15,8 @@ using std::vector;
 #include <algorithm>
 #include <string>
 #include <sstream>
+
+namespace gtable {
 
 // Exception classes:
 class TableError: public MyException {
@@ -107,4 +109,5 @@ private:
 //Interpolate value btwn p & --p:
   V interpolate(const A a, const citer p) const; 
 };
+} // end namespace table
 #endif

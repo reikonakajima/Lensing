@@ -416,9 +416,9 @@ Cosmology::getIntegral(double z, FunctionType ftype) const {
   }
   // Make a table for this function if there is none
   if (!integrals[ftype]) {
-    integrals[ftype] = new Table<>(Table<>::spline); 
+    integrals[ftype] = new gtable::Table<>(gtable::Table<>::spline);
     // Set up tables with a few very low-z points
-    Table<>& tab= *(integrals[ftype]);
+    gtable::Table<>& tab= *(integrals[ftype]);
     tab.addEntry(1., 0.);	//z=0;
     double da=sqrt(Tolerance)/2.;
     func.setMode(ftype);
@@ -429,7 +429,7 @@ Cosmology::getIntegral(double z, FunctionType ftype) const {
     tab.addEntry(1.-da, value);
   }
 
-  Table<>& tab=*(integrals[ftype]);
+  gtable::Table<>& tab=*(integrals[ftype]);
   double result=0.;
 
   // See if we are going to extrapolate to early times with dominant

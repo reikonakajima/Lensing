@@ -4,7 +4,7 @@
 #include "FiducialCosmology.h"
 #include "PowerSpectra.h"
 #include "Bispectra.h"
-#include "Table.h"
+#include "GTable.h"
 #include "AstronomicalConstants.h"
 
 #ifndef LENSQUANTITIES_H
@@ -69,7 +69,7 @@ namespace cosmology {
 
   class ZDistTable: public ZDist {
   private:
-    Table<> logNTab;
+    gtable::Table<> logNTab;
     double zmin;
     double zmax;
   public:
@@ -141,13 +141,13 @@ namespace cosmology {
 	   const FiducialCosmology& fc_,
 	   const NonLinearPowerSpectrum& nlps_): lw1(lw_), lw2(lw_), 
       fc(fc_), nlps(nlps_),
-      pktable(Table<>::spline) {}
+      pktable(gtable::Table<>::spline) {}
     Pkappa(const LensWeight& lw1_,
 	   const LensWeight& lw2_,
 	   const FiducialCosmology& fc_,
 	   const NonLinearPowerSpectrum& nlps_): lw1(lw1_), lw2(lw2_),
       fc(fc_), nlps(nlps_),
-      pktable(Table<>::spline) {}
+      pktable(gtable::Table<>::spline) {}
     double operator()(double l) const;
     double valueAt(double l) const;	//compute without lookup table
   private:
@@ -155,7 +155,7 @@ namespace cosmology {
     const LensWeight& lw2;
     const FiducialCosmology& fc;
     const NonLinearPowerSpectrum& nlps;
-    mutable Table<> pktable;
+    mutable gtable::Table<> pktable;
   };
 
   // Get Map and correlation functions from power spectrum:

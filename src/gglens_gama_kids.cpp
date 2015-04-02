@@ -7,6 +7,7 @@
 #include "Bounds.h"
 #include "GAMAObjects.h"
 #include "KiDSObjects.h"
+#include "Cosmology.h"
 #include "GGLens.h"
 #include "Bins.h"
 using std::ostringstream;
@@ -14,7 +15,6 @@ using std::setw;
 using std::setfill;
 using std::fixed;
 using std::setprecision;
-
 
 const string outfprefix = "gglens";
 const string configfname = "config.par";
@@ -147,6 +147,8 @@ main(int argc, char* argv[]) {
     //
     // create GGLensObjectList from lens_list and source_list (sums tangential shears for each lens)
     //
+    double Om=0.27, Ol=1.-Om;
+    cosmology::Cosmology cosmo(Om, Ol);
     GGLensObjectList<GAMAObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin);
 
     //

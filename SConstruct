@@ -11,6 +11,7 @@ env = Environment()
 env.Append(CPPPATH=['/vol/software/software/tools/tmv/tmv0.72/x86_64/include'])
 env.Append(CPPPATH=['/opt/local/include'])
 env.Append(CPPPATH=[os.path.join(home_dir,'src'), os.path.join(home_dir,'src','utilities'),])
+env.Append(CPPPATH=[os.path.join(home_dir,'src','cosmology'),])
 env.Append(LIBS=['tmv', 'blas', 'CCfits'])
 env.Append(LIBPATH = ['/vol/software/software/tools/tmv/tmv0.72/x86_64/lib', '/usr/local/lib'])
 
@@ -52,7 +53,7 @@ sub_objects = '''
 	    src/utilities/.obj/StringStuff.o
 	    src/utilities/.obj/Bins.o
 	    src/utilities/.obj/Mesh.o
-	    src/utilities/.obj/Table.o
+	    src/utilities/.obj/GTable.o
 	    src/utilities/.obj/odeint.o
 	    src/utilities/.obj/Matrix.o
 	    src/.obj/GGLens.o
