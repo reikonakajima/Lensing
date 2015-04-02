@@ -140,7 +140,9 @@ main(int argc, char* argv[]) {
     //
     // create GGLensObjectList from lens_list and source_list (sums tangential shears for each lens)
     //
-    GGLensObjectList<StarMaskObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin);
+    bool normalizeToSigmaCrit = false;
+    GGLensObjectList<StarMaskObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin,
+							       normalizeToSigmaCrit);
 
     //
     // sort each lens into binned_lists
