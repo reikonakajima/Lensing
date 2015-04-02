@@ -34,6 +34,12 @@ const string usage =
   " stdout: (none)\n";
 
 
+// source redshift cuts (based on z_B)
+const double MIN_SRC_Z = 0.005;
+const double MAX_SRC_Z = 1.2;
+const double MIN_LENS_SRC_SEP = 0.15;
+
+
 int
 main(int argc, char* argv[]) {
 
@@ -95,12 +101,13 @@ main(int argc, char* argv[]) {
     // setup lens/source samples
     //
     GAMAObjectList master_lens_list(lensf);
-    GAMAObjectList lens_list(master_lens_list);     // TODO: add any extra cuts
+    GAMAObjectList lens_list(master_lens_list);
+    lens_list.applyLogMStarCut(logmstar_bin.getMin(), logmstar_bin.getMax());
 
-    KiDSObjectList master_source_list(source_filename);
-    KiDSObjectList source_list(master_source_list);  // TODO: add any extra cuts
-    //source_list.applyMask();  // apply MASK == 0 criteria
-
+    int bitmask = 1;  /// TODO: UPDATE BITMASK OPTIONS  2^15 - 1 = 32767
+    KiDSObjectList master_source_list(source_filename, bitmask);
+    KiDSObjectList source_list(master_source_list);
+    source_list.applyRedshiftCut(MIN_SRC_Z, MAX_SRC_Z);
 
     //
     // diagnostic error messages
@@ -132,8 +139,9 @@ main(int argc, char* argv[]) {
     cerr << "magnitude bin range ... " << magnitude_bin[0] << " ... "
 	 << magnitude_bin[magnitude_bin.binSize()] << endl;
     */
-    cerr << "log(mstar) bin range ... " << logmstar_bin[0] << " ... "
-	 << logmstar_bin[logmstar_bin.binSize()] << endl;
+    cerr << "log(mstar) bin range ... ";
+    for (int i=0; i<logmstar_bin.vectorSize(); ++i)  cerr << logmstar_bin[i] << " ";
+    cerr << endl;
 
 
     //
