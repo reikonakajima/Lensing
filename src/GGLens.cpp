@@ -16,6 +16,7 @@ template<class lensObjPtr, class srcObjPtr>
 GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObjPtr> lens_list,
 							  SourceObjectList<srcObjPtr> source_list,
 							  GenericBins _radial_bin,
+							  bool normalizeToSigmaCrit,
 							  geometry _geom,
 							  double mesh_frac) :
   radial_bin(_radial_bin) , geom(_geom) {
@@ -144,15 +145,22 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	valarray<float> src_zbins;
 
 	// if source is a KiDSObject, then integrate over p(z) to calculate Sigma_crit
-	if (typeid(*srcobj) == typeid(KiDSObject)) {
-	  src_pz = srcobj->getPz();
-	  src_zbins = source_list.getPzBins();
-	  //Sigma_crit = cosmo.getSigmaCrit(zlens, src_pz, src_zbins, min_lens_src_sep);
-	  //double geom_weight = 1.0/Sigma_crit/Sigma_crit;
-	  //double weight *= geom_weight;  // update weight to include geometric weighting
-	}
-	else { // FUTURE TODO  // for a class using e1/e2 instead of g1/g2 reduced shear
-	  responsiv = srcobj->getResponsivity(et);
+	if (normalizeToSigmaCrit) {
+	  if (typeid(*srcobj) == typeid(KiDSObject)) {
+	    src_pz = srcobj->getPz();
+	    src_zbins = source_list.getPzBins();
+	    /*/ DEBUG
+	    for (int i=0; i<KiDSObjectList::NUM_PZ_ELEM; ++i) {
+	      cerr << i << " " << src_zbins[i] << " " << src_pz[i] << endl;
+	    }
+	    //*/ // end DEBUG
+	    //Sigma_crit = cosmo.getSigmaCrit(zlens, src_pz, src_zbins, min_lens_src_sep);
+	    //double geom_weight = 1.0/Sigma_crit/Sigma_crit;
+	    //double weight *= geom_weight;  // update weight to include geometric weighting
+	  }
+	  else { // FUTURE TODO  // for a class using e1/e2 instead of g1/g2 reduced shear
+	    responsiv = srcobj->getResponsivity(et);
+	  }
 	}
 
 	// the weighted shears

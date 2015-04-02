@@ -67,6 +67,7 @@ class GGLensObjectList {
   GGLensObjectList(LensObjectList<lensObjPtr> lens_list,
 		   SourceObjectList<srcObjPtr> source_list,
 		   GenericBins radial_bin,
+		   bool normalizeToSigmaCrit=true,
 		   geometry = SphericalSurface,
 		   double mesh_frac = 0.);
 
