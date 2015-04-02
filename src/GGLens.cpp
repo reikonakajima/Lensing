@@ -148,8 +148,8 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	double responsiv = 1.;  // responsivity for e1/e2; irrelevant if using g1/g2
 	valarray<float> src_pz;
 
-	// if source is a KiDSObject, then integrate over p(z) to calculate Sigma_crit
 	if (normalizeToSigmaCrit) {
+	  // integrate over p(z) to calculate Sigma_crit
 	  if (typeid(*srcobj) == typeid(KiDSObject)) {
 
 	    float zsrc = srcobj->getRedshift();  // this is z_B
@@ -172,9 +172,9 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	    }
 	    Sigma_crit *= SigmaCritPrefactor;  // normalize to units of [h M_sun pc^-2]
 
-	    // calculate weights
-	    double geom_weight = 1.0/Sigma_crit/Sigma_crit;
-	    weight *= geom_weight;  // update weight to include geometric weighting
+	    // calculate weight with normalization: DeltaSigma = Sum (w*Sigma_crit*gamma_t)
+	    double geom_weight_and_norm = 1.0/Sigma_crit;  // geom_weight = Sigma_crit^-2
+	    weight *= geom_weight_and_norm;  // update weight to include geom wt and normalization
 	  }
 	  else { // FUTURE TODO  // for a class using e1/e2 instead of g1/g2 reduced shear
 	    responsiv = srcobj->getResponsivity(et);
