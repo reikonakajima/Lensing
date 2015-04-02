@@ -43,9 +43,18 @@ env.Append(CPPPATH=['utilities',])
 
 # specify the sub-objects
 sub_objects = '''
+	    src/cosmology/.obj/Cosmology.o
+	    src/cosmology/.obj/GrowthFunction.o
+	    src/cosmology/.obj/HuEisenstein.o
+	    src/cosmology/.obj/LensQuantities.o
+	    src/cosmology/.obj/LinearPowerSpectrum.o
+	    src/cosmology/.obj/Bispectra.o
 	    src/utilities/.obj/StringStuff.o
 	    src/utilities/.obj/Bins.o
 	    src/utilities/.obj/Mesh.o
+	    src/utilities/.obj/Table.o
+	    src/utilities/.obj/odeint.o
+	    src/utilities/.obj/Matrix.o
 	    src/.obj/GGLens.o
 	    src/.obj/LensObjects.o
 	    src/.obj/StarMaskObjects.o
@@ -63,7 +72,7 @@ test = env.Program(target='GGLensTest', source=sub_objects+['src/GGLensDriver.cp
 starhalo = env.Program(target='gglens_starhalo', source=sub_objects+['src/gglens_starhalo.cpp',])
 gama_kids = env.Program(target='gglens_gama_kids', source=sub_objects+['src/gglens_gama_kids.cpp',])
 random_kids = env.Program(target='gglens_random_kids', source=sub_objects+['src/gglens_random_kids.cpp',])
-env.Install('bin', [test, starhalo, gama_kids, random_kids])
+env.Install('bin', [test, gama_kids, random_kids])
 env.Alias('install', 'bin')
 
 # (eventually, build a library code)

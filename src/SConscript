@@ -36,6 +36,18 @@ env.Object('Shear.cpp')
 env.Object('utilities/Bins.cpp')
 env.Object('utilities/Mesh.cpp')
 env.Object('utilities/StringStuff.cpp')
+env.Object('utilities/Table.cpp')
+env.Object('utilities/odeint.cpp')
+env.Object('utilities/Matrix.cpp')
+
+env.Object('cosmology/Cosmology.cpp')
+env.Object('cosmology/GrowthFunction.cpp')
+env.Object('cosmology/HuEisenstein.cpp')
+env.Object('cosmology/LensQuantities.cpp')
+env.Object('cosmology/LinearPowerSpectrum.cpp')
+env.Object('cosmology/Bispectra.cpp')
+
+
 
 # Library file containing generic code
 #obj_lib = env.SharedObject(lib_files)
