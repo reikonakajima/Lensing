@@ -115,7 +115,7 @@ KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask) {
   source_list.reserve(max_src_count);
   for (int i=0; i<max_src_count; ++i) {
       if (weight[i] == 0) continue;
-      //if (mask[i] & bitmask) continue;
+      if (mask[i] & bitmask) continue;
       KiDSObject* ptr = new KiDSObject(i, ra[i], dec[i], mag[i], xpos[i], ypos[i], fwhm[i],
 				       g1a[i], g2a[i], g1b[i], g2b[i],
 				       g1c[i], g2c[i], g1d[i], g2d[i],
