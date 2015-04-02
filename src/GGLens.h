@@ -10,6 +10,8 @@
 #include "ggLensSum.h"
 #include "LensObjects.h"
 #include "SourceObjects.h"
+#include "Cosmology.h"
+#include "AstronomicalConstants.h"
 
 using std::list;
 using std::istringstream;
@@ -67,7 +69,8 @@ class GGLensObjectList {
   GGLensObjectList(LensObjectList<lensObjPtr> lens_list,
 		   SourceObjectList<srcObjPtr> source_list,
 		   GenericBins radial_bin,
-		   bool normalizeToSigmaCrit=true,
+		   cosmology::Cosmology cosmo = cosmology::Cosmology(0.27,0.73),
+		   bool normalizeToSigmaCrit = true,
 		   geometry = SphericalSurface,
 		   double mesh_frac = 0.);
 

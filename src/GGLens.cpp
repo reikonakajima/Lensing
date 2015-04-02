@@ -16,6 +16,7 @@ template<class lensObjPtr, class srcObjPtr>
 GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObjPtr> lens_list,
 							  SourceObjectList<srcObjPtr> source_list,
 							  GenericBins _radial_bin,
+							  cosmology::Cosmology cosmo,
 							  bool normalizeToSigmaCrit,
 							  geometry _geom,
 							  double mesh_frac) :
@@ -149,7 +150,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	  if (typeid(*srcobj) == typeid(KiDSObject)) {
 	    src_pz = srcobj->getPz();
 	    src_zbins = source_list.getPzBins();
-	    //Sigma_crit = cosmo.getSigmaCrit(zlens, src_pz, src_zbins, min_lens_src_sep);
+	    Sigma_crit = cosmo.getSigmaCrit(zlens, src_pz, src_zbins, min_lens_src_sep);
 	    //double geom_weight = 1.0/Sigma_crit/Sigma_crit;
 	    //double weight *= geom_weight;  // update weight to include geometric weighting
 	  }
