@@ -169,6 +169,7 @@ class SourceObjectList {
 
   void sortByRA(); 
   void sortByDec();
+  void applyRedshiftCut(float min_z, float max_z);
 
   std::valarray<float>& getPzBins() { 
     if (pzbins.size() == 0)
@@ -183,9 +184,9 @@ class SourceObjectList {
  protected:
   SourceObjectList() {}
 
-  std::valarray<float> pzbins;      // p(z) redshifts values
   vector<ObjPtr> source_list;
   mutable Bounds<double> bounds;
+  std::valarray<float> pzbins;      // p(z) redshifts values
 
   static bool Compare_Source_RA(ObjPtr lhs, ObjPtr rhs) {
       return lhs->getRA() < rhs->getRA(); // sort in increasing order
