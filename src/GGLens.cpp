@@ -149,11 +149,6 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	  if (typeid(*srcobj) == typeid(KiDSObject)) {
 	    src_pz = srcobj->getPz();
 	    src_zbins = source_list.getPzBins();
-	    /*/ DEBUG
-	    for (int i=0; i<KiDSObjectList::NUM_PZ_ELEM; ++i) {
-	      cerr << i << " " << src_zbins[i] << " " << src_pz[i] << endl;
-	    }
-	    //*/ // end DEBUG
 	    //Sigma_crit = cosmo.getSigmaCrit(zlens, src_pz, src_zbins, min_lens_src_sep);
 	    //double geom_weight = 1.0/Sigma_crit/Sigma_crit;
 	    //double weight *= geom_weight;  // update weight to include geometric weighting
