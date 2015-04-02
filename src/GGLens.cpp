@@ -152,16 +152,28 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	if (normalizeToSigmaCrit) {
 	  if (typeid(*srcobj) == typeid(KiDSObject)) {
 
-	    float zsrc = srcobj->getRedshift();
+	    float zsrc = srcobj->getRedshift();  // this is z_B
 
 	    // discard src object that is not far enough behind of the lens
 	    if ((zsrc-zlens) < min_lens_src_delta_z)
 	      continue;
 
 	    // integrate over p(z) to get Sigma_crit
-	    src_pz = srcobj->getPz();
-	    //Sigma_crit = cosmo.getSigmaCrit(zlens, src_pz, src_zbins, min_lens_src_sep);
-	    //double geom_weight = 1.0/Sigma_crit/Sigma_crit;
+	    src_pz = srcobj->getPz();   // this is p(z)
+	    double pz_sum = 0;          // normalize p(z)
+	    for (int i=0; i<src_pz.size(); ++i) pz_sum += src_pz[i];
+	    src_pz /= pz_sum;
+	    Sigma_crit = 0;             // integrate over p(z)
+	    for (int i=0; i<src_pz.size(); ++i) {
+	      double invSigCrit = cosmo.LensShear(zlens, src_zbins[i]);
+	      if (invSigCrit > 0.) {
+		Sigma_crit += src_pz[i] / invSigCrit;
+	      }
+	    }
+	    Sigma_crit *= SigmaCritPrefactor;  // normalize to units of [h M_sun pc^-2]
+
+	    // calculate weights
+	    double geom_weight = 1.0/Sigma_crit/Sigma_crit;
 	    //double weight *= geom_weight;  // update weight to include geometric weighting
 	  }
 	  else { // FUTURE TODO  // for a class using e1/e2 instead of g1/g2 reduced shear
