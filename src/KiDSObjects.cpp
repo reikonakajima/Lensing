@@ -40,9 +40,6 @@ KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask) {
   valarray<float> g1a;
   CCfits::Column& column1 = table.column("e1_A");
   int max_src_count = column1.rows();
-  // DEBUG REMOVE
-  max_src_count = MIN(50000, max_src_count);  // for debugging purposes, to be removed!
-
   column1.read( g1a, 1, max_src_count );
   valarray<float> g2a;
   CCfits::Column& column2 = table.column("e2_A");
