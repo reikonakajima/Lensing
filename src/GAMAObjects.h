@@ -61,6 +61,7 @@ class GAMAObjectList : public LensObjectList<GAMAObject*> {
 
  public:
   GAMAObjectList(istream& is);
+  int applyLogMStarCut(float min_logmstar, float max_logmstar);
 
  private:
   // none

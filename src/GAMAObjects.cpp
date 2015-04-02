@@ -47,3 +47,17 @@ GAMAObjectList::GAMAObjectList(istream& is) {
     lens_list.push_back(ptr);
   }
 }
+
+
+int
+GAMAObjectList::applyLogMStarCut(float min_logmstar, float max_logmstar) {
+  for (vector<GAMAObject*>::iterator it = lens_list.begin();
+       it != lens_list.end(); /* no increment */) {
+    if ( (*it)->getLogMStar() < min_logmstar or (*it)->getLogMStar() >= max_logmstar ) {
+      it = lens_list.erase(it);
+    } else {
+      ++it;
+    }
+  }
+  return lens_list.size();
+}
