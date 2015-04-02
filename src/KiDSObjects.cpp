@@ -10,7 +10,7 @@ using namespace std;
 bool KiDSObject::usePixelCoords;
 
 
-KiDSObjectList::KiDSObjectList(const string fits_filename) {
+KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask) {
 
   // open FITS file
   const string obj_extension = "OBJECTS";
@@ -39,78 +39,83 @@ KiDSObjectList::KiDSObjectList(const string fits_filename) {
 
   valarray<float> g1a;
   CCfits::Column& column1 = table.column("e1_A");
-  column1.read( g1a, 1, column1.rows() );
+  int max_src_count = column1.rows();
+  // DEBUG REMOVE
+  max_src_count = MIN(50000, max_src_count);  // for debugging purposes, to be removed!
+
+  column1.read( g1a, 1, max_src_count );
   valarray<float> g2a;
   CCfits::Column& column2 = table.column("e2_A");
-  column2.read( g2a, 1, column2.rows() );
+  column2.read( g2a, 1, max_src_count );
   valarray<float> g1b;
   CCfits::Column& column3 = table.column("e1_B");
-  column3.read( g1b, 1, column3.rows() );
+  column3.read( g1b, 1, max_src_count );
   valarray<float> g2b;
   CCfits::Column& column4 = table.column("e2_B");
-  column4.read( g2b, 1, column4.rows() );
+  column4.read( g2b, 1, max_src_count );
   valarray<float> g1c;
   CCfits::Column& column5 = table.column("e1_C");
-  column5.read( g1c, 1, column5.rows() );
+  column5.read( g1c, 1, max_src_count );
   valarray<float> g2c;
   CCfits::Column& column6 = table.column("e2_C");
-  column6.read( g2c, 1, column6.rows() );
+  column6.read( g2c, 1, max_src_count );
   valarray<float> g1d;
   CCfits::Column& column7 = table.column("e1_D");
-  column7.read( g1d, 1, column7.rows() );
+  column7.read( g1d, 1, max_src_count );
   valarray<float> g2d;
   CCfits::Column& column8 = table.column("e2_D");
-  column8.read( g2d, 1, column8.rows() );
+  column8.read( g2d, 1, max_src_count );
 
   valarray<double> ra;
   CCfits::Column& column9 = table.column("ALPHA_J2000");
-  column9.read( ra, 1, column9.rows() );
+  column9.read( ra, 1, max_src_count );
   valarray<double> dec;
   CCfits::Column& column10 = table.column("DELTA_J2000");
-  column10.read( dec, 1, column10.rows() );
+  column10.read( dec, 1, max_src_count );
 
   valarray<float> xpos;
   CCfits::Column& column11 = table.column("Xpos");
-  column11.read( xpos, 1, column11.rows() );
+  column11.read( xpos, 1, max_src_count );
   valarray<float> ypos;
   CCfits::Column& column12 = table.column("Ypos");
-  column12.read( ypos, 1, column12.rows() );
+  column12.read( ypos, 1, max_src_count );
 
-  valarray<float> mask;
+  valarray<int> mask;
   CCfits::Column& column13 = table.column("MAN_MASK");
-  column13.read( mask, 1, column13.rows() );
+  column13.read( mask, 1, max_src_count );
 
   valarray<float> mag;
   CCfits::Column& column14 = table.column("MAG_GAAP_r_CALIB");
-  column14.read( mag, 1, column14.rows() );
+  column14.read( mag, 1, max_src_count );
   valarray<float> magerr;
   CCfits::Column& column15 = table.column("MAGERR_GAAP_r");
-  column15.read( magerr, 1, column15.rows() );
+  column15.read( magerr, 1, max_src_count );
 
   valarray<float> fwhm;
   CCfits::Column& column16 = table.column("FWHM_IMAGE");
-  column16.read( fwhm, 1, column16.rows() );
+  column16.read( fwhm, 1, max_src_count );
 
   valarray<float> weight;
   CCfits::Column& column17 = table.column("weight");
-  column17.read( weight, 1, column17.rows() );
+  column17.read( weight, 1, max_src_count );
 
   valarray<float> sn;
   CCfits::Column& column18 = table.column("SNratio");
-  column18.read( sn, 1, column18.rows() );
+  column18.read( sn, 1, max_src_count );
 
   valarray<double> z_B;
   CCfits::Column& column19 = table.column("Z_B");
-  column19.read( z_B, 1, column19.rows() );
+  column19.read( z_B, 1, max_src_count );
 
   vector<valarray<float> > pz_full;
   CCfits::Column& column20 = table.column("PZ_full");
-  column20.readArrays( pz_full, 1, column20.rows() );
+  column20.readArrays( pz_full, 1, max_src_count );
 
   // append objects to this list
-  source_list.reserve(column1.rows());
-  for (int i=0; i<column1.rows(); ++i) {
+  source_list.reserve(max_src_count);
+  for (int i=0; i<max_src_count; ++i) {
       if (weight[i] == 0) continue;
+      //if (mask[i] & bitmask) continue;
       KiDSObject* ptr = new KiDSObject(i, ra[i], dec[i], mag[i], xpos[i], ypos[i], fwhm[i],
 				       g1a[i], g2a[i], g1b[i], g2b[i],
 				       g1c[i], g2c[i], g1d[i], g2d[i],

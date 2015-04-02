@@ -102,7 +102,7 @@ class KiDSObject : public SourceObject {
 class KiDSObjectList : public SourceObjectList<KiDSObject*> {
 
  public:
-  KiDSObjectList(const string fits_filename);
+  KiDSObjectList(const string fits_filename, int bitmask=0);  // bitmask=0 means *no* masking
   void usePixelCoord(bool _usePix) { source_list[0]->usePixCoord(_usePix); return; }
   void setShearIndex(int _index) {
     checkShearIndex(_index);
@@ -110,7 +110,7 @@ class KiDSObjectList : public SourceObjectList<KiDSObject*> {
     return;
   }
   // apply mask such that objects with "MAN_MASK <= mask_thres" are kept, return number of kept obj.
-  int applyMask(int mask_thres=0);
+  int applyMask(int mask_thres=0);  // mask_thres=0 means mask *everything*
   // apply bit mask, so that (MAN_MASK & bitmask)>0 objects are excluded
   int applyBitMask(int bitmask);
 
