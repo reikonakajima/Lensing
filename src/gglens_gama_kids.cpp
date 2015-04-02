@@ -35,7 +35,7 @@ const string usage =
 
 
 // source redshift cuts (based on z_B)
-const double MIN_SRC_Z = 0.005;
+const double MIN_SRC_Z = 0.05;
 const double MAX_SRC_Z = 1.2;
 const double MIN_LENS_SRC_SEP = 0.15;
 

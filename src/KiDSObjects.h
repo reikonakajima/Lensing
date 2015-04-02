@@ -114,8 +114,10 @@ class KiDSObjectList : public SourceObjectList<KiDSObject*> {
   // apply bit mask, so that (MAN_MASK & bitmask)>0 objects are excluded
   int applyBitMask(int bitmask);
 
-  static const int NUM_PZ_ELEM = 70;  // parameters to set p(z) bins
+  // parameters to set p(z) bins
+  static const int NUM_PZ_ELEM = 70;
   static const float DELTA_Z = 0.05;
+  static const float INIT_Z = 0.025;
 
  private:
 

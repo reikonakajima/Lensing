@@ -127,7 +127,7 @@ KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask) {
   // "a vector of length 70 giving P(z) at redshifts spanning 0<z<3.5 with dz=0.05"
   float array[NUM_PZ_ELEM];
   for (int i=0; i<NUM_PZ_ELEM; ++i) {
-    array[i] = i * DELTA_Z;
+    array[i] = INIT_Z + i * DELTA_Z;
   }
   SourceObjectList::pzbins = valarray<float>(array, NUM_PZ_ELEM);
 
