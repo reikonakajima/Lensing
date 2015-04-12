@@ -137,7 +137,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 
 	if (std::isnan(et)) {
 	  bad_et++;
-	  continue;
+	  continue;  // to the next src obj
 	}
 
 	//
@@ -156,7 +156,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 
 	    // discard src object that is not far enough behind of the lens
 	    if ((zsrc-zlens) < min_lens_src_delta_z)
-	      continue;
+	      continue;  // to the next src obj
 
 	    // integrate over p(z) to get Sigma_crit
 	    src_pz = srcobj->getPz();   // this is p(z)
