@@ -16,9 +16,9 @@ template<class lensObjPtr, class srcObjPtr>
 GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObjPtr> lens_list,
 							  SourceObjectList<srcObjPtr> source_list,
 							  GenericBins _radial_bin,
+							  bool normalizeToSigmaCrit,
 							  cosmology::Cosmology cosmo,
 							  double min_lens_src_delta_z,
-							  bool normalizeToSigmaCrit,
 							  geometry _geom,
 							  double mesh_frac) :
   radial_bin(_radial_bin) , geom(_geom) {
@@ -179,13 +179,13 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	  else { // FUTURE TODO  // for a class using e1/e2 instead of g1/g2 reduced shear
 	    responsiv = srcobj->getResponsivity(et);
 	  }
-	}
+	}  // end: if (normalizeToSigmaCrit)
 
-	// the weighted shears
+	// the weighted shears and variance
 	double weightedsignal_t = et * weight;
 	double weightedsignal_s = es * weight;
-	double weightedVariance_t = weight * weight* et * et;
-	double weightedVariance_s = weight * weight* es * es;
+	double weightedVariance_t = weight * et * et;
+	double weightedVariance_s = weight * es * es;
 
 	/// add source object to sm bin 
 	(*this_gglens)[irad].addPairCounts();

@@ -69,9 +69,9 @@ class GGLensObjectList {
   GGLensObjectList(LensObjectList<lensObjPtr> lens_list,
 		   SourceObjectList<srcObjPtr> source_list,
 		   GenericBins radial_bin,
+		   bool normalizeToSigmaCrit = true,
 		   cosmology::Cosmology cosmo = cosmology::Cosmology(0.27,0.73),
 		   double min_lens_src_delta_z = 0.15,
-		   bool normalizeToSigmaCrit = true,
 		   geometry = SphericalSurface,
 		   double mesh_frac = 0.);
 

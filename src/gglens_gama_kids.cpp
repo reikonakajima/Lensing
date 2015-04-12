@@ -149,8 +149,10 @@ main(int argc, char* argv[]) {
     //
     double Om=0.27, Ol=1.-Om;
     cosmology::Cosmology cosmo(Om, Ol);
+    bool normalizeToSigmaCrit = true;
     GGLensObjectList<GAMAObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin,
-							   cosmo, MIN_LENS_SRC_SEP);
+							   normalizeToSigmaCrit, cosmo,
+							   MIN_LENS_SRC_SEP);
 
     //
     // sort each lens into binned_lists
@@ -207,7 +209,7 @@ main(int argc, char* argv[]) {
     // provide output per bin
     //
     ofs << "#imag irad pairs sum(weights) sum(w^2) sum(responsivity) sum(w*et) sum(w*ex) "
-	<< "sum(w^2*var(et)) sum(w^2*var(ex)) n_lens" << endl;
+	<< "sum(w*var(et)) sum(w*var(ex)) n_lens" << endl;
 
     ofs << "#magbins: ";
     for (int imag=0; imag<logmstar_bin.vectorSize(); ++imag) {
