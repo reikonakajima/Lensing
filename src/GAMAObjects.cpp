@@ -14,10 +14,10 @@ GAMAObject::GAMAObject(const string buffer) {
 	>> d_loglwage >> metal >> d_metal >> logtau >> d_logtau
 	>> logmremnants >> d_logmremnants >> rankbcg >> Nfof >> Zmax_19P8
 	>> Zmax_19P4)) {
-    LensObject::mag = 20.0;  // TO BE FIXED
     cerr << "## " << buffer << endl;
     throw GAMAObjectsError("error reading GAMAObject");
   }
+  LensObject::mag = rpetro;  // OK?
 }
 
 
