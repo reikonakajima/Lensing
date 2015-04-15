@@ -133,13 +133,13 @@ main(int argc, char* argv[]) {
       return(9);
     }
 
-    cerr << "radial bin range ...... " << radial_bin_arcsec[0] << " ... "
+    cerr << "radial bin range ...... " << radial_bin_arcsec[0] << " to "
 	 << radial_bin_arcsec[radial_bin_arcsec.binSize()] << " (arcsec)" << endl;
     /*
     cerr << "magnitude bin range ... " << magnitude_bin[0] << " ... "
 	 << magnitude_bin[magnitude_bin.binSize()] << endl;
     */
-    cerr << "log(mstar) bin range ... ";
+    cerr << "log(mstar) bin range .. ";
     for (int i=0; i<logmstar_bin.vectorSize(); ++i)  cerr << logmstar_bin[i] << " ";
     cerr << endl;
 
@@ -150,6 +150,9 @@ main(int argc, char* argv[]) {
     double Om=0.27, Ol=1.-Om;
     cosmology::Cosmology cosmo(Om, Ol);
     bool normalizeToSigmaCrit = true;
+    if (normalizeToSigmaCrit) {
+      cerr << "cosmology is .......... " << "(Om=" << Om << ", Ol=" << Ol << ")" << endl;
+    }
     GGLensObjectList<GAMAObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin,
 							   normalizeToSigmaCrit, cosmo,
 							   MIN_LENS_SRC_SEP);
