@@ -149,8 +149,8 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	//
 	double Sigma_crit_inv = 1.; // if we want to stack pure shear signals, keep Sigma_crit=1.
 	double obj_weight = srcobj->getWeight();  // weight for the individual src object
-	double weight = obj_weight;               // if no geometry
-	double weight_and_norm = weight;          // if no cosmology
+	double weight = obj_weight;               // if no geometry/cosmology
+	double weight_and_norm = weight;          // if no geometry/cosmology
 	double responsiv = 1.;  // responsivity used for e1/e2; irrelevant if using g1/g2
 	valarray<float> src_pz; // source redshift PDF
 
