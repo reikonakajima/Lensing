@@ -184,10 +184,8 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	    Sigma_crit_inv /= SigmaCritPrefactor;  // normalize to units of [h M_sun pc^-2]
 
 	    // calculate weight with normalization: DeltaSigma = Sum (w*Sigma_crit*gamma_t)
-	    double w_geom_and_norm = Sigma_crit_inv;           // normalization = Sigma_crit
-	    double w_geom = w_geom_and_norm * Sigma_crit_inv;  // w_geom = Sigma_crit^-2
-	    weight_and_norm *= w_geom_and_norm;
-	    weight *= w_geom;   // update weight to include geometrical weight
+	    weight_and_norm *= Sigma_crit_inv;           // normalization = Sigma_crit
+	    weight *= Sigma_crit_inv * Sigma_crit_inv;   // update to include geom_wt=Sigma_crit^-2
 	  }
 	  else { // FUTURE TODO  // for a class using e1/e2 instead of g1/g2 reduced shear
 	    responsiv = srcobj->getResponsivity(et);
