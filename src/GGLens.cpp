@@ -101,6 +101,9 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     int bad_et = 0;
     int bad_src = 0;
 
+    // integrate over redshift probability distribution?
+    bool use_pz = true;
+
     // get the redshift bins for p(z) of source objects
     valarray<float> src_zbins = source_list.getPzBins();
 
@@ -141,15 +144,18 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	}
 
 	//
-	// calculate weights, responsivities, shears and shear errors
+	// calculate weights, (responsivities,) shears and shear errors
+	// (reject based on redshift)
 	//
-	double Sigma_crit = 1.; // if we want to stack pure shear signals, keep Sigma_crit 1.
-	double weight = srcobj->getWeight();  // weight for the individual object
-	double responsiv = 1.;  // responsivity for e1/e2; irrelevant if using g1/g2
-	valarray<float> src_pz;
+	double Sigma_crit_inv = 1.; // if we want to stack pure shear signals, keep Sigma_crit=1.
+	double obj_weight = srcobj->getWeight();  // weight for the individual src object
+	double weight = obj_weight;               // if no geometry
+	double weight_and_norm = weight;          // if no cosmology
+	double responsiv = 1.;  // responsivity used for e1/e2; irrelevant if using g1/g2
+	valarray<float> src_pz; // source redshift PDF
 
 	if (normalizeToSigmaCrit) {
-	  // integrate over p(z) to calculate Sigma_crit
+	  // integrate over p(z) to calculate Sigma_crit_inv
 	  if (typeid(*srcobj) == typeid(KiDSObject)) {
 
 	    float zsrc = srcobj->getRedshift();  // this is z_B
@@ -158,23 +164,30 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	    if ((zsrc-zlens) < min_lens_src_delta_z)
 	      continue;  // to the next src obj
 
-	    // integrate over p(z) to get Sigma_crit
-	    src_pz = srcobj->getPz();   // this is p(z)
-	    double pz_sum = 0;          // normalize p(z)
-	    for (int i=0; i<src_pz.size(); ++i) pz_sum += src_pz[i];
-	    src_pz /= pz_sum;
-	    Sigma_crit = 0;             // integrate over p(z)
-	    for (int i=0; i<src_pz.size(); ++i) {
-	      double invSigCrit = cosmo.LensShear(zlens, src_zbins[i]);
-	      if (invSigCrit > 0.) {
-		Sigma_crit += src_pz[i] / invSigCrit;
+	    if (use_pz) {
+	      // first, normalize p(z)
+	      src_pz = srcobj->getPz();   // this is p(z), unnormalized
+	      double pz_sum = 0;
+	      for (int i=0; i<src_pz.size(); ++i) pz_sum += src_pz[i];
+	      src_pz /= pz_sum;
+
+	      // integrate over p(z) to get Sigma_crit_inv
+	      Sigma_crit_inv = 0;
+	      for (int i=0; i<src_pz.size(); ++i) {
+		Sigma_crit_inv += src_pz[i] * cosmo.LensShear(src_zbins[i], zlens);
 	      }
 	    }
-	    Sigma_crit *= SigmaCritPrefactor;  // normalize to units of [h M_sun pc^-2]
+	    else {
+	      // calculate Sigma_crit using source z_B only
+	      Sigma_crit_inv = cosmo.LensShear(zsrc, zlens);
+	    }
+	    Sigma_crit_inv /= SigmaCritPrefactor;  // normalize to units of [h M_sun pc^-2]
 
 	    // calculate weight with normalization: DeltaSigma = Sum (w*Sigma_crit*gamma_t)
-	    double geom_weight_and_norm = 1.0/Sigma_crit;  // geom_weight = Sigma_crit^-2
-	    weight *= geom_weight_and_norm;  // update weight to include geom wt and normalization
+	    double w_geom_and_norm = Sigma_crit_inv;           // normalization = Sigma_crit
+	    double w_geom = w_geom_and_norm * Sigma_crit_inv;  // w_geom = Sigma_crit^-2
+	    weight_and_norm *= w_geom_and_norm;
+	    weight *= w_geom;   // update weight to include geometrical weight
 	  }
 	  else { // FUTURE TODO  // for a class using e1/e2 instead of g1/g2 reduced shear
 	    responsiv = srcobj->getResponsivity(et);
@@ -182,10 +195,10 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	}  // end: if (normalizeToSigmaCrit)
 
 	// the weighted shears and variance
-	double weightedsignal_t = et * weight;
-	double weightedsignal_s = es * weight;
-	double weightedVariance_t = weight * et * et;
-	double weightedVariance_s = weight * es * es;
+	double weightedsignal_t = et * weight_and_norm;    // w * w_geom * et * Sigma_crit
+	double weightedsignal_s = es * weight_and_norm;    //   = weight_and_norm * et
+	double weightedVariance_t = obj_weight * et * et;  // w * w_geom * et^2 * Sigma_crit^2
+	double weightedVariance_s = obj_weight * es * es;  //   = w * et^2
 
 	/// add source object to sm bin 
 	(*this_gglens)[irad].addPairCounts();
