@@ -16,6 +16,7 @@ template<class lensObjPtr, class srcObjPtr>
 GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObjPtr> lens_list,
 							  SourceObjectList<srcObjPtr> source_list,
 							  GenericBins _radial_bin,
+							  bool radialBinInMpc,
 							  bool normalizeToSigmaCrit,
 							  cosmology::Cosmology cosmo,
 							  double min_lens_src_delta_z,
@@ -54,6 +55,12 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
   Mesh<srcObjPtr> srcmesh(meshdimX, meshdimY, 1, source_vector, isPeriodic,
 			  ramin, ramax, decmin, decmax);
 
+  /// prepare for conversion into DEGREE (still needs to be devided by Angular Diameter Distance)
+  if (radialBinInMpc) {
+    radial_bin /= DEGREE; // still in Mpc/h, divided by DEGREE
+  } else {
+    radial_bin /= 3600.;  // convert from arcsec into degree
+  }
 
   //
   // iterate over all lens; generate lensing signal profile for each lens object
@@ -75,6 +82,12 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     double ldec = lensdec * DEGREE;
     double zlens = lensobj->getRedshift();
 
+    /// correct radial binning from Mpc to angular scale (arcsec)
+    GenericBins angular_radial_bin(radial_bin);  // make a copy
+    if (radialBinInMpc) {
+      angular_radial_bin /= cosmo.DA(zlens) * HubbleLengthMpc;   // angular_radial_bin in degrees
+    }
+
     if (!srcbounds.includes(Position<double>(lensra, lensdec)))
        continue;
 
@@ -87,7 +100,8 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	throw GGLensError("GGLens should not take Flat geometry");
       } else if (geom == SphericalSurface) {
 	bglist[irad] = srcmesh.getNearAngleMap(lensra, lensdec, 0.,
-					       radial_bin[irad+1], radial_bin[irad]);
+					       angular_radial_bin[irad+1],
+					       angular_radial_bin[irad]);
       }
     }
 
