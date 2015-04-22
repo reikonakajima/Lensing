@@ -31,6 +31,11 @@ class GenericBins {
   void setReverse(bool b) { reverseOrder = b; return; }
   bool isReverse() { return reverseOrder; }
   double operator[](int index) { return binEdges[index]; }
+  double operator/=(double _scale) {
+    for (int i=0; i<this->vectorSize(); ++i) {
+      binEdges[i] /= _scale;
+    }
+  }
   void rescale(double _scale) {
     for (int i=0; i<this->vectorSize(); ++i) {
       binEdges[i] *= _scale;
