@@ -69,21 +69,20 @@ main(int argc, char* argv[]) {
       throw MyException("source catalog file " + source_filename + " not found");
 
     //
-    // setup radial bins (in arcsec)
+    // setup radial bins (in Mpc/h)
     //
     ifstream radialbinf(radial_bin_filename.c_str());
-    double min_theta = 5.0;
-    double max_theta = 4000.0;
-    int rad_nbin = 50;
+    double min_Mpc = 1e-2;  // 10 kpc/h minimum
+    double max_Mpc = 10;    // 10 Mpc/h maximum
+    int rad_nbin = 16;
     if (radialbinf) {
-      if (!(radialbinf >> min_theta >> max_theta >> rad_nbin))
+      if (!(radialbinf >> min_Mpc >> max_Mpc >> rad_nbin))
 	throw MyException("radialbin file type error");
-      if (rad_nbin < 2 || min_theta < 0 || max_theta < min_theta)
+      if (rad_nbin < 2 || min_Mpc < 0 || max_Mpc < min_Mpc)
 	throw MyException("radialbin file specification error");
     }
-    LogarithmicBins radial_bin_arcsec(min_theta, max_theta, rad_nbin);  // for debug/info
-    LogarithmicBins radial_bin(min_theta, max_theta, rad_nbin);
-    radial_bin.rescale(1./3600.);  // convert arcsec to degree
+    // note that radial_bin will eventually need to be in degrees for use with the Mesh class
+    LogarithmicBins radial_bin(min_Mpc, max_Mpc, rad_nbin);
 
     //
     // setup bins (magnitude)
@@ -133,8 +132,8 @@ main(int argc, char* argv[]) {
       return(9);
     }
 
-    cerr << "radial bin range ...... " << radial_bin_arcsec[0] << " to "
-	 << radial_bin_arcsec[radial_bin_arcsec.binSize()] << " (arcsec)" << endl;
+    cerr << "radial bin range ...... " << radial_bin[0] << " to "
+	 << radial_bin[radial_bin.binSize()] << " (Mpc/h)" << endl;
     /*
     cerr << "magnitude bin range ... " << magnitude_bin[0] << " ... "
 	 << magnitude_bin[magnitude_bin.binSize()] << endl;
@@ -149,13 +148,14 @@ main(int argc, char* argv[]) {
     //
     double Om=0.27, Ol=1.-Om;
     cosmology::Cosmology cosmo(Om, Ol);
+    bool radialBinIsMpc = true;
     bool normalizeToSigmaCrit = true;
     if (normalizeToSigmaCrit) {
       cerr << "cosmology is .......... " << "(Om=" << Om << ", Ol=" << Ol << ")" << endl;
     }
     GGLensObjectList<GAMAObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin,
-							   normalizeToSigmaCrit, cosmo,
-							   MIN_LENS_SRC_SEP);
+							   radialBinIsMpc, normalizeToSigmaCrit,
+							   cosmo, MIN_LENS_SRC_SEP);
 
     //
     // sort each lens into binned_lists
@@ -220,9 +220,9 @@ main(int argc, char* argv[]) {
     }
     ofs << endl;
 
-    ofs << "#radbins(arcsec): ";
-    for (int irad=0; irad<radial_bin_arcsec.vectorSize(); ++irad) {
-      ofs << radial_bin_arcsec[irad] << " ";
+    ofs << "#radbins(Mpc/h): ";
+    for (int irad=0; irad<radial_bin.vectorSize(); ++irad) {
+      ofs << radial_bin[irad] << " ";
     }
     ofs << endl;
 
