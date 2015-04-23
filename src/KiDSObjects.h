@@ -31,14 +31,7 @@ class KiDSObjectsError : public MyException {
  *
  * class KiDSObjectList
  *
- * Upon generation, lensfit weight == 0 objects are automatically excluded from this list.
- *
- *
- * TODO:
- *   read Massimo's paper, see if any additional KiDS catalog info is necessary
- *   add applyMask() function
- *   correct KiDS catalog entries (such as magnitudes)
- *   add photometric redshift information
+ *  *** Upon generation, lensfit weight == 0 objects are automatically excluded from this list.
  *
  */
 
@@ -77,7 +70,7 @@ class KiDSObject : public SourceObject {
     c2_corr[2] = _c2_C;
     c2_corr[3] = _c2_D;
 
-    // copy the _A info into "main"
+    // copy the _A info into "main"  // TODO: make this specifiable via parameter (file)
     this->setShearG1G2BiasCorrections(shear[0], _g1_A, -_g2_A, _m_corr, _c1_A, -_c2_A);
 
     SourceObject::pz = _pz_full;
@@ -136,7 +129,7 @@ class KiDSObjectList : public SourceObjectList<KiDSObject*> {
     return;
   }
   // apply mask such that objects with "MAN_MASK <= mask_thres" are kept, return number of kept obj.
-  int applyMask(int mask_thres=0);  // mask_thres=0 means mask *everything*
+  int applyMask(int mask_thres=0);  // mask_thres=0 means mask *everything* except MASK==0
   // apply bit mask, so that (MAN_MASK & bitmask)>0 objects are excluded
   int applyBitMask(int bitmask);
 
