@@ -27,7 +27,7 @@ const string usage =
   " usage: gglens_gama_kids <lens_catalog> <source_catalog> <radial_bin_info> <outfile_prefix>\n"
   "  lens_catalog:    lens catalog which contains the columns\n"
   "  source_catalog:  source catalog, which contains the columns\n"
-  "  radial_bin_info: radial bin info (3 numbers, in arcseconds): [min_theta, max_theta, rad_nbin]\n"
+  "  radial_bin_info: radial bin info (3 numbers, in Mpc/h): [min_Mpch, max_Mpch, rad_nbin]\n"
   "  \n"
   //  " output #1: file name:\" "+outfprefix+suffix+"\"\n"
   " stdin:  (none)\n"
@@ -35,7 +35,7 @@ const string usage =
 
 
 // source redshift cuts (based on z_B)
-const double MIN_SRC_Z = 0.05;
+const double MIN_SRC_Z = 0.005;
 const double MAX_SRC_Z = 1.2;
 const double MIN_LENS_SRC_SEP = 0.15;
 
@@ -103,7 +103,7 @@ main(int argc, char* argv[]) {
     GAMAObjectList lens_list(master_lens_list);
     lens_list.applyLogMStarCut(logmstar_bin.getMin(), logmstar_bin.getMax());
 
-    int bitmask = 1;  /// TODO: UPDATE BITMASK OPTIONS  2^15 - 1 = 32767
+    int bitmask = 1;  /// remove bitmask masked objs. TODO: UPDATE BITMASK OPTIONS  2^15 - 1 = 32767
     KiDSObjectList master_source_list(source_filename, bitmask);
     KiDSObjectList source_list(master_source_list);
     source_list.applyRedshiftCut(MIN_SRC_Z, MAX_SRC_Z);
