@@ -53,14 +53,33 @@ class KiDSObject : public SourceObject {
 	     float _fwhm_image,
 	     double _g1_A, double _g2_A, double _g1_B, double _g2_B,
 	     double _g1_C, double _g2_C, double _g1_D, double _g2_D,
-	     float sn_ratio, double _zB, valarray<float> _pz_full, int _mask, double _wt) :
+	     float sn_ratio, double _zB, valarray<float> _pz_full, int _mask, double _wt,
+	     float _m_corr,                                         // m_correction
+	     float _c1_A, float _c2_A, float _c1_B, float _c2_B,    // c_corrections
+	     float _c1_C, float _c2_C, float _c1_D, float _c2_D) :
   SourceObject(_id, ra, dec, 99., 99., _zB, _wt),  // temporarily g1 and g2 in base source object
     mag(_mag), xpos(_xpos), ypos(_ypos), fwhm(_fwhm_image), sn(sn_ratio), mask(_mask) {
+
     shear[0] = Shear().setG1G2(_g1_A, -_g2_A);  // ra runs in negative direction,
-    shear[1] = Shear().setG1G2(_g1_B, -_g2_B);  // lensfit flips g2 sign
-    shear[2] = Shear().setG1G2(_g1_C, -_g2_C);  // presumably because it fits in pixel space
+    shear[1] = Shear().setG1G2(_g1_B, -_g2_B);  // so the g2 sign needs to be flipped
+    shear[2] = Shear().setG1G2(_g1_C, -_g2_C);
     shear[3] = Shear().setG1G2(_g1_D, -_g2_D);
-    this->setShearAndG1G2(shear[0], _g1_A, -_g2_A);  // copy the _A shear into "main shape"
+
+    m_corr = _m_corr;
+
+    c1_corr[0] = _c1_A;
+    c1_corr[1] = _c1_B;
+    c1_corr[2] = _c1_C;
+    c1_corr[3] = _c1_D;
+
+    c2_corr[0] = _c2_A;
+    c2_corr[1] = _c2_B;
+    c2_corr[2] = _c2_C;
+    c2_corr[3] = _c2_D;
+
+    // copy the _A info into "main"
+    this->setShearG1G2BiasCorrections(shear[0], _g1_A, -_g2_A, _m_corr, _c1_A, -_c2_A);
+
     SourceObject::pz = _pz_full;
   }
 
@@ -87,14 +106,21 @@ class KiDSObject : public SourceObject {
   float xpos, ypos;
   float fwhm;
   Shear shear[NUM_SHEAR];
+  float m_corr;
+  float c1_corr[NUM_SHEAR];
+  float c2_corr[NUM_SHEAR];
   float sn;            // Signal-to-noise
   int   mask;
 
   // make sure the shear is set in the base SourceObject class
-  void setShearAndG1G2(Shear s_new, double _g1, double _g2) {
+  void setShearG1G2BiasCorrections(Shear s_new, double _g1, double _g2,
+				   float _m, float _c1, float _c2) {
     SourceObject::s = s_new;
     SourceObject::g1 = _g1;
     SourceObject::g2 = _g2;
+    SourceObject::m = _m;
+    SourceObject::c1 = _c2;
+    SourceObject::c2 = _c1;
   }
 };
 

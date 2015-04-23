@@ -108,6 +108,37 @@ KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask) {
   CCfits::Column& column20 = table.column("PZ_full");
   column20.readArrays( pz_full, 1, max_src_count );
 
+  valarray<float> c1a;
+  CCfits::Column& column21 = table.column("c1_A");
+  column21.read( c1a, 1, max_src_count );
+  valarray<float> c2a;
+  CCfits::Column& column22 = table.column("c2_A");
+  column22.read( c2a, 1, max_src_count );
+  valarray<float> c1b;
+  CCfits::Column& column23 = table.column("c1_B");
+  column23.read( c1b, 1, max_src_count );
+  valarray<float> c2b;
+  CCfits::Column& column24 = table.column("c2_B");
+  column24.read( c2b, 1, max_src_count );
+  valarray<float> c1c;
+  CCfits::Column& column25 = table.column("c1_C");
+  column25.read( c1c, 1, max_src_count );
+  valarray<float> c2c;
+  CCfits::Column& column26 = table.column("c2_C");
+  column26.read( c2c, 1, max_src_count );
+  valarray<float> c1d;
+  CCfits::Column& column27 = table.column("c1_D");
+  column27.read( c1d, 1, max_src_count );
+  valarray<float> c2d;
+  CCfits::Column& column28 = table.column("c2_D");
+  column28.read( c2d, 1, max_src_count );
+
+  valarray<float> m_corr;
+  CCfits::Column& column29 = table.column("m_cor");
+  column29.read( m_corr, 1, max_src_count );
+
+
+
   // append objects to this list
   source_list.reserve(max_src_count);
   for (int i=0; i<max_src_count; ++i) {
@@ -116,7 +147,10 @@ KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask) {
       KiDSObject* ptr = new KiDSObject(i, ra[i], dec[i], mag[i], xpos[i], ypos[i], fwhm[i],
 				       g1a[i], g2a[i], g1b[i], g2b[i],
 				       g1c[i], g2c[i], g1d[i], g2d[i],
-				       sn[i], z_B[i], pz_full[i], mask[i], weight[i]);
+				       sn[i], z_B[i], pz_full[i], mask[i], weight[i],
+				       m_corr[i],
+				       c1a[i], c2a[i], c1b[i], c2b[i],
+				       c1c[i], c2c[i], c1d[i], c2d[i]);
       source_list.push_back(ptr);
   }
 

@@ -34,8 +34,9 @@ class SourceObject {
  public:
   SourceObject();
   SourceObject(long int _id, double _ra, double _dec, double _s1, double _s2,
-	       float _zB, double _wt=1., bool _shapeIsReducedShear=true) :
-  id(_id), ra(_ra), dec(_dec), zB(_zB), wt(_wt), responsiv(-99.),
+	       float _zB, double _wt=1., bool _shapeIsReducedShear=true,
+	       double _m=0., double _c1=0., double _c2=0.) :
+  id(_id), ra(_ra), dec(_dec), m(_m), c1(_c1), c2(_c2), zB(_zB), wt(_wt), responsiv(-99.),
   inputIsReducedShear(_shapeIsReducedShear)
     {
       if (inputIsReducedShear) {
@@ -59,6 +60,9 @@ class SourceObject {
   double getG1() const { return g1; }
   double getG2() const { return g2; }
   Shear  getShear() const { return s; }
+  double getM() const { return m; }
+  double getC1() const { return c1; }
+  double getC2() const { return c2; }
 
   float  getRedshift() const { return zB; }
   std::valarray<float>& getPz() {
@@ -110,6 +114,8 @@ class SourceObject {
   double ra, dec;  // position
   Shear s;         // shear saves e1,e2 values
   double g1, g2;   // reduced shear
+  double m;        // multiplicative bias correction factor
+  double c1, c2;   // additive bias correction factors
   mutable double wt;         // calculated weight
   bool inputIsReducedShear;
   float zB;             // z_B of photo-z
