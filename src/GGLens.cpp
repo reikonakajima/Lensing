@@ -213,6 +213,11 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	  }
 	}  // end: if (normalizeToSigmaCrit)
 
+	//
+	// calculate multiplicative bias
+	//
+	double m = srcobj->getM();
+
 	// the weighted shears and variance
 	double weightedsignal_t = et * weight_and_norm;    // w * w_geom * et * Sigma_crit
 	double weightedsignal_s = es * weight_and_norm;    //   = weight_and_norm * et
@@ -228,6 +233,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	(*this_gglens)[irad].addDeltaSigma_s(weightedsignal_s);
 	(*this_gglens)[irad].addVariance_t(weightedVariance_t);
 	(*this_gglens)[irad].addVariance_s(weightedVariance_s);
+	(*this_gglens)[irad].addMBias(m*weight);
 
       } // END: source object (within bglist[irad]) 'for' loop
 
