@@ -29,12 +29,16 @@ const string usage =
   "  source_catalog:  source catalog, which contains the columns\n"
   "  radial_bin_info: radial bin info (3 numbers, in Mpc/h): [min_Mpch, max_Mpch, rad_nbin]\n"
   "  \n"
+  "  (future TODO:)\n"
+  "  (allow stellar mass or luminosity binning as parameter file option)\n"
+  "  (allow h = H0/100 km/s/Mpc as parameter file option)\n"
+  "  \n"
   //  " output #1: file name:\" "+outfprefix+suffix+"\"\n"
   " stdin:  (none)\n"
   " stdout: (none)\n";
 
 
-// source redshift cuts (based on z_B)
+/// source redshift cuts (based on z_B)   TODO: These should be specifiable from a parameter file
 const double MIN_SRC_Z = 0.005;
 const double MAX_SRC_Z = 1.2;
 const double MIN_LENS_SRC_SEP = 0.15;
@@ -69,11 +73,11 @@ main(int argc, char* argv[]) {
       throw MyException("source catalog file " + source_filename + " not found");
 
     //
-    // setup radial bins (in Mpc/h)
+    // setup radial bins (in Mpc or Mpc/h, depending on definition of h)
     //
     ifstream radialbinf(radial_bin_filename.c_str());
-    double min_Mpc = 1e-2;  // 10 kpc/h minimum
-    double max_Mpc = 10;    // 10 Mpc/h maximum
+    double min_Mpc = 1e-2;  // 10 kpc minimum
+    double max_Mpc = 10;    // 10 Mpc maximum
     int rad_nbin = 16;
     if (radialbinf) {
       if (!(radialbinf >> min_Mpc >> max_Mpc >> rad_nbin))
@@ -133,7 +137,7 @@ main(int argc, char* argv[]) {
     }
 
     cerr << "radial bin range ...... " << radial_bin[0] << " to "
-	 << radial_bin[radial_bin.binSize()] << " (Mpc/h)" << endl;
+	 << radial_bin[radial_bin.binSize()] << " (Mpc or Mpc/h)" << endl;
     /*
     cerr << "magnitude bin range ... " << magnitude_bin[0] << " ... "
 	 << magnitude_bin[magnitude_bin.binSize()] << endl;
@@ -221,7 +225,7 @@ main(int argc, char* argv[]) {
     }
     ofs << endl;
 
-    ofs << "#radbins(Mpc/h): ";
+    ofs << "#radbins(Mpc/h),h="<< h <<": ";
     for (int irad=0; irad<radial_bin.vectorSize(); ++irad) {
       ofs << radial_bin[irad] << " ";
     }
