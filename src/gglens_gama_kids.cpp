@@ -208,6 +208,8 @@ main(int argc, char* argv[]) {
 	    (*binned_lists[imag][ilens])[irad].getVariance_t());
 	  radial_shears[imag][irad].addVariance_s(
 	    (*binned_lists[imag][ilens])[irad].getVariance_s());
+	  radial_shears[imag][irad].addMBias(
+	    (*binned_lists[imag][ilens])[irad].getMBias());
 	}
       }
     } // end for(imag)
@@ -244,6 +246,7 @@ main(int argc, char* argv[]) {
 	    << radial_shears[imag][irad].getDeltaSigma_s() << " "
 	    << radial_shears[imag][irad].getVariance_t() << " "
 	    << radial_shears[imag][irad].getVariance_s() << " "
+	    << radial_shears[imag][irad].getMBias() << " "
 	    << radial_shears[imag][irad].getLensCounts() << endl;
       }
     }
