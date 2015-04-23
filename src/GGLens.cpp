@@ -82,7 +82,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     double ldec = lensdec * DEGREE;
     double zlens = lensobj->getRedshift();
 
-    /// correct radial binning from Mpc to angular scale (arcsec)
+    /// correct radial binning from Mpc to angular scale (degrees)
     GenericBins angular_radial_bin(radial_bin);  // make a copy
     if (radialBinInMpc) {
       angular_radial_bin /= cosmo.DA(zlens) * HubbleLengthMpc;   // angular_radial_bin in degrees
