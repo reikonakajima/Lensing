@@ -219,7 +219,7 @@ main(int argc, char* argv[]) {
     // provide output per bin
     //
     ofs << "#imag irad pairs sum(weights) sum(w^2) sum(responsivity) sum(w*et) sum(w*ex) "
-	<< "sum(w*var(et)) sum(w*var(ex)) n_lens" << endl;
+	<< "sum(w*var(et)) sum(w*var(ex)) n_lens m_corr" << endl;
 
     ofs << "#magbins: ";
     for (int imag=0; imag<logmstar_bin.vectorSize(); ++imag) {
@@ -246,8 +246,8 @@ main(int argc, char* argv[]) {
 	    << radial_shears[imag][irad].getDeltaSigma_s() << " "
 	    << radial_shears[imag][irad].getVariance_t() << " "
 	    << radial_shears[imag][irad].getVariance_s() << " "
-	    << radial_shears[imag][irad].getMBias() << " "
-	    << radial_shears[imag][irad].getLensCounts() << endl;
+	    << radial_shears[imag][irad].getLensCounts() << " "
+	    << radial_shears[imag][irad].getMBias() << endl;
       }
     }
 
