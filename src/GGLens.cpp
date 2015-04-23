@@ -19,10 +19,17 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 							  bool radialBinInMpc,
 							  bool normalizeToSigmaCrit,
 							  cosmology::Cosmology cosmo,
+							  double h,
 							  double min_lens_src_delta_z,
 							  geometry _geom,
 							  double mesh_frac) :
   radial_bin(_radial_bin) , geom(_geom) {
+
+  //
+  // adjust cosmological distance calculations for h
+  //
+  const double HUBBLE_LENGTH_MPC = HubbleLengthMpc * h;
+  const double SIGMA_CRIT_PREFACTOR = SigmaCritPrefactor / h;
 
   //
   // create source mesh list, for fast iteration over lens-source pairs
@@ -57,7 +64,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 
   /// prepare for conversion into DEGREE (still needs to be devided by Angular Diameter Distance)
   if (radialBinInMpc) {
-    radial_bin /= DEGREE; // still in Mpc/h, divided by DEGREE
+    radial_bin /= DEGREE; // still in Mpc, divided by DEGREE
   } else {
     radial_bin /= 3600.;  // convert from arcsec into degree
   }
@@ -85,7 +92,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     /// correct radial binning from Mpc to angular scale (degrees)
     GenericBins angular_radial_bin(radial_bin);  // make a copy
     if (radialBinInMpc) {
-      angular_radial_bin /= cosmo.DA(zlens) * HubbleLengthMpc;   // angular_radial_bin in degrees
+      angular_radial_bin /= cosmo.DA(zlens) * HUBBLE_LENGTH_MPC;   // angular_radial_bin in degrees
     }
 
     if (!srcbounds.includes(Position<double>(lensra, lensdec)))
@@ -195,7 +202,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	      // calculate Sigma_crit using source z_B only
 	      Sigma_crit_inv = cosmo.LensShear(zsrc, zlens);
 	    }
-	    Sigma_crit_inv /= SigmaCritPrefactor;  // normalize to units of [h M_sun pc^-2]
+	    Sigma_crit_inv /= SIGMA_CRIT_PREFACTOR;  // normalize to units of [(h) M_sun pc^-2]
 
 	    // calculate weight with normalization: DeltaSigma = Sum (w*Sigma_crit*gamma_t)
 	    weight_and_norm *= Sigma_crit_inv;           // normalization = Sigma_crit

@@ -72,6 +72,7 @@ class GGLensObjectList {
 		   bool radialBinInMpc = true,
 		   bool normalizeToSigmaCrit = true,
 		   cosmology::Cosmology cosmo = cosmology::Cosmology(0.27,0.73),
+		   double h = 1.0,
 		   double min_lens_src_delta_z = 0.15,
 		   geometry = SphericalSurface,
 		   double mesh_frac = 0.);

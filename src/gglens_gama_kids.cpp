@@ -38,7 +38,7 @@ const string usage =
 const double MIN_SRC_Z = 0.005;
 const double MAX_SRC_Z = 1.2;
 const double MIN_LENS_SRC_SEP = 0.15;
-
+const double h = 0.7;  // H0 = 100 h km/s/Mpc
 
 int
 main(int argc, char* argv[]) {
@@ -152,10 +152,11 @@ main(int argc, char* argv[]) {
     bool normalizeToSigmaCrit = true;
     if (normalizeToSigmaCrit) {
       cerr << "cosmology is .......... " << "(Om=" << Om << ", Ol=" << Ol << ")" << endl;
+      cerr << "h is .................. " << h << endl;
     }
     GGLensObjectList<GAMAObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin,
 							   radialBinIsMpc, normalizeToSigmaCrit,
-							   cosmo, MIN_LENS_SRC_SEP);
+							   cosmo, h, MIN_LENS_SRC_SEP);
 
     //
     // sort each lens into binned_lists
