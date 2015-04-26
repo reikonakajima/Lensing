@@ -28,8 +28,8 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
   //
   // adjust cosmological distance calculations for h
   //
-  const double HUBBLE_LENGTH_MPC = HubbleLengthMpc * h;
-  const double SIGMA_CRIT_PREFACTOR = SigmaCritPrefactor / h;
+  const double HUBBLE_LENGTH_MPC = HubbleLengthMpc / h;        // in units of Mpc
+  const double SIGMA_CRIT_PREFACTOR = SigmaCritPrefactor * h;  // in units of M_sun / pc^2
 
   //
   // create source mesh list, for fast iteration over lens-source pairs
