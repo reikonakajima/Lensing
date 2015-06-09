@@ -202,6 +202,39 @@ KiDSObjectList::applyBitMask(int bitmask){
 
 
 void
+KiDSObjectList::setBlinding(char blinding){
+  int blind_index = 0;
+  switch (blinding) {
+    case 'A':
+      blind_index = 0;
+      break;
+    case 'B':
+      blind_index = 1;
+      break;
+    case 'C':
+      blind_index = 2;
+      break;
+    case 'D':
+      blind_index = 3;
+      break;
+    default:
+      throw KiDSObjectsError("setBlinding: wrong blinding specified");
+  }
+  for (vector<KiDSObject*>::iterator it = source_list.begin();
+       it != source_list.end(); ++it) {
+    Shear s = (*it)->getShearArray()[blind_index];
+    double g1, g2;
+    s.setG1G2(g1, g2);
+    (*it)->setShearG1G2BiasCorrections(s, g1, g2, (*it)->getM(),
+				       (*it)->getC1Array()[blind_index],
+				       (*it)->getC2Array()[blind_index]);
+  }
+
+  return;
+}
+
+
+void
 KiDSObject::printLine(ostream& os) const {
   os << id << " "
      << setprecision(5) << setw(10)

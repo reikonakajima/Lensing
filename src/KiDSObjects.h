@@ -37,6 +37,8 @@ class KiDSObjectsError : public MyException {
 
 class KiDSObject : public SourceObject {
 
+  friend class KiDSObjectList;
+
  public:
   
   static const int NUM_SHEAR=4;  // number of blindings
@@ -65,13 +67,16 @@ class KiDSObject : public SourceObject {
     c1_corr[2] = _c1_C;
     c1_corr[3] = _c1_D;
 
-    c2_corr[0] = _c2_A;
-    c2_corr[1] = _c2_B;
-    c2_corr[2] = _c2_C;
-    c2_corr[3] = _c2_D;
+    c2_corr[0] = -_c2_A;
+    c2_corr[1] = -_c2_B;
+    c2_corr[2] = -_c2_C;
+    c2_corr[3] = -_c2_D;
 
     // copy the _A info into "main"  // TODO: make this specifiable via parameter (file)
-    this->setShearG1G2BiasCorrections(shear[0], _g1_A, -_g2_A, _m_corr, _c1_A, -_c2_A);
+    //this->setShearG1G2BiasCorrections(shear[0], _g1_A, -_g2_A, _m_corr, _c1_A, -_c2_A);
+    //this->setShearG1G2BiasCorrections(shear[0], _g1_B, -_g2_B, _m_corr, _c1_B, -_c2_B);
+    //this->setShearG1G2BiasCorrections(shear[0], _g1_C, -_g2_C, _m_corr, _c1_C, -_c2_C);
+    this->setShearG1G2BiasCorrections(shear[0], _g1_D, -_g2_D, _m_corr, _c1_D, -_c2_D);
 
     SourceObject::pz = _pz_full;
   }
@@ -84,6 +89,11 @@ class KiDSObject : public SourceObject {
   double getDec() const { if (usePixelCoords) return ypos; else return SourceObject::dec; }
   float getSNratio() const { return sn; }
   int getMask() const { return mask; }
+
+  // get the array of shapes, c1/2 corrections
+  Shear* getShearArray() {return shear;}
+  float* getC1Array() {return c1_corr;}
+  float* getC2Array() {return c2_corr;}
 
   // for use with Mesh object: important to override the SourceObject::getX() and getY()!!
   double getX() const { return getRA(); }
@@ -132,6 +142,8 @@ class KiDSObjectList : public SourceObjectList<KiDSObject*> {
   int applyMask(int mask_thres=0);  // mask_thres=0 means mask *everything* except MASK==0
   // apply bit mask, so that (MAN_MASK & bitmask)>0 objects are excluded
   int applyBitMask(int bitmask);
+  // selection source objects according to the blindings A, B, C, or D
+  void setBlinding(char blinding);   // THIS NEEDS DEBUGGING!!!  THE SHEAR ARRAY IS NOT WORKING!!
 
   // parameters to set p(z) bins
   static const int NUM_PZ_ELEM = 70;
