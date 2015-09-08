@@ -33,7 +33,7 @@ class RandomObjectsError : public MyException {
 class LensObject;
 
 class RandomObject : public LensObject {
-  
+
   public:
   RandomObject() {}
   RandomObject(const string buffer);
@@ -64,6 +64,36 @@ class RandomObjectList : public LensObjectList<RandomObject*> {
  private:
   // none
 };
+
+
+
+class GAMARandomObject : public LensObject {
+
+  public:
+  GAMARandomObject() {}
+  GAMARandomObject(const string buffer);
+GAMARandomObject(long int _id, double _ra, double _dec, float _z, float _r_comoving, int _fieldp) :
+  LensObject(_id, _ra, _dec, _z, -99) {    // mag set to -99
+    r_comoving = _r_comoving;
+    field_pos = _fieldp;
+  }
+  float  getMag() const { throw RandomObjectsError("random objects have no magnitudes"); }
+
+ private:
+  float r_comoving;
+  int   field_pos;
+};
+
+
+class GAMARandomObjectList : public LensObjectList<GAMARandomObject*> {
+
+ public:
+  GAMARandomObjectList(const string fits_filename, int max_count=-1);
+
+ private:
+  // none
+};
+
 
 #endif // RANDOMOBJECTS_H
 

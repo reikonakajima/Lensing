@@ -63,6 +63,70 @@ RandomObjectList::RandomObjectList(const string fits_filename, int max_count) {
 }
 
 
+GAMARandomObjectList::GAMARandomObjectList(const string fits_filename, int max_count) {
+
+  // open FITS file
+  const string obj_extension = "OBJECTS";
+  auto_ptr<CCfits::FITS> pInfile(0);
+
+  try {
+    // open the fits table and go to the right extension
+    pInfile.reset(new CCfits::FITS(fits_filename, CCfits::Read, obj_extension));
+
+  } catch (CCfits::FITS::CantOpen &fitsError) {
+      throw RandomObjectsError(string("Error opening the file with message: ")+fitsError.message());
+  } catch (CCfits::FITS::NoSuchHDU &fitsError) {
+      throw RandomObjectsError(string("Error going to the HDU: ") + fitsError.message());
+  } catch (CCfits::FitsException &fitsError) {
+      throw RandomObjectsError(string("Error in FITS: ") + fitsError.message());
+  }
+
+  // goto OBJECTS extension
+  CCfits::ExtHDU& table = pInfile->extension(obj_extension);
+
+  // read the following columns (annoyingly, only one column can be read at a time):
+  //  id, RA/DEC, Z_1, FIELD_POS, R_COMOVING
+
+  valarray<double> id;
+  CCfits::Column& column1 = table.column("id");
+  column1.read( id, 1, column1.rows() );
+
+  valarray<double> ra;
+  CCfits::Column& column2 = table.column("RA");
+  column2.read( ra, 1, column2.rows() );
+  valarray<double> dec;
+  CCfits::Column& column3 = table.column("DEC");
+  column3.read( dec, 1, column3.rows() );
+
+  valarray<float> z;
+  CCfits::Column& column4 = table.column("Z_1");
+  column4.read( z, 1, column4.rows() );
+
+  valarray<int> field_pos;
+  CCfits::Column& column5 = table.column("FIELD_POS");
+  column5.read( field_pos, 1, column5.rows() );
+
+  valarray<float> r_comoving;
+  CCfits::Column& column6 = table.column("R_COMOVING");
+  column6.read( r_comoving, 1, column6.rows() );
+
+  // append objects to this list
+  if (max_count < 0)
+    max_count = column1.rows();
+  else if (column1.rows() < max_count)
+    max_count = column1.rows();
+
+  lens_list.reserve(max_count);
+  for (long int i=0; i<max_count; ++i) {
+      GAMARandomObject* ptr = new GAMARandomObject(id[i], ra[i], dec[i], z[i],
+						   field_pos[i], r_comoving[i]);
+      lens_list.push_back(ptr);
+  }
+
+  return;
+}
+
+
 /*
 void
 RandomObject::printLine(ostream& os) const {
