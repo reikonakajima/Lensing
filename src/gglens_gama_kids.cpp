@@ -160,7 +160,7 @@ main(int argc, char* argv[]) {
       cerr << "h is .................. " << h << endl;
     }
 
-    //
+    /*/
     // DEBUG
     cerr << "cosmo test (comoving distanes Dc):" << endl;
     cerr << "z=0.1: " << cosmo.Dc(0.1) * HubbleLengthMpc / h << endl;
@@ -171,7 +171,7 @@ main(int argc, char* argv[]) {
     cerr << argv[0] << " DEBUG END" << endl;
     exit(1);
     // DEBUG END
-    //
+    /*/
 
     GGLensObjectList<GAMAObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin,
 							   radialBinIsMpc, normalizeToSigmaCrit,
