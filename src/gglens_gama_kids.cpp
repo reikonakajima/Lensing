@@ -138,11 +138,8 @@ main(int argc, char* argv[]) {
     }
 
     cerr << "radial bin range ...... " << radial_bin[0] << " to "
-	 << radial_bin[radial_bin.binSize()] << " (Mpc or Mpc/h)" << endl;
-    /*
-    cerr << "magnitude bin range ... " << magnitude_bin[0] << " ... "
-	 << magnitude_bin[magnitude_bin.binSize()] << endl;
-    */
+	 << radial_bin[radial_bin.binSize()] << " (Mpc/h)" << endl;
+
     cerr << "log(mstar) bin range .. ";
     for (int i=0; i<logmstar_bin.vectorSize(); ++i)  cerr << logmstar_bin[i] << " ";
     cerr << endl;
@@ -173,10 +170,9 @@ main(int argc, char* argv[]) {
     // DEBUG END
     /*/
 
-    GGLensObjectList<GAMAObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin,
-							   radialBinIsMpc, normalizeToSigmaCrit,
-							   cosmo, h, MIN_LENS_SRC_SEP);
-
+    GGLensObjectList<GAMAObject*, KiDSObject*>
+      gglens_list(lens_list, source_list, radial_bin, radialBinIsMpc, normalizeToSigmaCrit,
+		  cosmo, h, MIN_LENS_SRC_SEP);
 
     //
     // sort each lens into binned_lists

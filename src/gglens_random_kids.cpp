@@ -34,6 +34,11 @@ const string usage =
   " stdin:  (none)\n"
   " stdout: (none)\n";
 
+/// source redshift cuts (based on z_B)   TODO: These should be specifiable from a parameter file
+const double MIN_SRC_Z = 0.005;
+const double MAX_SRC_Z = 1.2;
+const double MIN_LENS_SRC_SEP = 0.15;
+const double h = 1.0;  // H0 = 100 h km/s/Mpc
 
 int
 main(int argc, char* argv[]) {
@@ -63,18 +68,17 @@ main(int argc, char* argv[]) {
     // setup radial bins (in arcsec)
     //
     ifstream radialbinf(radial_bin_filename.c_str());
-    double min_theta = 5.0;
-    double max_theta = 4000.0;
-    int rad_nbin = 50;
+    double min_Mpc = 1e-2;  // 10 kpc/h minimum
+    double max_Mpc = 10;    // 10 Mpc/h maximum
+    int rad_nbin = 16;
     if (radialbinf) {
-      if (!(radialbinf >> min_theta >> max_theta >> rad_nbin))
+      if (!(radialbinf >> min_Mpc >> max_Mpc >> rad_nbin))
 	throw MyException("radialbin file type error");
-      if (rad_nbin < 2 || min_theta < 0 || max_theta < min_theta)
+      if (rad_nbin < 2 || min_Mpc < 0 || max_Mpc < min_Mpc)
 	throw MyException("radialbin file specification error");
     }
-    LogarithmicBins radial_bin_arcsec(min_theta, max_theta, rad_nbin);  // for debug/info
-    LogarithmicBins radial_bin(min_theta, max_theta, rad_nbin);
-    radial_bin.rescale(1./3600.);  // convert arcsec to degree
+    // note that radial_bin will eventually need to be in degrees for use with the Mesh class
+    LogarithmicBins radial_bin(min_Mpc, max_Mpc, rad_nbin);
 
 
     //
@@ -85,6 +89,7 @@ main(int argc, char* argv[]) {
 
     KiDSObjectList master_source_list(source_filename);
     KiDSObjectList source_list(master_source_list);  // TODO: add any extra cuts
+    source_list.applyRedshiftCut(MIN_SRC_Z, MAX_SRC_Z);
 
 
     //
@@ -111,14 +116,25 @@ main(int argc, char* argv[]) {
       return(9);
     }
 
-    cerr << "radial bin range ...... " << radial_bin_arcsec[0] << " ... "
-	 << radial_bin_arcsec[radial_bin_arcsec.binSize()] << " (arcsec)" << endl;
+    cerr << "radial bin range ...... " << radial_bin[0] << " ... "
+	 << radial_bin[radial_bin.binSize()] << " (Mpc/h)" << endl;
 
 
     //
     // create GGLensObjectList from lens_list and source_list (sums tangential shears for each lens)
     //
-    GGLensObjectList<GAMARandomObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin);
+    double Om=0.315, Ol=1.-Om;
+    cosmology::Cosmology cosmo(Om, Ol);
+    bool radialBinIsMpc = true;
+    bool normalizeToSigmaCrit = true;
+    if (normalizeToSigmaCrit) {
+      cerr << "cosmology is .......... " << "(Om=" << Om << ", Ol=" << Ol << ")" << endl;
+      cerr << "h is .................. " << h << endl;
+    }
+
+    GGLensObjectList<GAMARandomObject*, KiDSObject*>
+      gglens_list(lens_list, source_list, radial_bin, radialBinIsMpc, normalizeToSigmaCrit,
+		  cosmo, h, MIN_LENS_SRC_SEP);
 
     //
     // make output filename
@@ -163,9 +179,9 @@ main(int argc, char* argv[]) {
     ofs << "#imag irad pairs sum(weights) sum(w^2) sum(responsivity) sum(w*et) sum(w*ex) "
 	<< "sum(w*var(et)) sum(w*var(ex)) n_lens" << endl;
 
-    ofs << "#radbins(arcsec): ";
-    for (int irad=0; irad<radial_bin_arcsec.vectorSize(); ++irad) {
-      ofs << radial_bin_arcsec[irad] << " ";
+    ofs << "#radbins(Mpc/h): ";
+    for (int irad=0; irad<radial_bin.vectorSize(); ++irad) {
+      ofs << radial_bin[irad] << " ";
     }
     ofs << endl;
 
