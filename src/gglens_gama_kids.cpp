@@ -165,6 +165,13 @@ main(int argc, char* argv[]) {
     cerr << "z=0.3: " << cosmo.Dc(0.3) * HubbleLengthMpc / h << endl;
     cerr << "z=0.4: " << cosmo.Dc(0.4) * HubbleLengthMpc / h << endl;
     cerr << "z=0.5: " << cosmo.Dc(0.5) * HubbleLengthMpc / h << endl;
+    cerr << endl;
+    double one_deg_in_radian = 1.0 * DEGREE;
+    cerr << "1deg at z=0.1: " << cosmo.Dc(0.1) * HubbleLengthMpc / h * one_deg_in_radian << endl;
+    cerr << "1deg at z=0.2: " << cosmo.Dc(0.2) * HubbleLengthMpc / h * one_deg_in_radian << endl;
+    cerr << "1deg at z=0.3: " << cosmo.Dc(0.3) * HubbleLengthMpc / h * one_deg_in_radian << endl;
+    cerr << "1deg at z=0.4: " << cosmo.Dc(0.4) * HubbleLengthMpc / h * one_deg_in_radian << endl;
+    cerr << "1deg at z=0.5: " << cosmo.Dc(0.5) * HubbleLengthMpc / h * one_deg_in_radian << endl;
     cerr << argv[0] << " DEBUG END" << endl;
     exit(1);
     // DEBUG END
