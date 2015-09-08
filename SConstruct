@@ -74,6 +74,6 @@ starhalo = env.Program(target='gglens_starhalo', source=sub_objects+['src/gglens
 gama_kids = env.Program(target='gglens_gama_kids', source=sub_objects+['src/gglens_gama_kids.cpp',])
 random_kids = env.Program(target='gglens_random_kids', source=sub_objects+['src/gglens_random_kids.cpp',])
 env.Install('bin', [test, gama_kids, random_kids, starhalo])
-env.Alias('install', 'bin')
+#env.Alias('install', 'bin')
 
 # (eventually, build a library code)

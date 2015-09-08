@@ -42,7 +42,7 @@ const string usage =
 const double MIN_SRC_Z = 0.005;
 const double MAX_SRC_Z = 1.2;
 const double MIN_LENS_SRC_SEP = 0.15;
-const double h = 0.7;  // H0 = 100 h km/s/Mpc
+const double h = 1.0;  // H0 = 100 h km/s/Mpc
 
 int
 main(int argc, char* argv[]) {
@@ -76,8 +76,8 @@ main(int argc, char* argv[]) {
     // setup radial bins (in Mpc or Mpc/h, depending on definition of h)
     //
     ifstream radialbinf(radial_bin_filename.c_str());
-    double min_Mpc = 1e-2;  // 10 kpc minimum
-    double max_Mpc = 10;    // 10 Mpc maximum
+    double min_Mpc = 1e-2;  // 10 kpc/h minimum
+    double max_Mpc = 10;    // 10 Mpc/h maximum
     int rad_nbin = 16;
     if (radialbinf) {
       if (!(radialbinf >> min_Mpc >> max_Mpc >> rad_nbin))
@@ -88,11 +88,12 @@ main(int argc, char* argv[]) {
     // note that radial_bin will eventually need to be in degrees for use with the Mesh class
     LogarithmicBins radial_bin(min_Mpc, max_Mpc, rad_nbin);
 
-    //
+    /*/
     // setup bins (magnitude)
     //
     ifstream magbinf("absmag.txt");
     ArbitraryWidthBins magnitude_bin(magbinf);
+    /*/
 
     //
     // setup bins (magnitude)
@@ -150,7 +151,7 @@ main(int argc, char* argv[]) {
     //
     // create GGLensObjectList from lens_list and source_list (sums tangential shears for each lens)
     //
-    double Om=0.27, Ol=1.-Om;
+    double Om=0.315, Ol=1.-Om;
     cosmology::Cosmology cosmo(Om, Ol);
     bool radialBinIsMpc = true;
     bool normalizeToSigmaCrit = true;
@@ -158,9 +159,24 @@ main(int argc, char* argv[]) {
       cerr << "cosmology is .......... " << "(Om=" << Om << ", Ol=" << Ol << ")" << endl;
       cerr << "h is .................. " << h << endl;
     }
+
+    //
+    // DEBUG
+    cerr << "cosmo test (comoving distanes Dc):" << endl;
+    cerr << "z=0.1: " << cosmo.Dc(0.1) * HubbleLengthMpc / h << endl;
+    cerr << "z=0.2: " << cosmo.Dc(0.2) * HubbleLengthMpc / h << endl;
+    cerr << "z=0.3: " << cosmo.Dc(0.3) * HubbleLengthMpc / h << endl;
+    cerr << "z=0.4: " << cosmo.Dc(0.4) * HubbleLengthMpc / h << endl;
+    cerr << "z=0.5: " << cosmo.Dc(0.5) * HubbleLengthMpc / h << endl;
+    cerr << argv[0] << " DEBUG END" << endl;
+    exit(1);
+    // DEBUG END
+    //
+
     GGLensObjectList<GAMAObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin,
 							   radialBinIsMpc, normalizeToSigmaCrit,
 							   cosmo, h, MIN_LENS_SRC_SEP);
+
 
     //
     // sort each lens into binned_lists

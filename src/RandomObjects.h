@@ -43,7 +43,10 @@ class RandomObject : public LensObject {
     ypos = _ypos;
     mask = _mask;
   }
-  double getRedshift() const { throw RandomObjectsError("random objects have no redshifts"); }
+  double getRedshift() const {
+    return 0.34;  // for M7 objects, the <zlens> is 0.34  TO BE CORRECTED
+    //throw RandomObjectsError("random objects have no redshifts");
+  }
   float  getMag() const { throw RandomObjectsError("random objects have no magnitudes"); }
 
  private:
