@@ -126,3 +126,4 @@ template class LensObjectList<StarMaskObject*>;
 template class LensObjectList<GAMAObject*>;
 #include "RandomObjects.h"
 template class LensObjectList<RandomObject*>;
+template class LensObjectList<GAMARandomObject*>;
