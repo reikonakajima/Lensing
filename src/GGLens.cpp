@@ -292,3 +292,4 @@ template class GGLensObjectList<StarMaskObject*, RCSLenSObject*>;
 template class GGLensObjectList<StarMaskObject*, KiDSObject*>;
 template class GGLensObjectList<GAMAObject*, KiDSObject*>;
 template class GGLensObjectList<RandomObject*, KiDSObject*>;
+template class GGLensObjectList<GAMARandomObject*, KiDSObject*>;

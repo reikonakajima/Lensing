@@ -80,8 +80,8 @@ main(int argc, char* argv[]) {
     //
     // setup lens/source samples
     //
-    RandomObjectList master_lens_list(lens_filename.c_str(), max_lens_count);
-    RandomObjectList lens_list(master_lens_list);     // TODO: add any extra cuts
+    GAMARandomObjectList master_lens_list(lens_filename.c_str(), max_lens_count);
+    GAMARandomObjectList lens_list(master_lens_list);     // TODO: add any extra cuts
 
     KiDSObjectList master_source_list(source_filename);
     KiDSObjectList source_list(master_source_list);  // TODO: add any extra cuts
@@ -118,7 +118,7 @@ main(int argc, char* argv[]) {
     //
     // create GGLensObjectList from lens_list and source_list (sums tangential shears for each lens)
     //
-    GGLensObjectList<RandomObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin);
+    GGLensObjectList<GAMARandomObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin);
 
     //
     // make output filename
