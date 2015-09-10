@@ -169,6 +169,8 @@ main(int argc, char* argv[]) {
 	  (*gglens_list[ilens])[irad].getVariance_t());
 	radial_shears[irad].addVariance_s(
 	  (*gglens_list[ilens])[irad].getVariance_s());
+	radial_shears[irad].addMBias(
+	  (*gglens_list[ilens])[irad].getMBias());
       }
     }
     
@@ -177,7 +179,7 @@ main(int argc, char* argv[]) {
     // provide output per bin
     //
     ofs << "#imag irad pairs sum(weights) sum(w^2) sum(responsivity) sum(w*et) sum(w*ex) "
-	<< "sum(w*var(et)) sum(w*var(ex)) n_lens" << endl;
+	<< "sum(w*var(et)) sum(w*var(ex)) n_lens m_corr" << endl;
 
     ofs << "#radbins(Mpc/h): ";
     for (int irad=0; irad<radial_bin.vectorSize(); ++irad) {
@@ -198,7 +200,8 @@ main(int argc, char* argv[]) {
 	  << radial_shears[irad].getDeltaSigma_s() << " "
 	  << radial_shears[irad].getVariance_t() << " "
 	  << radial_shears[irad].getVariance_s() << " "
-	  << radial_shears[irad].getLensCounts() << endl;
+	  << radial_shears[irad].getLensCounts() << " "
+	  << radial_shears[irad].getMBias() << endl;
     }
 
   } catch (MyException& m) {
