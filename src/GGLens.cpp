@@ -288,6 +288,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::splitList(const int nSplit) {
 #include "StarMaskObjects.h"
 #include "GAMAObjects.h"
 #include "RandomObjects.h"
+#include "GAMARandomObjects.h"
 template class GGLensObjectList<StarMaskObject*, RCSLenSObject*>;
 template class GGLensObjectList<StarMaskObject*, KiDSObject*>;
 template class GGLensObjectList<GAMAObject*, KiDSObject*>;

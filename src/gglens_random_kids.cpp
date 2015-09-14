@@ -5,7 +5,7 @@
 #include "Std.h"
 #include "StringStuff.h"
 #include "Bounds.h"
-#include "RandomObjects.h"
+#include "GAMARandomObjects.h"
 #include "KiDSObjects.h"
 #include "GGLens.h"
 #include "Bins.h"
@@ -77,7 +77,7 @@ main(int argc, char* argv[]) {
       if (rad_nbin < 2 || min_Mpc < 0 || max_Mpc < min_Mpc)
 	throw MyException("radialbin file specification error");
     }
-    // note that radial_bin will eventually need to be in degrees for use with the Mesh class
+    // note that radial_bin will later need to be in degrees for use with the Mesh class
     LogarithmicBins radial_bin(min_Mpc, max_Mpc, rad_nbin);
 
 

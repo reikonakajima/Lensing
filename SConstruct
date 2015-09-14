@@ -61,6 +61,7 @@ sub_objects = '''
 	    src/.obj/StarMaskObjects.o
 	    src/.obj/GAMAObjects.o
 	    src/.obj/RandomObjects.o
+	    src/.obj/GAMARandomObjects.o
 	    src/.obj/SourceObjects.o
 	    src/.obj/RCSLenSObjects.o
 	    src/.obj/KiDSObjects.o
