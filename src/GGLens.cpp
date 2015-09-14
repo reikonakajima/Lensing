@@ -125,6 +125,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     int bad_src = 0;
 
     // integrate over redshift probability distribution?
+    // TODO:  *** the following should be paramter input ***
     bool use_pz = true;
 
     // get the redshift bins for p(z) of source objects
