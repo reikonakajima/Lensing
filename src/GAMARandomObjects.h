@@ -37,11 +37,12 @@ class GAMARandomObject : public LensObject {
   public:
   GAMARandomObject() {}
   GAMARandomObject(const string buffer);
-GAMARandomObject(long int _id, double _ra, double _dec, float _z, float _r_comoving,
-                 float _logmstar, float _absmag_r, float _uminusr) :
-  LensObject(_id, _ra, _dec, _z, -99),     // mag set to -99
-    r_comoving(_r_comoving), logmstar(_logmstar), absmag_r(_absmag_r), uminusr(_uminusr) {}
-  float  getMag() const { throw GAMARandomObjectsError("GAMA random objects have no apparent magnitudes (yet)"); }
+  GAMARandomObject(long int _id, double _ra, double _dec, float _z, float _r_comoving,
+                   float _logmstar, float _absmag_r, float _uminusr) :
+             LensObject(_id, _ra, _dec, _z, -99), r_comoving(_r_comoving), logmstar(_logmstar),
+	     absmag_r(_absmag_r), uminusr(_uminusr) {}
+  float  getMag() const {
+    throw GAMARandomObjectsError("GAMA random objects have no apparent magnitudes (yet)"); }
 
  private:
   float r_comoving;
@@ -54,7 +55,9 @@ GAMARandomObject(long int _id, double _ra, double _dec, float _z, float _r_comov
 class GAMARandomObjectList : public LensObjectList<GAMARandomObject*> {
 
  public:
-  GAMARandomObjectList(const string fits_filename, int n_decimate=-1);
+  // Constructor:  If max_count < 0, use the entire input.
+  //               Otherwise, randomize input rows and return the first max_count objects
+  GAMARandomObjectList(const string fits_filename, int max_count=-1);
 
  private:
   // none
