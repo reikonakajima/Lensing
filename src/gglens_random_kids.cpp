@@ -93,7 +93,8 @@ main(int argc, char* argv[]) {
     GAMARandomObjectList lens_list(master_lens_list);     // TODO: add any extra cuts
     lens_list.applyLogMStarCut(logmstar_bin.getMin(), logmstar_bin.getMax());
 
-    KiDSObjectList master_source_list(source_filename);
+    int bitmask = 1;  /// remove bitmask masked objs. TODO: UPDATE BITMASK OPTIONS  2^15 - 1 = 32767
+    KiDSObjectList master_source_list(source_filename, bitmask);
     KiDSObjectList source_list(master_source_list);  // TODO: add any extra cuts
     source_list.applyRedshiftCut(MIN_SRC_Z, MAX_SRC_Z);
 
@@ -125,6 +126,10 @@ main(int argc, char* argv[]) {
     cerr << "radial bin range ...... " << radial_bin[0] << " ... "
 	 << radial_bin[radial_bin.binSize()] << " (Mpc/h)" << endl;
 
+    cerr << "log(mstar) bin range .. ";
+    for (int i=0; i<logmstar_bin.vectorSize(); ++i)  cerr << logmstar_bin[i] << " ";
+    cerr << endl;
+
 
     //
     // create GGLensObjectList from lens_list and source_list (sums tangential shears for each lens)
@@ -143,43 +148,57 @@ main(int argc, char* argv[]) {
 		  cosmo, h, MIN_LENS_SRC_SEP);
 
     //
-    // make output filename
+    // sort each lens into binned_lists
     //
+
+    // make output filename
     std::stringstream sstm;
     sstm << outf_prefix << ".dat";    // output filename
     string out_filename = sstm.str();
     ofstream ofs(out_filename.c_str());
 
+    vector<GGLensObjectList<GAMARandomObject*, KiDSObject*> > binned_lists  // vector over <mags>
+      = gglens_list.splitList(logmstar_bin.binSize());  // initialize the split lists
+    // fill in the split lists
+    for (int ilens = 0; ilens < gglens_list.size(); ++ilens) {
+      int index = logmstar_bin.getIndex(gglens_list[ilens]->getLensPtr()->getLogMStar());
+      if (index != -1) {
+	binned_lists[index].push_back(gglens_list[ilens]);
+      }
+    }
+
 
     //
     // sum tangential shear according to the given lens binning
     //
-    vector<ggLensSum> radial_shears(vector<ggLensSum>(radial_bin.binSize()));
-
-    /// sum tangential shear quantities over all lenses
-    for (int ilens = 0; ilens < gglens_list.size(); ++ilens) {
-      for (int irad = 0; irad < radial_bin.binSize(); ++irad) {
-	radial_shears[irad].addLensCounts();  // increment by one lens
-	radial_shears[irad].addPairCounts(    // increment by source counts
-	  (*gglens_list[ilens])[irad].getPairCounts());
-	double w = (*gglens_list[ilens])[irad].getWeights();
-	radial_shears[irad].addWeight(w);
-	radial_shears[irad].addWeightSq(w*w);
-	radial_shears[irad].addResponsivity(
-	  (*gglens_list[ilens])[irad].getResponsivity());
-	radial_shears[irad].addDeltaSigma_t(
-	  (*gglens_list[ilens])[irad].getDeltaSigma_t());
-	radial_shears[irad].addDeltaSigma_s(
-	  (*gglens_list[ilens])[irad].getDeltaSigma_s());
-	radial_shears[irad].addVariance_t(
-	  (*gglens_list[ilens])[irad].getVariance_t());
-	radial_shears[irad].addVariance_s(
-	  (*gglens_list[ilens])[irad].getVariance_s());
-	radial_shears[irad].addMBias(
-	  (*gglens_list[ilens])[irad].getMBias());
+    vector<vector<ggLensSum> > radial_shears(logmstar_bin.binSize(),
+					     vector<ggLensSum>(radial_bin.binSize()));
+    for (int imag = 0; imag < logmstar_bin.binSize(); ++imag) {
+      /// sum tangential shear quantities over all lenses
+      for (int ilens = 0; ilens < binned_lists[imag].size(); ++ilens) {
+	for (int irad = 0; irad < radial_bin.binSize(); ++irad) {
+	  radial_shears[imag][irad].addLensCounts();  // increment by one lens
+	  radial_shears[imag][irad].addPairCounts(    // increment by source counts
+	    (*binned_lists[imag][ilens])[irad].getPairCounts());
+	  double w = (*binned_lists[imag][ilens])[irad].getWeights();
+	  radial_shears[imag][irad].addWeight(w);
+	  radial_shears[imag][irad].addWeightSq(w*w);
+	  radial_shears[imag][irad].addResponsivity(
+	    (*binned_lists[imag][ilens])[irad].getResponsivity());
+	  radial_shears[imag][irad].addDeltaSigma_t(
+	    (*binned_lists[imag][ilens])[irad].getDeltaSigma_t());
+	  radial_shears[imag][irad].addDeltaSigma_s(
+	    (*binned_lists[imag][ilens])[irad].getDeltaSigma_s());
+	  radial_shears[imag][irad].addVariance_t(
+	    (*binned_lists[imag][ilens])[irad].getVariance_t());
+	  radial_shears[imag][irad].addVariance_s(
+	    (*binned_lists[imag][ilens])[irad].getVariance_s());
+	  radial_shears[imag][irad].addMBias(
+	    (*binned_lists[imag][ilens])[irad].getMBias());
+	}
       }
-    }
-    
+    } // end for(imag)
+
 
     //
     // provide output per bin
@@ -187,27 +206,34 @@ main(int argc, char* argv[]) {
     ofs << "#imag irad pairs sum(weights) sum(w^2) sum(responsivity) sum(w*et) sum(w*ex) "
 	<< "sum(w*var(et)) sum(w*var(ex)) n_lens m_corr" << endl;
 
-    ofs << "#radbins(Mpc/h): ";
+    ofs << "#magbins: ";
+    for (int imag=0; imag<logmstar_bin.vectorSize(); ++imag) {
+      ofs << logmstar_bin[imag] << " ";
+    }
+    ofs << endl;
+
+    ofs << "#radbins(Mpc/h),h="<< h <<": ";
     for (int irad=0; irad<radial_bin.vectorSize(); ++irad) {
       ofs << radial_bin[irad] << " ";
     }
     ofs << endl;
 
-    const int imag = 0;  // no magnitude binning in random objects
-    for (int irad=0; irad<radial_bin.binSize(); ++irad) {
-      if (radial_shears[irad].getPairCounts() == 0)
-	continue;
-      ofs << imag << " " << irad << "  ";
-      ofs << radial_shears[irad].getPairCounts() << " "
-	  << radial_shears[irad].getWeights() << " "
-	  << radial_shears[irad].getWeightSq() << " "
-	  << radial_shears[irad].getResponsivity() << " "
-	  << radial_shears[irad].getDeltaSigma_t() << " "
-	  << radial_shears[irad].getDeltaSigma_s() << " "
-	  << radial_shears[irad].getVariance_t() << " "
-	  << radial_shears[irad].getVariance_s() << " "
-	  << radial_shears[irad].getLensCounts() << " "
-	  << radial_shears[irad].getMBias() << endl;
+    for (int imag=0; imag<logmstar_bin.binSize(); ++imag) {
+      for (int irad=0; irad<radial_bin.binSize(); ++irad) {
+	if (radial_shears[imag][irad].getPairCounts() == 0)
+	  continue;
+	ofs << imag << " " << irad << "  ";
+	ofs << radial_shears[imag][irad].getPairCounts() << " "
+	    << radial_shears[imag][irad].getWeights() << " "
+	    << radial_shears[imag][irad].getWeightSq() << " "
+	    << radial_shears[imag][irad].getResponsivity() << " "
+	    << radial_shears[imag][irad].getDeltaSigma_t() << " "
+	    << radial_shears[imag][irad].getDeltaSigma_s() << " "
+	    << radial_shears[imag][irad].getVariance_t() << " "
+	    << radial_shears[imag][irad].getVariance_s() << " "
+	    << radial_shears[imag][irad].getLensCounts() << " "
+	    << radial_shears[imag][irad].getMBias() << endl;
+      }
     }
 
   } catch (MyException& m) {

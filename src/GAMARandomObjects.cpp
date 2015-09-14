@@ -69,15 +69,15 @@ ColDefs(
   CCfits::Column& column4 = table.column("R_COMOVING");
   column4.read( r_comoving, 1, column4.rows() );
 
-  valarray<int> logmstar;
+  valarray<float> logmstar;
   CCfits::Column& column5 = table.column("logmstar");
   column5.read( logmstar, 1, column5.rows() );
 
-  valarray<int> absmag_r;
+  valarray<float> absmag_r;
   CCfits::Column& column6 = table.column("absmag_r");
   column6.read( absmag_r, 1, column6.rows() );
 
-  valarray<int> uminusr;
+  valarray<float> uminusr;
   CCfits::Column& column7 = table.column("uminusr");
   column7.read( uminusr, 1, column7.rows() );
 
@@ -109,6 +109,7 @@ int
 GAMARandomObjectList::applyLogMStarCut(float min_logmstar, float max_logmstar) {
   for (vector<GAMARandomObject*>::iterator it = lens_list.begin();
        it != lens_list.end(); /* no increment */) {
+    float logmstar = (*it)->getLogMStar();
     if ( (*it)->getLogMStar() < min_logmstar or (*it)->getLogMStar() >= max_logmstar ) {
       it = lens_list.erase(it);
     } else {

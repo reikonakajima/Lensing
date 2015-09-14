@@ -95,12 +95,15 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
       angular_radial_bin /= cosmo.DA(zlens) * HUBBLE_LENGTH_MPC;   // angular_radial_bin in degrees
     }
 
+    // the following criteria not necessary.
+    // related to TODO: *** multiple source files ***
     if (!srcbounds.includes(Position<double>(lensra, lensdec)))
        continue;
 
     //
     // collect all matching sources (get their indicies of srcvector) in radial bins
     //
+    // TODO: *** optimize ring search ***
     vector<multimap<double, int> > bglist(rad_nbin);
     for (int irad = 0; irad < rad_nbin; ++irad) {
       if (geom == Flat) {
@@ -115,7 +118,6 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     //
     // LOOP over all sources (by radial bins) for this lens object, accumulate data
     //
-
     GGLensObject<lensObjPtr> *this_gglens = new GGLensObject<lensObjPtr>(lensobj, rad_nbin);
 
     int bg_count = 0;      // source object count for this lens object
