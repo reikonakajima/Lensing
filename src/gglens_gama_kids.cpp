@@ -29,10 +29,6 @@ const string usage =
   "  source_catalog:  source catalog, which contains the columns\n"
   "  radial_bin_info: radial bin info (3 numbers, in Mpc/h): [min_Mpch, max_Mpch, rad_nbin]\n"
   "  \n"
-  "  (future TODO:)\n"
-  "  (allow stellar mass or luminosity binning as parameter file option)\n"
-  "  (allow h = H0/100 km/s/Mpc as parameter file option)\n"
-  "  \n"
   //  " output #1: file name:\" "+outfprefix+suffix+"\"\n"
   " stdin:  (none)\n"
   " stdout: (none)\n";
@@ -87,13 +83,6 @@ main(int argc, char* argv[]) {
     }
     // note that radial_bin will eventually need to be in degrees for use with the Mesh class
     LogarithmicBins radial_bin(min_Mpc, max_Mpc, rad_nbin);
-
-    /*/
-    // setup bins (magnitude)
-    //
-    ifstream magbinf("absmag.txt");
-    ArbitraryWidthBins magnitude_bin(magbinf);
-    /*/
 
     //
     // setup bins (magnitude)

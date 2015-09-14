@@ -43,6 +43,7 @@ class GAMARandomObject : public LensObject {
 	     absmag_r(_absmag_r), uminusr(_uminusr) {}
   float  getMag() const {
     throw GAMARandomObjectsError("GAMA random objects have no apparent magnitudes (yet)"); }
+  float getLogMStar() const { return logmstar; }
 
  private:
   float r_comoving;
@@ -58,6 +59,8 @@ class GAMARandomObjectList : public LensObjectList<GAMARandomObject*> {
   // Constructor:  If max_count < 0, use the entire input.
   //               Otherwise, randomize input rows and return the first max_count objects
   GAMARandomObjectList(const string fits_filename, int max_count=-1);
+  // apply cuts based on logmstar
+  int applyLogMStarCut(float min_logmstar, float max_logmstar);
 
  private:
   // none

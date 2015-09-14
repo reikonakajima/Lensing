@@ -80,12 +80,18 @@ main(int argc, char* argv[]) {
     // note that radial_bin will later need to be in degrees for use with the Mesh class
     LogarithmicBins radial_bin(min_Mpc, max_Mpc, rad_nbin);
 
+    //
+    // setup bins (magnitude)
+    //
+    ifstream logmstarf("logmstar.txt");
+    ArbitraryWidthBins logmstar_bin(logmstarf);
 
     //
     // setup lens/source samples
     //
     GAMARandomObjectList master_lens_list(lens_filename.c_str(), max_lens_count);
     GAMARandomObjectList lens_list(master_lens_list);     // TODO: add any extra cuts
+    lens_list.applyLogMStarCut(logmstar_bin.getMin(), logmstar_bin.getMax());
 
     KiDSObjectList master_source_list(source_filename);
     KiDSObjectList source_list(master_source_list);  // TODO: add any extra cuts

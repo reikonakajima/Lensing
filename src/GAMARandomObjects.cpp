@@ -105,6 +105,20 @@ ColDefs(
 }
 
 
+int
+GAMARandomObjectList::applyLogMStarCut(float min_logmstar, float max_logmstar) {
+  for (vector<GAMARandomObject*>::iterator it = lens_list.begin();
+       it != lens_list.end(); /* no increment */) {
+    if ( (*it)->getLogMStar() < min_logmstar or (*it)->getLogMStar() >= max_logmstar ) {
+      it = lens_list.erase(it);
+    } else {
+      ++it;  // increment here; only if there were no deletion
+    }
+  }
+  return lens_list.size();
+}
+
+
 /*
 void
 RandomObject::printLine(ostream& os) const {
