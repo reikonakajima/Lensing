@@ -16,8 +16,6 @@ using std::setfill;
 using std::fixed;
 using std::setprecision;
 
-const string outfprefix = "gglens";
-const string configfname = "config.par";
 const string suffix = ".dat";
 
 const string usage =
@@ -29,7 +27,6 @@ const string usage =
   "  source_catalog:  source catalog, which contains the columns\n"
   "  radial_bin_info: radial bin info (3 numbers, in Mpc/h): [min_Mpch, max_Mpch, rad_nbin]\n"
   "  \n"
-  //  " output #1: file name:\" "+outfprefix+suffix+"\"\n"
   " stdin:  (none)\n"
   " stdout: (none)\n";
 
@@ -93,7 +90,7 @@ main(int argc, char* argv[]) {
     //
     // setup lens/source samples
     //
-    GAMAObjectList master_lens_list(lensf);
+    GAMAObjectList master_lens_list(lens_filename);
     GAMAObjectList lens_list(master_lens_list);
     lens_list.applyLogMStarCut(logmstar_bin.getMin(), logmstar_bin.getMax());
 
@@ -176,7 +173,7 @@ main(int argc, char* argv[]) {
 
     // make output filename
     std::stringstream sstm;
-    sstm << outf_prefix << ".dat";    // output filename
+    sstm << outf_prefix << suffix;    // output filename
     string out_filename = sstm.str();
     ofstream ofs(out_filename.c_str());
 
