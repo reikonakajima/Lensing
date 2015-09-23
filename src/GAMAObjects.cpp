@@ -73,7 +73,7 @@ GAMAObjectList::GAMAObjectList(const string fits_filename, int max_count) {
   CCfits::ExtHDU& table = pInfile->extension(obj_extension);
 
   // read the following columns (annoyingly, only one column can be read at a time):
-  //  id, RA/DEC, Z_1, FIELD_POS, R_COMOVING
+  //  id, RA/DEC, Z_1, R_COMOVING, ...
 
   valarray<double> ra;
   CCfits::Column& column1 = table.column("RA");
@@ -85,10 +85,6 @@ GAMAObjectList::GAMAObjectList(const string fits_filename, int max_count) {
   valarray<float> z;
   CCfits::Column& column3 = table.column("Z_1");
   column3.read( z, 1, column3.rows() );
-
-  valarray<float> fluxscale;
-  CCfits::Column& column4 = table.column("fluxscale");
-  column4.read( fluxscale, 1, column4.rows() );
 
   valarray<float> logmstar;
   CCfits::Column& column5 = table.column("logmstar");
