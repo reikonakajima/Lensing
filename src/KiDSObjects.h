@@ -73,10 +73,10 @@ class KiDSObject : public SourceObject {
     c2_corr[3] = -_c2_D;
 
     // copy the _A info into "main"  // TODO: make this specifiable via parameter (file)
-    //this->setShearG1G2BiasCorrections(shear[0], _g1_A, -_g2_A, _m_corr, _c1_A, -_c2_A);
+    this->setShearG1G2BiasCorrections(shear[0], _g1_A, -_g2_A, _m_corr, _c1_A, -_c2_A);
     //this->setShearG1G2BiasCorrections(shear[0], _g1_B, -_g2_B, _m_corr, _c1_B, -_c2_B);
     //this->setShearG1G2BiasCorrections(shear[0], _g1_C, -_g2_C, _m_corr, _c1_C, -_c2_C);
-    this->setShearG1G2BiasCorrections(shear[0], _g1_D, -_g2_D, _m_corr, _c1_D, -_c2_D);
+    //this->setShearG1G2BiasCorrections(shear[0], _g1_D, -_g2_D, _m_corr, _c1_D, -_c2_D);
 
     SourceObject::pz = _pz_full;
   }

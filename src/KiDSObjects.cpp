@@ -38,30 +38,43 @@ KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask) {
   //  FWHM_IMAGE, weight, and assign it to SourceObject
 
   valarray<float> g1a;
-  CCfits::Column& column1 = table.column("e1_A");
-  int max_src_count = column1.rows();
-  column1.read( g1a, 1, max_src_count );
   valarray<float> g2a;
-  CCfits::Column& column2 = table.column("e2_A");
-  column2.read( g2a, 1, max_src_count );
   valarray<float> g1b;
-  CCfits::Column& column3 = table.column("e1_B");
-  column3.read( g1b, 1, max_src_count );
   valarray<float> g2b;
-  CCfits::Column& column4 = table.column("e2_B");
-  column4.read( g2b, 1, max_src_count );
   valarray<float> g1c;
-  CCfits::Column& column5 = table.column("e1_C");
-  column5.read( g1c, 1, max_src_count );
   valarray<float> g2c;
-  CCfits::Column& column6 = table.column("e2_C");
-  column6.read( g2c, 1, max_src_count );
   valarray<float> g1d;
-  CCfits::Column& column7 = table.column("e1_D");
-  column7.read( g1d, 1, max_src_count );
   valarray<float> g2d;
-  CCfits::Column& column8 = table.column("e2_D");
-  column8.read( g2d, 1, max_src_count );
+  int max_src_count;
+
+  try {
+    CCfits::Column& column1 = table.column("e1_A");
+    max_src_count = column1.rows();
+    column1.read( g1a, 1, max_src_count );
+    CCfits::Column& column2 = table.column("e2_A");
+    column2.read( g2a, 1, max_src_count );
+    CCfits::Column& column3 = table.column("e1_B");
+    column3.read( g1b, 1, max_src_count );
+    CCfits::Column& column4 = table.column("e2_B");
+    column4.read( g2b, 1, max_src_count );
+    CCfits::Column& column5 = table.column("e1_C");
+    column5.read( g1c, 1, max_src_count );
+    CCfits::Column& column6 = table.column("e2_C");
+    column6.read( g2c, 1, max_src_count );
+    CCfits::Column& column7 = table.column("e1_D");
+    column7.read( g1d, 1, max_src_count );
+    CCfits::Column& column8 = table.column("e2_D");
+    column8.read( g2d, 1, max_src_count );
+  }
+  catch (CCfits::Table::NoSuchColumn& m) {
+    CCfits::Column& column1 = table.column("e1");
+    max_src_count = column1.rows();
+    column1.read( g1a, 1, max_src_count );
+    g1b = g1c = g1d = g1a;
+    CCfits::Column& column2 = table.column("e2");
+    column2.read( g2a, 1, max_src_count );
+    g2b = g2c = g2d = g2a;
+  }
 
   valarray<double> ra;
   CCfits::Column& column9 = table.column("ALPHA_J2000");
@@ -109,33 +122,45 @@ KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask) {
   column20.readArrays( pz_full, 1, max_src_count );
 
   valarray<float> c1a;
-  CCfits::Column& column21 = table.column("c1_A");
-  column21.read( c1a, 1, max_src_count );
   valarray<float> c2a;
-  CCfits::Column& column22 = table.column("c2_A");
-  column22.read( c2a, 1, max_src_count );
   valarray<float> c1b;
-  CCfits::Column& column23 = table.column("c1_B");
-  column23.read( c1b, 1, max_src_count );
   valarray<float> c2b;
-  CCfits::Column& column24 = table.column("c2_B");
-  column24.read( c2b, 1, max_src_count );
   valarray<float> c1c;
-  CCfits::Column& column25 = table.column("c1_C");
-  column25.read( c1c, 1, max_src_count );
   valarray<float> c2c;
-  CCfits::Column& column26 = table.column("c2_C");
-  column26.read( c2c, 1, max_src_count );
   valarray<float> c1d;
-  CCfits::Column& column27 = table.column("c1_D");
-  column27.read( c1d, 1, max_src_count );
   valarray<float> c2d;
-  CCfits::Column& column28 = table.column("c2_D");
-  column28.read( c2d, 1, max_src_count );
-
   valarray<float> m_corr;
-  CCfits::Column& column29 = table.column("m_cor");
-  column29.read( m_corr, 1, max_src_count );
+  try {
+    CCfits::Column& column21 = table.column("c1_A");
+    column21.read( c1a, 1, max_src_count );
+    CCfits::Column& column22 = table.column("c2_A");
+    column22.read( c2a, 1, max_src_count );
+    CCfits::Column& column23 = table.column("c1_B");
+    column23.read( c1b, 1, max_src_count );
+    CCfits::Column& column24 = table.column("c2_B");
+    column24.read( c2b, 1, max_src_count );
+    CCfits::Column& column25 = table.column("c1_C");
+    column25.read( c1c, 1, max_src_count );
+    CCfits::Column& column26 = table.column("c2_C");
+    column26.read( c2c, 1, max_src_count );
+    CCfits::Column& column27 = table.column("c1_D");
+    column27.read( c1d, 1, max_src_count );
+    CCfits::Column& column28 = table.column("c2_D");
+    column28.read( c2d, 1, max_src_count );
+    CCfits::Column& column29 = table.column("m_cor");
+    column29.read( m_corr, 1, max_src_count );
+  }
+  catch (CCfits::Table::NoSuchColumn& m) {
+    CCfits::Column& column21 = table.column("c1");
+    column21.read( c1a, 1, max_src_count );
+    c1b = c1c = c1d = c1a;
+    CCfits::Column& column22 = table.column("c2");
+    column22.read( c2a, 1, max_src_count );
+    c2b = c2c = c2d = c2a;
+    CCfits::Column& column29 = table.column("m_cor");
+    column29.read( m_corr, 1, max_src_count );
+  }
+
 
 
 
