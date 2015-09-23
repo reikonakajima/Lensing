@@ -56,7 +56,7 @@ class GAMARandomObject : public LensObject {
 class GAMARandomObjectList : public LensObjectList<GAMARandomObject*> {
 
  public:
-  // Constructor:  If max_count < 0, use the entire input.
+  // Constructor:  If max_count <= 0, use the entire input.
   //               Otherwise, randomize input rows and return the first max_count objects
   GAMARandomObjectList(const string fits_filename, int max_count=-1);
   // apply cuts based on logmstar

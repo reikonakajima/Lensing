@@ -89,7 +89,7 @@ ColDefs(
     index[i] = i;
   }
   // randomize the index array, then truncate at max_count
-  if (max_count < 0) {
+  if (max_count <= 0) {
     max_count = num_randoms;
   }
   random_shuffle(&index[0], &index[num_randoms]);
