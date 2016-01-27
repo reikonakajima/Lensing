@@ -83,7 +83,7 @@ GAMAObjectList::GAMAObjectList(const string fits_filename, int max_count) {
   column2.read( dec, 1, column2.rows() );
 
   valarray<float> z;
-  CCfits::Column& column3 = table.column("Z_1");
+  CCfits::Column& column3 = table.column("Z_TONRY");
   column3.read( z, 1, column3.rows() );
 
   valarray<float> logmstar;
