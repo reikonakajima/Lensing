@@ -75,6 +75,8 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
   } else {
     radial_bin /= 3600.;  // convert from arcsec into degree
   }
+  // determine radial bin size
+  int rad_nbin = radial_bin.binSize();
 
   //
   // iterate over all lens; generate lensing signal profile for each lens object
@@ -102,16 +104,13 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     // remove angular radial bins that are above max_angular_sep
     angular_radial_bin.trim_high(max_angular_sep);
 
-    // determine radial bin size
-    int rad_nbin = angular_radial_bin.binSize();
-
     //
     // collect all matching sources (get their indicies of srcvector) in radial bins
     //
     // TODO: *** optimize ring search ***
     vector<multimap<double, int> > bglist(rad_nbin);
 
-    for (int irad = 0; irad < rad_nbin; ++irad) {
+    for (int irad = 0; irad < angular_radial_bin.binSize(); ++irad) {
       if (geom == Flat) {
 	throw GGLensError("GGLens should not take Flat geometry");
       } else if (geom == SphericalSurface) {
