@@ -42,6 +42,7 @@ class GenericBins {
     }
     return;
   }
+  int trim_high(double _max_val);
  protected:
   vector<double> binEdges;
   int findIndex(double val);
