@@ -150,14 +150,13 @@ Mesh<Ttype, Tpos>::getNearAngleMap(Tpos ra, Tpos dec, Tpos z, Tpos thetamax, Tpo
   iz = int((z - zmin)/dz);
   Tpos cosd_1 = cos((dec+thetamax)*DEGREE);
   Tpos cosd_2 = cos((dec-thetamax)*DEGREE);
+  // XXX PROBLEMATIC WHEN (dec +/- thetamax) IS > 90 deg !!! XXXX
+  // this fatal flaw can be fixed by rotating the sphere so that center is at the ecliptic
   if ((cosd_1 < 0) or (cosd_2 < 0))
     throw logic_error("Mesh::getNearAngleMap(): angular separation is too large");
   Tpos cosd = cosd_1;
   if ((cosd_1 > cosd_2)) 
     cosd = cosd_2;
-  //cerr << "! " << cosd << " " << cosd_1 << " " << cosd_2 << endl;
-  //cerr << thetamax << " (" << ra << " " << dec << ")" << endl;
-  // XXX BUG NOTE: THIS IS PROBLEMATIC WHEN (dec +/- thetamax) IS > 90 deg !!!  XXXX
   int srx = int(thetamax/dx/cosd)+1; // calculate radius in terms of mesh indicies
   int sry = int(thetamax/dy)+1;      // (ra shrinks by cos(dec), include this effect)
   int srz = int(thetamax/dz)+1;
