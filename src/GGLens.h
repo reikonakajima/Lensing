@@ -75,7 +75,9 @@ class GGLensObjectList {
 		   double h = 1.0,
 		   double min_lens_src_delta_z = 0.15,
 		   geometry = SphericalSurface,
-		   double mesh_frac = 0.);
+		   double mesh_frac = 0.,
+		   double max_angular_sep = 90.0  // maximum separation, must be <=90 [degrees].
+    );
 
   int size() { return gglens_object_list.size(); }
 

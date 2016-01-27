@@ -22,8 +22,15 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 							  double h,
 							  double min_lens_src_delta_z,
 							  geometry _geom,
-							  double mesh_frac) :
+							  double mesh_frac,
+							  double max_angular_sep) :
   radial_bin(_radial_bin) , geom(_geom) {
+
+  //
+  // Mesh does not work if Dec separation is >90 degrees.
+  //
+  if (max_angular_sep >= 90.)
+    throw GGLensError("maximum angular separation cannot be larger than 90 degrees");
 
   //
   // adjust cosmological distance calculations for h
@@ -73,9 +80,6 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
   // iterate over all lens; generate lensing signal profile for each lens object
   //
 
-  /// each GGLensObject will have some number of radial bins
-  int rad_nbin = radial_bin.binSize();
-
   // lens objects lost through "not enough BG object count"
   int lost_bgcount = 0;
 
@@ -95,16 +99,18 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
       angular_radial_bin /= cosmo.DA(zlens) * HUBBLE_LENGTH_MPC;   // angular_radial_bin in degrees
     }
 
-    // the following criteria not necessary.
-    // related to TODO: *** multiple source files ***
-    if (!srcbounds.includes(Position<double>(lensra, lensdec)))
-       continue;
+    // remove angular radial bins that are above max_angular_sep
+    angular_radial_bin.trim_high(max_angular_sep);
+
+    // determine radial bin size
+    int rad_nbin = angular_radial_bin.binSize();
 
     //
     // collect all matching sources (get their indicies of srcvector) in radial bins
     //
     // TODO: *** optimize ring search ***
     vector<multimap<double, int> > bglist(rad_nbin);
+
     for (int irad = 0; irad < rad_nbin; ++irad) {
       if (geom == Flat) {
 	throw GGLensError("GGLens should not take Flat geometry");
