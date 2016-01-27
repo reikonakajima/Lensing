@@ -1,5 +1,6 @@
 #include "Mesh.h"
-
+#include <stdexcept>
+using std::logic_error;
 
 /*
 template <class Ttype, class Tpos> 
@@ -136,6 +137,7 @@ Mesh<Ttype, Tpos>::getNearMeshMap(Tpos x, Tpos y, Tpos z, Tpos rmax, Tpos rmin) 
 template <class Ttype, class Tpos> 
 multimap<double, int> 
 Mesh<Ttype, Tpos>::getNearAngleMap(Tpos ra, Tpos dec, Tpos z, Tpos thetamax, Tpos thetamin) {
+
   std::multimap<double, int> nbr;    // the return list
   nbr.clear();                       // clear list
   int ix,iy,iz,ii,p;
@@ -148,6 +150,8 @@ Mesh<Ttype, Tpos>::getNearAngleMap(Tpos ra, Tpos dec, Tpos z, Tpos thetamax, Tpo
   iz = int((z - zmin)/dz);
   Tpos cosd_1 = cos((dec+thetamax)*DEGREE);
   Tpos cosd_2 = cos((dec-thetamax)*DEGREE);
+  if ((cosd_1 < 0) or (cosd_2 < 0))
+    throw logic_error("Mesh::getNearAngleMap(): angular separation is too large");
   Tpos cosd = cosd_1;
   if ((cosd_1 > cosd_2)) 
     cosd = cosd_2;
@@ -157,6 +161,7 @@ Mesh<Ttype, Tpos>::getNearAngleMap(Tpos ra, Tpos dec, Tpos z, Tpos thetamax, Tpo
   int srx = int(thetamax/dx/cosd)+1; // calculate radius in terms of mesh indicies
   int sry = int(thetamax/dy)+1;      // (ra shrinks by cos(dec), include this effect)
   int srz = int(thetamax/dz)+1;
+
   std::vector<int> close = closemeshes(ix,iy,iz,srx,sry,srz);
   for (std::vector<int>::iterator ii=close.begin(); ii!=close.end(); ii++) {
     if ( (p=head[*ii])>=0 ) {
@@ -401,21 +406,15 @@ Mesh<Ttype, Tpos>::closemeshes(int ix, int iy, int iz,
 	}
   }
   else {
-    //cerr << srx << endl;
     int srxmin = ix-srx;  if (srxmin<  0   ) srxmin=0;  if (srxmin>=nm[0]) srxmin=nm[0]-1;
-    //cerr << srxmin << endl;
     int srymin = iy-sry;  if (srymin<  0   ) srymin=0;  if (srymin>=nm[1]) srymin=nm[1]-1;
-    //cerr << srymin << endl;
     int srzmin = iz-srz;  if (srzmin<  0   ) srzmin=0;  if (srzmin>=nm[2]) srzmin=nm[2]-1;
-    //cerr << srzmin << endl;
     int srxmax = ix+srx;  if (srxmax>=nm[0]) srxmax=nm[0]-1;  if (srxmax<  0   ) srxmax=0; 
-    //cerr << srxmax << endl;
     int srymax = iy+sry;  if (srymax>=nm[1]) srymax=nm[1]-1;  if (srymax<  0   ) srymax=0; 
-    //cerr << srymax << endl;
     int srzmax = iz+srz;  if (srzmax>=nm[2]) srzmax=nm[2]-1;  if (srzmax<  0   ) srzmax=0; 
-    //cerr << srzmax << endl;
+
     retlist.resize( (srxmax-srxmin+1)*(srymax-srymin+1)*(srzmax-srzmin+1) );
-    //cerr << retlist.size() << endl;
+
     nn = 0;
     for (int iix=srxmin; iix<=srxmax; iix++)
       for (int iiy=srymin; iiy<=srymax; iiy++)
@@ -424,7 +423,6 @@ Mesh<Ttype, Tpos>::closemeshes(int ix, int iy, int iz,
 	  retlist[nn] = ii;
 	  nn++;
 	}
-    //cerr << nn << endl;
   }
   return(retlist);
 }
