@@ -103,22 +103,15 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 
     // remove angular radial bins that are above max_angular_sep
     angular_radial_bin.trim_high(max_angular_sep);
+    int this_rad_nbin = angular_radial_bin.binSize();  // <= rad_nbin
 
     //
     // collect all matching sources (get their indicies of srcvector) in radial bins
     //
-    // TODO: *** optimize ring search ***
-    vector<multimap<double, int> > bglist(rad_nbin);
-
-    for (int irad = 0; irad < angular_radial_bin.binSize(); ++irad) {
-      if (geom == Flat) {
-	throw GGLensError("GGLens should not take Flat geometry");
-      } else if (geom == SphericalSurface) {
-	bglist[irad] = srcmesh.getNearAngleMap(lensra, lensdec, 0.,
-					       angular_radial_bin[irad+1],
-					       angular_radial_bin[irad]);
-      }
-    }
+    if (geom == Flat)
+      throw GGLensError("GGLens should not take Flat geometry");
+    vector<multimap<double, int> > bglist =
+      srcmesh.getNearAngleMap(lensra, lensdec, 0., angular_radial_bin.getBinEdges());
 
     //
     // LOOP over all sources (by radial bins) for this lens object, accumulate data
@@ -137,7 +130,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     valarray<float> src_zbins = source_list.getPzBins();
 
     multimap<double, int>::const_iterator isrc;
-    for (int irad = 0; irad < rad_nbin; ++irad) {
+    for (int irad = 0; irad < this_rad_nbin; ++irad) {
       for (isrc = bglist[irad].begin(); isrc != bglist[irad].end(); ++isrc) {
 
 	//
