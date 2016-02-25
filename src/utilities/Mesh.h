@@ -43,8 +43,10 @@ class Mesh {
   // Returns a map of (dist.sq., obj.index)
   multimap<double,int> getNearMeshMap(Tpos x, Tpos y, Tpos z, Tpos rmax, Tpos rmin = 0);
   // Returns a map of (spherical angle separation, obj.index)
-  // *assumes ra/dec are in degrees*
+  // *assumes ra,dec,theta are in degrees*
   multimap<double,int> getNearAngleMap(Tpos ra, Tpos dec, Tpos z, Tpos thetamax, Tpos thetamin=0);
+  vector<multimap<double,int> > getNearAngleMap(Tpos ra, Tpos dec, Tpos z,
+						vector<Tpos> thetabin_edges);
   // Returns a list of distances^2 for objects near pos.
   // list<Tpos> dist2(Tpos pos[], Tpos rmin, Tpos rmax);
   list<Tpos> getDistSqList(Tpos x, Tpos y, Tpos z, Tpos rmax, Tpos rmin = 0);
@@ -64,6 +66,11 @@ class Mesh {
   // Returns a list (vector) of the mesh points within sr of i.
   vector<int> closemeshes(int ix, int iy, int iz,
 			  int srx, int sry, int srz);
+  // prepares srx, sry, srz given ra/dec/thetamax (in degrees)
+  void prepare_angular_indices(Tpos ra, Tpos dec, Tpos thetamax,  /* input */
+			       int& ix, int& iy, int& iz,    /* output */
+			       int& srx, int& sry, int& srz  /* output */ );
+  Tpos calculate_angular_separation(Tpos ra0, Tpos sin_dec0, Tpos cos_dec0, Tpos ra1, Tpos dec1);
   Tpos xmin, xmax, dx;
   Tpos ymin, ymax, dy;
   Tpos zmin, zmax, dz;

@@ -21,6 +21,31 @@ LogarithmicBins::LogarithmicBins(double min_, double max_, int nbin_) {
 
 
 int
+GenericBins::trim_high(double _max_val) {
+  int count = 0;
+  if (!reverseOrder) {
+    for (int i=this->vectorSize()-1; i >= 0; --i) {
+      if (binEdges[i] > _max_val) {
+	binEdges.erase(binEdges.begin() + i);
+	++count;
+      }
+    }
+    nbin = binEdges.size() - 1;
+    min = binEdges[0];
+    max = binEdges[nbin-1];
+  } else {
+    while (*(binEdges.begin()) > _max_val) {
+      binEdges.erase(binEdges.begin());
+      ++count;
+    }
+    nbin = binEdges.size() - 1;
+    max = binEdges[0];
+    min = binEdges[nbin-1];
+  }
+  return count;
+}
+
+int
 GenericBins::findIndex(double val) { 
   int index = 0;
 

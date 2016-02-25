@@ -10,6 +10,8 @@
 #include "ggLensSum.h"
 #include "LensObjects.h"
 #include "SourceObjects.h"
+#include "Cosmology.h"
+#include "AstronomicalConstants.h"
 
 using std::list;
 using std::istringstream;
@@ -67,8 +69,15 @@ class GGLensObjectList {
   GGLensObjectList(LensObjectList<lensObjPtr> lens_list,
 		   SourceObjectList<srcObjPtr> source_list,
 		   GenericBins radial_bin,
-		   geometry = Flat,             // FIXME!! Change default to SphericalSurface
-		   double mesh_frac = 0.);
+		   bool radialBinInMpc = true,  // if not in Mpc, expects arcseconds
+		   bool normalizeToSigmaCrit = true,
+		   cosmology::Cosmology cosmo = cosmology::Cosmology(0.27,0.73),
+		   double h = 1.0,
+		   double min_lens_src_delta_z = 0.15,
+		   geometry = SphericalSurface,
+		   double mesh_frac = 0.,
+		   double max_angular_sep = 20.0  // maximum separation, must be <90 [degrees].
+    );
 
   int size() { return gglens_object_list.size(); }
 

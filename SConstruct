@@ -11,7 +11,8 @@ env = Environment()
 env.Append(CPPPATH=['/vol/software/software/tools/tmv/tmv0.72/x86_64/include'])
 env.Append(CPPPATH=['/opt/local/include'])
 env.Append(CPPPATH=[os.path.join(home_dir,'src'), os.path.join(home_dir,'src','utilities'),])
-env.Append(LIBS=['tmv', 'blas', 'CCfits'])
+env.Append(CPPPATH=[os.path.join(home_dir,'src','cosmology'),])
+env.Append(LIBS=['CCfits', 'tmv', 'blas', 'cfitsio'])
 env.Append(LIBPATH = ['/vol/software/software/tools/tmv/tmv0.72/x86_64/lib', '/usr/local/lib'])
 #env.Append(CPPPATH=['-stdlib=libstdc++'])
 
@@ -43,12 +44,24 @@ env.Append(CPPPATH=['utilities',])
 
 # specify the sub-objects
 sub_objects = '''
+	    src/cosmology/.obj/Cosmology.o
+	    src/cosmology/.obj/GrowthFunction.o
+	    src/cosmology/.obj/HuEisenstein.o
+	    src/cosmology/.obj/LensQuantities.o
+	    src/cosmology/.obj/LinearPowerSpectrum.o
+	    src/cosmology/.obj/Bispectra.o
 	    src/utilities/.obj/StringStuff.o
 	    src/utilities/.obj/Bins.o
 	    src/utilities/.obj/Mesh.o
+	    src/utilities/.obj/GTable.o
+	    src/utilities/.obj/odeint.o
+	    src/utilities/.obj/Matrix.o
 	    src/.obj/GGLens.o
 	    src/.obj/LensObjects.o
 	    src/.obj/StarMaskObjects.o
+	    src/.obj/GAMAObjects.o
+	    src/.obj/RandomObjects.o
+	    src/.obj/GAMARandomObjects.o
 	    src/.obj/SourceObjects.o
 	    src/.obj/RCSLenSObjects.o
 	    src/.obj/KiDSObjects.o
@@ -59,7 +72,9 @@ sub_objects = '''
 
 test = env.Program(target='GGLensTest', source=sub_objects+['src/GGLensDriver.cpp',])
 starhalo = env.Program(target='gglens_starhalo', source=sub_objects+['src/gglens_starhalo.cpp',])
-env.Install('bin', [test, starhalo])
-env.Alias('install', 'bin')
+gama_kids = env.Program(target='gglens_gama_kids', source=sub_objects+['src/gglens_gama_kids.cpp',])
+random_kids = env.Program(target='gglens_random_kids', source=sub_objects+['src/gglens_random_kids.cpp',])
+env.Install('bin', [test, gama_kids, random_kids, starhalo])
+#env.Alias('install', 'bin')
 
 # (eventually, build a library code)

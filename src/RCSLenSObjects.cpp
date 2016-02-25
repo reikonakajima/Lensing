@@ -8,7 +8,6 @@ using namespace std;
 // The following variables are static members of the RCSLenSObject class.
 // They need to be defined outside the scope of the class in order to be accessible from outside.
 bool RCSLenSObject::usePixelCoords;
-int RCSLenSObject::index;
 
 
 RCSLenSObjectList::RCSLenSObjectList(const string fits_filename) {
@@ -126,7 +125,7 @@ RCSLenSObject::printLine(ostream& os) const {
      << setprecision(5) << setw(10)
      << ra << " " << setw(10) << dec << " "
      << setprecision(3) << setw(10)
-     << e1 << " " << e2 << " "
+     << g1 << " " << g2 << " "
      << wt << " " << mag << " "
      << xpos << " " << ypos << " "
      << fwhm << " " << sn << " ";

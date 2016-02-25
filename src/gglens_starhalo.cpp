@@ -5,9 +5,7 @@
 #include "Std.h"
 #include "StringStuff.h"
 #include "Bounds.h"
-#include "LensObjects.h"
 #include "StarMaskObjects.h"
-#include "SourceObjects.h"
 #include "KiDSObjects.h"
 #include "GGLens.h"
 #include "Bins.h"
@@ -26,10 +24,11 @@ const string usage =
   "\n"
   "gglens_starhalo: calculate tangential shear around a given central point (halo center)\n"
   "\n"
-  " usage: gglens_starhalo <lens_catalog> <source_catalog> <radial_bin_info> <outfile_prefix>\n"
+  " usage: gglens_starhalo <lens_catalog> <source_catalog> <radial_bin_info> <outfile_prefix> <blinding>\n"
   "  lens_catalog:    lens catalog which contains the columns\n"
   "  source_catalog:  source catalog, which contains the columns\n"
   "  radial_bin_info: radial bin info (3 numbers, in arcseconds): [min_theta, max_theta, rad_nbin]\n"
+  "  blinding:        A, B, C, or D (for 4 different blindings)\n"
   "  \n"
   //  " output #1: file name:\" "+outfprefix+suffix+"\"\n"
   " stdin:  (none)\n"
@@ -44,7 +43,7 @@ main(int argc, char* argv[]) {
     //
     // process arguments
     //
-    if (argc != 5) {
+    if (argc != 6) {
       cerr << usage;
       exit(2);
     }
@@ -53,7 +52,12 @@ main(int argc, char* argv[]) {
     const string source_filename = argv[++iarg];
     const string radial_bin_filename = argv[++iarg];
     const string outf_prefix = argv[++iarg];
+    const char blinding = argv[++iarg][0];
     
+    /// check blinding
+    if (blinding != 'A' and blinding != 'B' and blinding != 'C' and blinding != 'D')
+      throw MyException("blinding not within specified range");
+
     /// open lens file
     ifstream lensf(lens_filename.c_str());
     if (!lensf) 
@@ -78,8 +82,7 @@ main(int argc, char* argv[]) {
 	throw MyException("radialbin file specification error");
     }
     LogarithmicBins radial_bin_arcsec(min_theta, max_theta, rad_nbin);  // for debug/info
-    LogarithmicBins radial_bin(min_theta, max_theta, rad_nbin);
-    radial_bin.rescale(1./3600.);  // convert arcsec to degree
+    LogarithmicBins radial_bin(min_theta, max_theta, rad_nbin);  // keep in arcsec
 
     //
     // setup bins (magnitude)
@@ -105,12 +108,12 @@ main(int argc, char* argv[]) {
     KiDSObjectList master_source_list(source_filename);
     KiDSObjectList source_list(master_source_list);  // TODO: add any extra cuts
     //source_list.usePixelCoord(true);  // must use ra/dec for lens and source
-
+    //source_list.setBlinding(blinding);
 
     //
     // diagnostic error messages
     //
-    cerr << "=== GGLensDriver ===" << endl;
+    cerr << "=== gglens_starhalo ===" << endl;
     cerr << "lens catalog .......... " << lens_filename << endl;
     cerr << "     count ............ " << lens_list.size() << "/"
 	 << master_lens_list.size() << endl;
@@ -132,15 +135,20 @@ main(int argc, char* argv[]) {
     }
 
     cerr << "radial bin range (\") .. " << radial_bin_arcsec[0] << " ... "
-	 << radial_bin[radial_bin_arcsec.binSize()] << endl;
-    cerr << "magnitude bin range ... " << magnitude_bin[0] << " ... "
-	 << magnitude_bin[magnitude_bin.binSize()] << endl;
+	 << radial_bin_arcsec[radial_bin_arcsec.binSize()] << endl;
+
+    cerr << "magnitude bin range ... ";
+    for (int i=0; i<magnitude_bin.vectorSize(); ++i)  cerr << magnitude_bin[i] << " ";
+    cerr << endl;
 
 
     //
     // create GGLensObjectList from lens_list and source_list (sums tangential shears for each lens)
     //
-    GGLensObjectList<StarMaskObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin);
+    bool radialBinIsMpc = false;
+    bool normalizeToSigmaCrit = false;
+    GGLensObjectList<StarMaskObject*, KiDSObject*> gglens_list(lens_list, source_list, radial_bin,
+							       radialBinIsMpc, normalizeToSigmaCrit);
 
     //
     // sort each lens into binned_lists
@@ -204,7 +212,7 @@ main(int argc, char* argv[]) {
       // provide output per bin
       //
       ofs << "#imag irad pairs sum(weights) sum(w^2) sum(responsivity) sum(w*et) sum(w*ex) "
-	  << "sum(w^2*var(et)) sum(w^2*var(ex)) n_lens" << endl;
+	  << "sum(w*var(et)) sum(w*var(ex)) n_lens" << endl;
 
       ofs << "#magbins: ";
       for (int imag=0; imag<magnitude_bin.vectorSize(); ++imag) {

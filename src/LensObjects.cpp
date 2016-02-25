@@ -5,7 +5,7 @@ using namespace std;
 
 LensObject::LensObject(const string buffer) {
   istringstream iss(buffer);
-  if (!(iss >> id >> ra >> dec)) {
+  if (!(iss >> id >> ra >> dec >> z >> mag)) {
     cerr << "## " << buffer << endl;
     throw LensObjectsError("error reading LensObject");
   }
@@ -122,3 +122,9 @@ LensObjectList<ObjPtr>::findBounds() {
 template class LensObjectList<LensObject*>;
 #include "StarMaskObjects.h"
 template class LensObjectList<StarMaskObject*>;
+#include "GAMAObjects.h"
+template class LensObjectList<GAMAObject*>;
+#include "RandomObjects.h"
+template class LensObjectList<RandomObject*>;
+#include "GAMARandomObjects.h"
+template class LensObjectList<GAMARandomObject*>;
