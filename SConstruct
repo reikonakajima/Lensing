@@ -13,7 +13,7 @@ env.Append(CPPPATH=['/opt/local/include'])
 env.Append(CPPPATH=[os.path.join(home_dir,'src'), os.path.join(home_dir,'src','utilities'),])
 env.Append(LIBS=['tmv', 'blas', 'CCfits'])
 env.Append(LIBPATH = ['/vol/software/software/tools/tmv/tmv0.72/x86_64/lib', '/usr/local/lib'])
-
+#env.Append(CPPPATH=['-stdlib=libstdc++'])
 
 def ReadFileList(fname):
     """
