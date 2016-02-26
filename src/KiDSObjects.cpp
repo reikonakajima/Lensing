@@ -5,13 +5,8 @@
 using namespace std;
 
 
-// The following variables are static members of the KiDSObject class.
-// They need to be defined outside the scope of the class in order to be accessible from outside.
-bool KiDSObject::usePixelCoords;
-
-
-KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask) {
-
+KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask,
+			       KiDSObjectList::blind blind_index) {
   // open FITS file
   const string obj_extension = "OBJECTS";
   auto_ptr<CCfits::FITS> pInfile(0);
@@ -34,7 +29,7 @@ KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask) {
   // read the following columns (annoyingly, only one column can be read at a time):
   //  e1/2_A/B/C, ALPHA_J2000/DELTA_J2000, Xpos/Ypos,
   //  MAN_MASK, MAG_GAAP_r_CALIB, MAGERR_GAAP_r,
-  //  PZ_full, Z_B, (Z_B_MIN, Z_B_MAX)
+  //  Z_B, (Z_B_MIN, Z_B_MAX)
   //  FWHM_IMAGE, weight, and assign it to SourceObject
 
   valarray<float> g1a;
@@ -43,9 +38,9 @@ KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask) {
   valarray<float> g2b;
   valarray<float> g1c;
   valarray<float> g2c;
-  valarray<float> wa;
-  valarray<float> wb;
-  valarray<float> wc;
+  valarray<float> wt_a;
+  valarray<float> wt_b;
+  valarray<float> wt_c;
 
   int max_src_count;
 
@@ -56,21 +51,21 @@ KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask) {
     CCfits::Column& column2 = table.column("e2_A");
     column2.read( g2a, 1, max_src_count );
     CCfits::Column& column3 = table.column("weight_A");
-    column3.read( wa, 1, max_src_count );
+    column3.read( wt_a, 1, max_src_count );
 
     CCfits::Column& column4 = table.column("e1_B");
     column4.read( g1b, 1, max_src_count );
     CCfits::Column& column5 = table.column("e2_B");
     column5.read( g2b, 1, max_src_count );
     CCfits::Column& column6 = table.column("weight_B");
-    column6.read( wb, 1, max_src_count );
+    column6.read( wt_b, 1, max_src_count );
 
     CCfits::Column& column7 = table.column("e1_C");
     column7.read( g1c, 1, max_src_count );
     CCfits::Column& column8 = table.column("e2_C");
     column8.read( g2c, 1, max_src_count );
-    CCfits::Column& column9 = table.column("weight_c");
-    column9.read( wc, 1, max_src_count );
+    CCfits::Column& column9 = table.column("weight_C");
+    column9.read( wt_c, 1, max_src_count );
 
 
   }
@@ -121,70 +116,17 @@ KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask) {
   CCfits::Column& column19 = table.column("Z_B");
   column19.read( z_B, 1, max_src_count );
 
-  /*
-  valarray<float> c1a;
-  valarray<float> c2a;
-  valarray<float> c1b;
-  valarray<float> c2b;
-  valarray<float> c1c;
-  valarray<float> c2c;
-  valarray<float> m_corr;
-  try {
-    CCfits::Column& column20 = table.column("c1_A");
-    column20.read( c1a, 1, max_src_count );
-    CCfits::Column& column21 = table.column("c2_A");
-    column21.read( c2a, 1, max_src_count );
-    CCfits::Column& column22 = table.column("c1_B");
-    column22.read( c1b, 1, max_src_count );
-    CCfits::Column& column23 = table.column("c2_B");
-    column23.read( c2b, 1, max_src_count );
-    CCfits::Column& column24 = table.column("c1_C");
-    column24.read( c1c, 1, max_src_count );
-    CCfits::Column& column25 = table.column("c2_C");
-    column25.read( c2c, 1, max_src_count );
-    CCfits::Column& column26 = table.column("m_cor");
-    column26.read( m_corr, 1, max_src_count );
-  }
-  catch (CCfits::Table::NoSuchColumn& m) {
-    CCfits::Column& column21 = table.column("c1");
-    column21.read( c1a, 1, max_src_count );
-    c1b = c1c = c1a;
-    CCfits::Column& column22 = table.column("c2");
-    column22.read( c2a, 1, max_src_count );
-    c2b = c2c = c2a;
-    CCfits::Column& column23 = table.column("m_cor");
-    column23.read( m_corr, 1, max_src_count );
-  }
-  */
 
   // append objects to this list
   source_list.reserve(max_src_count);
   for (int i=0; i<max_src_count; ++i) {
-      if (weight[i] == 0) continue;
+      if (wt_a[i] == 0) continue;
       if (mask[i] & bitmask) continue;
       KiDSObject* ptr = new KiDSObject(i, ra[i], dec[i], mag[i], xpos[i], ypos[i], fwhm[i],
-				       g1a[i], g2a[i], g1b[i], g2b[i],
-				       g1c[i], g2c[i],
-				       sn[i], z_B[i], pz_full[i], mask[i], weight[i],
-				       // m_corr[i], c1a[i], c2a[i], c1b[i], c2b[i], c1c[i], c2c[i]
-				       );
+				       g1a[i], g2a[i], g1b[i], g2b[i], g1c[i], g2c[i],
+				       wt_a[i], wt_b[i], wt_c[i], sn[i], z_B[i], mask[i], blind_index);
       source_list.push_back(ptr);
   }
-
-  // set up the p(z) redshift bins
-  // "a vector of length 70 giving P(z) at redshifts spanning 0<z<3.5 with dz=0.05"
-  float array[NUM_PZ_ELEM];
-  for (int i=0; i<NUM_PZ_ELEM; ++i) {
-    array[i] = INIT_Z + i * DELTA_Z;
-  }
-  SourceObjectList::pzbins = valarray<float>(array, NUM_PZ_ELEM);
-
-  // The following two commands needs to be set after the KiDSObject list has been filled:
-  // - initially set shear to "A" (driver code can change this)
-  // setShearIndex(0);  // TODO -- be able to set to any of the ABCD shears!  (initially set to 0)
-  // - initially set coordinates to use ra/dec
-  //   (driver code must specify if pixel coordinate is to be used)
-  usePixelCoord(false);
 
   return;
 }
@@ -219,34 +161,19 @@ KiDSObjectList::applyBitMask(int bitmask){
 
 
 void
-KiDSObjectList::setBlinding(char blinding){
-  int blind_index = 0;
-  switch (blinding) {
-    case 'A':
-      blind_index = 0;
-      break;
-    case 'B':
-      blind_index = 1;
-      break;
-    case 'C':
-      blind_index = 2;
-      break;
-    case 'D':
-      blind_index = 3;
-      break;
-    default:
-      throw KiDSObjectsError("setBlinding: wrong blinding specified");
-  }
+KiDSObjectList::setBlinding(KiDSObjectList::blind blind_index){
+
+  if ((blind_index<0) || (blind_index >=KiDSObject::NUM_SHEAR))
+    throw KiDSObjectsError("setBlinding(): wrong blinding specified");
+
   for (vector<KiDSObject*>::iterator it = source_list.begin();
        it != source_list.end(); ++it) {
     Shear s = (*it)->getShearArray()[blind_index];
-    double g1, g2;
-    s.setG1G2(g1, g2);
-    (*it)->setShearG1G2BiasCorrections(s, g1, g2, (*it)->getM(),
-				       (*it)->getC1Array()[blind_index],
-				       (*it)->getC2Array()[blind_index]);
+    double g1 = (*it)->getG1Array()[blind_index];
+    double g2 = (*it)->getG2Array()[blind_index];
+    double wt = (*it)->getWeightArray()[blind_index];
+    (*it)->setShearG1G2BiasCorrections(s, g1, g2, wt);
   }
-
   return;
 }
 
