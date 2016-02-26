@@ -101,7 +101,7 @@ main(int argc, char* argv[]) {
     //                may have multiple bands
     KiDSObjectList master_source_list(source_filename);
     KiDSObjectList source_list(master_source_list);  // TODO: add any extra cuts
-    source_list.usePixelCoord(true);  // use pixel coordinates
+    //source_list.usePixelCoord(true);  // use pixel coordinates
 
 
     //
