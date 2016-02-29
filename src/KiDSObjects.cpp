@@ -67,7 +67,6 @@ KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask,
     CCfits::Column& column9 = table.column("weight_C");
     column9.read( wt_c, 1, max_src_count );
 
-
   }
   catch (CCfits::Table::NoSuchColumn& m) {
     CCfits::Column& column1 = table.column("e1");
@@ -109,13 +108,16 @@ KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask,
   column17.read( fwhm, 1, max_src_count );
 
   valarray<float> sn;
-  CCfits::Column& column18 = table.column("SNratio");
+  CCfits::Column& column18 = table.column("pixel_SNratio");
   column18.read( sn, 1, max_src_count );
 
   valarray<double> z_B;
   CCfits::Column& column19 = table.column("Z_B");
   column19.read( z_B, 1, max_src_count );
 
+
+  // declare which blind is being used
+  cerr << "Using blind: " << KiDSObjectList::blind_str(blind_index) << endl;
 
   // append objects to this list
   source_list.reserve(max_src_count);

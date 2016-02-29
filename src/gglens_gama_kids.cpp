@@ -65,6 +65,7 @@ main(int argc, char* argv[]) {
     if (!sourcef) 
       throw MyException("source catalog file " + source_filename + " not found");
 
+
     //
     // setup radial bins (in Mpc or Mpc/h, depending on definition of h)
     //
@@ -95,7 +96,7 @@ main(int argc, char* argv[]) {
     lens_list.applyLogMStarCut(logmstar_bin.getMin(), logmstar_bin.getMax());
 
     int bitmask = 1;  /// remove bitmask masked objs. TODO: UPDATE BITMASK OPTIONS  2^15 - 1 = 32767
-    KiDSObjectList master_source_list(source_filename, bitmask);
+    KiDSObjectList master_source_list(source_filename, bitmask, KiDSObjectList::Z);
     KiDSObjectList source_list(master_source_list);
     source_list.applyRedshiftCut(MIN_SRC_Z, MAX_SRC_Z);
 

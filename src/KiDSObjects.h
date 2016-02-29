@@ -42,7 +42,14 @@ class KiDSObjectList : public SourceObjectList<KiDSObject*> {
  friend class KiDSObject;
 
  public:
-  enum blind {Z, X, Y};       // Z=(A), X=(B), Y=(C)  index shuffling, where (A)(B)(C) are the original
+  enum blind {Z, X, Y};      // Z=(A), X=(B), Y=(C)  index shuffling, where (A)(B)(C) are the original
+  static char blind_str(blind b) {
+    switch(b) {
+      case X: return 'X'; break;
+      case Y: return 'Y'; break;
+      case Z: return 'Z'; break;
+    }
+  }
   static blind blind_index;  // to keep track of which shear to return
 
   KiDSObjectList(const string fits_filename, int bitmask=0,  // bitmask=0 means *no* masking
