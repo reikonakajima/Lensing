@@ -26,11 +26,12 @@ const string usage =
   "\n"
   "GGLensDriver: calculate tangential shear around a point (galaxy-galaxy lensing signal)\n"
   "\n"
-  " usage: GGLensDriver <lens_catalog> <source_catalog>\n"
+  " usage: GGLensDriver <lens_catalog> <source_catalog> <specz_source_catalog>\n"
   "  lens_catalog:  lens catalog which containts the columns\n"
   "  r.txt:   radial bin info (3 numbers): [min_theta, max_theta, rad_nbin]\n"
   "  \n"
   "  source_catalog:  source catalog, which contains the columns\n"
+  "  specz_src_catalog:  source spec-z catalog, which contains the columns\n"
   "  \n"
   //  " output #1: file name:\" "+outfprefix+suffix+"\"\n"
   " stdin:  (none)\n"
@@ -45,13 +46,14 @@ main(int argc, char* argv[]) {
     //
     // process arguments
     //
-    if (argc != 3) {
+    if (argc != 4) {
       cerr << usage;
       exit(2);
     }
     int iarg = 0;
     const string lens_filename = argv[++iarg];
     const string source_filename = argv[++iarg];
+    const string specz_src_filename = argv[++iarg];
     
     /// open lens file
     ifstream lensf(lens_filename.c_str());
@@ -62,6 +64,7 @@ main(int argc, char* argv[]) {
     ifstream sourcef(source_filename.c_str());
     if (!sourcef) 
       throw MyException("source catalog file " + source_filename + " not found");
+    sourcef.close();
 
     //
     // setup radial bins (in pixel units)

@@ -24,9 +24,10 @@ const string usage =
   "\n"
   "gglens_starhalo: calculate tangential shear around a given central point (halo center)\n"
   "\n"
-  " usage: gglens_starhalo <lens_catalog> <source_catalog> <radial_bin_info> <outfile_prefix> <blinding>\n"
+  " usage: gglens_starhalo <lens_cat> <source_cat> <specz_src_cat> <radial_bin_info> <outfile_prefix> <blinding>\n"
   "  lens_catalog:    lens catalog which contains the columns\n"
   "  source_catalog:  source catalog, which contains the columns\n"
+  "  specz_src_catalog:  source specz catalog, which contains the columns\n"
   "  radial_bin_info: radial bin info (3 numbers, in arcseconds): [min_theta, max_theta, rad_nbin]\n"
   "  blinding:        A, B, C, or D (for 4 different blindings)\n"
   "  \n"
@@ -43,13 +44,14 @@ main(int argc, char* argv[]) {
     //
     // process arguments
     //
-    if (argc != 6) {
+    if (argc != 7) {
       cerr << usage;
       exit(2);
     }
     int iarg = 0;
     const string lens_filename = argv[++iarg];
     const string source_filename = argv[++iarg];
+    const string specz_src_filename = argv[++iarg];
     const string radial_bin_filename = argv[++iarg];
     const string outf_prefix = argv[++iarg];
     const char blinding = argv[++iarg][0];
@@ -67,6 +69,7 @@ main(int argc, char* argv[]) {
     ifstream sourcef(source_filename.c_str());
     if (!sourcef) 
       throw MyException("source catalog file " + source_filename + " not found");
+    sourcef.close();
 
     //
     // setup radial bins (in arcsec)

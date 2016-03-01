@@ -22,10 +22,12 @@ const string usage =
   "\n"
   "gglens_gama_kids: calculate tangential shear around a given central point (halo center)\n"
   "\n"
-  " usage: gglens_gama_kids <lens_catalog> <source_catalog> <radial_bin_info> <outfile_prefix>\n"
-  "  lens_catalog:    lens catalog which contains the columns\n"
-  "  source_catalog:  source catalog, which contains the columns\n"
+  " usage: gglens_gama_kids <lens_cat> <src_cat> <src_specz_cat> <radial_bin_info> <outfile_prefix>\n"
+  "  lens_cat:        lens catalog which contains the columns\n"
+  "  src_cat:         source catalog, which contains the columns\n"
+  "  src_specz_cat:   spec_z catalog which determines the p(z) of the source catalog\n"
   "  radial_bin_info: radial bin info (3 numbers, in Mpc/h): [min_Mpch, max_Mpch, rad_nbin]\n"
+  "  outfile_prefix:  prefix for the output file (suffix is "+suffix+")\n"
   "  \n"
   " stdin:  (none)\n"
   " stdout: (none)\n";
@@ -45,25 +47,32 @@ main(int argc, char* argv[]) {
     //
     // process arguments
     //
-    if (argc != 5) {
+    if (argc != 6) {
       cerr << usage;
       exit(2);
     }
     int iarg = 0;
     const string lens_filename = argv[++iarg];
     const string source_filename = argv[++iarg];
+    const string specz_src_filename = argv[++iarg];
     const string radial_bin_filename = argv[++iarg];
     const string outf_prefix = argv[++iarg];
     
     /// open lens file
     ifstream lensf(lens_filename.c_str());
-    if (!lensf) 
+    if (!lensf)
       throw MyException("lens catalog file " + lens_filename + " not found");
+    lensf.close();
 
-    /// construct source filenames, open files
+    /// check source filenames
     ifstream sourcef(source_filename.c_str());
-    if (!sourcef) 
+    if (!sourcef)
       throw MyException("source catalog file " + source_filename + " not found");
+    sourcef.close();
+    ifstream speczf(specz_src_filename.c_str());
+    if (!speczf)
+      throw MyException("source specz catalog file " + specz_src_filename + " not found");
+    speczf.close();
 
 
     //
@@ -89,14 +98,19 @@ main(int argc, char* argv[]) {
     ArbitraryWidthBins logmstar_bin(logmstarf);
 
     //
-    // setup lens/source samples
+    // setup lens sample
     //
     GAMAObjectList master_lens_list(lens_filename);
     GAMAObjectList lens_list(master_lens_list);
     lens_list.applyLogMStarCut(logmstar_bin.getMin(), logmstar_bin.getMax());
 
-    int bitmask = 1;  /// remove bitmask masked objs. TODO: UPDATE BITMASK OPTIONS  2^15 - 1 = 32767
-    KiDSObjectList master_source_list(source_filename, bitmask, KiDSObjectList::Z);
+    //
+    // setup source sample
+    //
+    int bitmask = 0x7c14;  /// remove bitmask masked objs.
+    int blind_index = 0;
+    valarray<float> pz_list = KiDSObjectList::getPZ(specz_src_filename, MIN_SRC_Z, MAX_SRC_Z, bitmask);
+    KiDSObjectList master_source_list(source_filename, bitmask, blind_index, pz_list);
     KiDSObjectList source_list(master_source_list);
     source_list.applyRedshiftCut(MIN_SRC_Z, MAX_SRC_Z);
 

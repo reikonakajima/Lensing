@@ -2,13 +2,14 @@
 // KiDSObjects.cpp
 //
 #include "KiDSObjects.h"
+#include <gsl/gsl_histogram.h>
 using namespace std;
 
 
 KiDSObjectList::KiDSObjectList(const string kids_fits_filename,
-			       const string specz_fits_filename,
 			       int bitmask,
-			       KiDSObjectList::blind blind_index) {
+			       int blind_index,
+			       valarray<float> pz_full) {
   // open KiDS FITS file
   const string obj_extension = "OBJECTS";
   auto_ptr<CCfits::FITS> pInfile(0);
@@ -119,8 +120,41 @@ KiDSObjectList::KiDSObjectList(const string kids_fits_filename,
   column19.read( z_B, 1, max_src_count );
 
 
-  // open spec-z FITS file
-  const string specz_extension = "PSSC";
+  // declare which blind is being used
+  checkBlinding(blind_index);
+  cerr << "Using blind: " << blind_index << endl;
+
+  // append objects to this list
+  source_list.reserve(max_src_count);
+  for (int i=0; i<max_src_count; ++i) {
+      if (wt_a[i] == 0) continue;
+      if (mask[i] & bitmask) continue;
+      KiDSObject* ptr = new KiDSObject(i, ra[i], dec[i], mag[i], xpos[i], ypos[i], fwhm[i], sn[i],
+				       g1a[i], g2a[i], g1b[i], g2b[i], g1c[i], g2c[i],
+				       wt_a[i], wt_b[i], wt_c[i],
+				       z_B[i], pz_full, mask[i], blind_index);
+      source_list.push_back(ptr);
+  }
+
+  // set up the p(z) redshift bins
+  // "a vector of length 70 giving P(z) at redshifts spanning 0<z<3.5 with dz=0.05"
+  float array[NUM_PZ_ELEM];
+  for (int i=0; i<NUM_PZ_ELEM; ++i) {
+    array[i] = INIT_Z + i * DELTA_Z;
+  }
+  SourceObjectList::pzbins = valarray<float>(array, NUM_PZ_ELEM);
+
+  return;
+}
+
+
+valarray<float>
+KiDSObjectList::getPZ(const string specz_fits_filename, float minz, float maxz, int bitmask) {
+
+ // open spec-z FITS file
+  const string specz_extension = "PSSC";  // or alternatively, the integer '1'
+  auto_ptr<CCfits::FITS> pInfile(0);
+
   try {
     // open the fits table and go to the right extension
     cerr << "reading " << specz_fits_filename << endl;
@@ -137,28 +171,63 @@ KiDSObjectList::KiDSObjectList(const string kids_fits_filename,
   // goto OBJECTS extension
   CCfits::ExtHDU& specz_table = pInfile->extension(specz_extension);
 
-  // DEBUG: EMPTY ARRAY
-  vector<valarray<float> > pz_full;
-  pz_full.resize(max_src_count);
-  ////////////////////
+  valarray<float> z_spec;
+  valarray<float> Z_B;
+  valarray<int> mask;
+  valarray<float> spec_weight;
 
-  // declare which blind is being used
-  cerr << "Using blind: " << KiDSObjectList::blind_str(blind_index) << endl;
+  int max_specz_count;
 
-  // append objects to this list
-  source_list.reserve(max_src_count);
-  for (int i=0; i<max_src_count; ++i) {
-      if (wt_a[i] == 0) continue;
-      if (mask[i] & bitmask) continue;
-      KiDSObject* ptr = new KiDSObject(i, ra[i], dec[i], mag[i], xpos[i], ypos[i], fwhm[i], sn[i],
-				       g1a[i], g2a[i], g1b[i], g2b[i], g1c[i], g2c[i],
-				       wt_a[i], wt_b[i], wt_c[i],
-				       z_B[i], pz_full[i], mask[i], blind_index);
-      source_list.push_back(ptr);
+  try {
+    CCfits::Column& column1 = specz_table.column("z_spec");
+    max_specz_count = column1.rows();
+    column1.read( z_spec, 1, max_specz_count );
+    CCfits::Column& column2 = specz_table.column("Z_B");
+    column2.read( Z_B, 1, max_specz_count );
+    CCfits::Column& column3 = specz_table.column("spec_weight");
+    column3.read( spec_weight, 1, max_specz_count );
+    CCfits::Column& column4 = specz_table.column("MASK");
+    column4.read( mask, 1, max_specz_count );
+  }
+  catch (CCfits::Table::NoSuchColumn& fitsError) {
+    throw KiDSObjectsError(string("Error reading column(s): ") + fitsError.message());
   }
 
+  // append objects to this list
+  vector<float> specz_list;
+  vector<float> specz_weight_list;
+  specz_list.reserve(max_specz_count);
+  specz_weight_list.reserve(max_specz_count);
+  for (int i=0; i<max_specz_count; ++i) {
+      if (spec_weight[i] == 0) continue;
+      if (mask[i] & bitmask) continue;
+      if (Z_B[i] < minz || Z_B[i] <= maxz) continue;
+      specz_list.push_back(z_spec[i]);
+      specz_weight_list.push_back(spec_weight[i]);
+  }
 
-  return;
+  // create n(z) histogram (to be substituted as P(z))
+  gsl_histogram *h = gsl_histogram_alloc(NUM_PZ_ELEM);
+  float END_Z = INIT_Z + NUM_PZ_ELEM * DELTA_Z;
+  gsl_histogram_set_ranges_uniform(h, INIT_Z, END_Z);
+  for (int i=0; i<specz_list.size(); ++i) {
+    gsl_histogram_accumulate(h, specz_list[i], specz_weight_list[i]);
+  }
+
+  // generate histogram array
+  float hist[NUM_PZ_ELEM];
+  float norm = 0;
+  for (int i=0; i<NUM_PZ_ELEM; ++i) {
+    hist[i] = gsl_histogram_get(h, i);
+    norm += hist[i];
+  }
+  // normalize histogram
+  for (int i=0; i<NUM_PZ_ELEM; ++i) {
+    hist[i] /= norm;
+  }
+
+  // return normalized histogram
+  return valarray<float>(hist, NUM_PZ_ELEM);
 }
 
 
@@ -191,10 +260,17 @@ KiDSObjectList::applyBitMask(int bitmask){
 
 
 void
-KiDSObjectList::setBlinding(KiDSObjectList::blind blind_index){
+KiDSObjectList::checkBlinding(int blind_index){
 
   if ((blind_index<0) || (blind_index >=KiDSObject::NUM_SHEAR))
-    throw KiDSObjectsError("setBlinding(): wrong blinding specified");
+    throw KiDSObjectsError("setBlinding(): wrong blinding index specified");
+}
+
+
+void
+KiDSObjectList::setBlinding(int blind_index){
+
+  checkBlinding(blind_index);
 
   for (vector<KiDSObject*>::iterator it = source_list.begin();
        it != source_list.end(); ++it) {

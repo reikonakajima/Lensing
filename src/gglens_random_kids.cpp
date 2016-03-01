@@ -24,9 +24,10 @@ const string usage =
   "\n"
   "gglens_random_kids: calculate tangential shear around a given central point (halo center)\n"
   "\n"
-  " usage: gglens_random_kids <lens_catalog> <source_catalog> <radial_bin_info> <outfile_prefix> <max_num_randoms>\n"
+  " usage: gglens_random_kids <lens_cat> <source_cat> <specz_src_cat> <radial_bin_info> <outfile_prefix> <max_num_randoms>\n"
   "  lens_catalog:    lens catalog which contains the columns\n"
   "  source_catalog:  source catalog, which contains the columns\n"
+  "  specz_src_catalog:  source specz catalog, which contains the columns\n"
   "  radial_bin_info: radial bin info (3 numbers, in arcseconds): [min_theta, max_theta, rad_nbin]\n"
   "  max_num_randoms: maximum number of randoms to use to calculate signal\n"
   "  \n"
@@ -48,13 +49,14 @@ main(int argc, char* argv[]) {
     //
     // process arguments
     //
-    if (argc != 6) {
+    if (argc != 7) {
       cerr << usage;
       exit(2);
     }
     int iarg = 0;
     const string lens_filename = argv[++iarg];
     const string source_filename = argv[++iarg];
+    const string specz_src_filename = argv[++iarg];
     const string radial_bin_filename = argv[++iarg];
     const string outf_prefix = argv[++iarg];
     const int    max_lens_count = atoi(argv[++iarg]);
@@ -87,14 +89,19 @@ main(int argc, char* argv[]) {
     ArbitraryWidthBins logmstar_bin(logmstarf);
 
     //
-    // setup lens/source samples
+    // setup lens sample
     //
     GAMARandomObjectList master_lens_list(lens_filename.c_str(), max_lens_count);
     GAMARandomObjectList lens_list(master_lens_list);     // TODO: add any extra cuts
     lens_list.applyLogMStarCut(logmstar_bin.getMin(), logmstar_bin.getMax());
 
-    int bitmask = 1;  /// remove bitmask masked objs. TODO: UPDATE BITMASK OPTIONS  2^15 - 1 = 32767
-    KiDSObjectList master_source_list(source_filename, bitmask);
+    //
+    // setup source sample
+    //
+    int bitmask = 0x7c14;  // remove bitmask masked objs.
+    int blind_index = 0;   // 0, 1, or 2
+    valarray<float> pz_list = KiDSObjectList::getPZ(specz_src_filename, MIN_SRC_Z, MAX_SRC_Z, bitmask);
+    KiDSObjectList master_source_list(source_filename, bitmask, blind_index, pz_list);
     KiDSObjectList source_list(master_source_list);  // TODO: add any extra cuts
     source_list.applyRedshiftCut(MIN_SRC_Z, MAX_SRC_Z);
 

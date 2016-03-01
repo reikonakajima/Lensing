@@ -42,26 +42,37 @@ class KiDSObjectList : public SourceObjectList<KiDSObject*> {
  friend class KiDSObject;
 
  public:
-  enum blind {Z, X, Y};      // Z=(A), X=(B), Y=(C)  index shuffling, where (A)(B)(C) are the original
+  enum blind {C, A, B};      // 1=(A), 2=(B), 0=(C)  index shuffling, where (A)(B)(C) are the original
   static char blind_str(blind b) {
     switch(b) {
-      case X: return 'X'; break;
-      case Y: return 'Y'; break;
-      case Z: return 'Z'; break;
+      case A: return 'A'; break;
+      case B: return 'B'; break;
+      case C: return 'C'; break;
     }
   }
-  static blind blind_index;  // to keep track of which shear to return
+  static int blind_index;  // to keep track of which shear to return
 
   KiDSObjectList(const string fits_filename,
-		 const string specz_filename,
-		 int bitmask=0,  // bitmask=0 means *no* masking
-		 KiDSObjectList::blind blind_index=KiDSObjectList::X);
+		 int bitmask=0,       // bitmask=0 means *no* masking
+		 int blind_index=0,
+		 valarray<float> pz_full=valarray<float>());
   // selection source objects according to the blindings 0, 1, or 2
-  void setBlinding(KiDSObjectList::blind _blind_index);
+  void setBlinding(int _blind_index);
   // apply mask such that objects with "MASK <= mask_thres" are kept, return number of kept obj.
   int applyMask(int mask_thres=0);  // mask_thres=0 means mask *everything* except MASK==0
   // apply bit mask, so that (MASK & bitmask)>0 objects are excluded
   int applyBitMask(int bitmask);
+
+  // read in p(z) from a specz_file
+  static valarray<float> getPZ(const string specz_fits_filename, float minz, float maxz, int bitmask);
+
+ private:
+  // check that the blinding index is within the correct range
+  void checkBlinding(int _blind_index);
+
+  static const int NUM_PZ_ELEM = 70;
+  static const float DELTA_Z = 0.05;
+  static const float INIT_Z = 0.025;
 };
 
 
@@ -81,33 +92,39 @@ class KiDSObject : public SourceObject {
 	     double _wt_A, double _wt_B, double _wt_C,
 	     double _zB, valarray<float> _pz_full,
 	     int _mask, int blind_index) :
+  // assign id, ra, dec, zB to base SourceObject
   SourceObject(_id, ra, dec, 99., 99., _zB, 0.),  // store junk g1, g2, wt in base source object
+    // assign mag, xpos, ypos, fwhm, sn, mask into KiDSObject
     mag(_mag), xpos(_xpos), ypos(_ypos), fwhm(_fwhm_image), sn(sn_ratio), mask(_mask) {
 
-    shear[0] = Shear().setG1G2(_g1_A, -_g2_A);  // ra runs in negative direction,
-    shear[1] = Shear().setG1G2(_g1_B, -_g2_B);  // so the g2 sign needs to be flipped
-    shear[2] = Shear().setG1G2(_g1_C, -_g2_C);
+    // assign shear and weights to KiDSObject (with blinding-shuffling!)
+    shear[KiDSObjectList::A] = Shear().setG1G2(_g1_A, -_g2_A);  // ra runs in negative direction,
+    shear[KiDSObjectList::B] = Shear().setG1G2(_g1_B, -_g2_B);  // so the g2 sign needs to be flipped
+    shear[KiDSObjectList::C] = Shear().setG1G2(_g1_C, -_g2_C);
 
-    g1[0] = _g1_A;
-    g1[1] = _g1_B;
-    g1[2] = _g1_C;
+    g1[KiDSObjectList::A] = _g1_A;
+    g1[KiDSObjectList::B] = _g1_B;
+    g1[KiDSObjectList::C] = _g1_C;
 
-    g2[0] = -_g2_A;
-    g2[1] = -_g2_B;
-    g2[2] = -_g2_C;
+    g2[KiDSObjectList::A] = -_g2_A;
+    g2[KiDSObjectList::B] = -_g2_B;
+    g2[KiDSObjectList::C] = -_g2_C;
 
-    weight[0] = _wt_A;
-    weight[1] = _wt_B;
-    weight[2] = _wt_C;
+    weight[KiDSObjectList::A] = _wt_A;
+    weight[KiDSObjectList::B] = _wt_B;
+    weight[KiDSObjectList::C] = _wt_C;
 
-    // assign blinded shears and weights to SourceObject
+    // assign blinded shears and weights to base SourceObject
     setShearG1G2BiasCorrections(shear[blind_index],
 				g1[blind_index], g2[blind_index], weight[blind_index]);
+
+    // assign p(z) to baseSourceObject
+    SourceObject::pz = _pz_full;
   }
 
   // override SourceObject::setWeight() function
   void   setWeight() const {
-    throw KiDSObjectsError("setWeight() invalidated, use KiDSObjectList::setBlinding() instead");
+    throw KiDSObjectsError("setWeight() invalidated fore KiDSObjectList (determined by LensFit)");
   }
 
   // ordinary return value functions
