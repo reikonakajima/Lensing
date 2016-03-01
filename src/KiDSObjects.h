@@ -52,7 +52,9 @@ class KiDSObjectList : public SourceObjectList<KiDSObject*> {
   }
   static blind blind_index;  // to keep track of which shear to return
 
-  KiDSObjectList(const string fits_filename, int bitmask=0,  // bitmask=0 means *no* masking
+  KiDSObjectList(const string fits_filename,
+		 const string specz_filename,
+		 int bitmask=0,  // bitmask=0 means *no* masking
 		 KiDSObjectList::blind blind_index=KiDSObjectList::X);
   // selection source objects according to the blindings 0, 1, or 2
   void setBlinding(KiDSObjectList::blind _blind_index);
@@ -74,10 +76,11 @@ class KiDSObject : public SourceObject {
   // constructors
   KiDSObject() {}
   KiDSObject(long int _id, double ra, double dec, float _mag, float _xpos, float _ypos,
-	     float _fwhm_image,
+	     float _fwhm_image, float sn_ratio, 
 	     double _g1_A, double _g2_A, double _g1_B, double _g2_B, double _g1_C, double _g2_C,
 	     double _wt_A, double _wt_B, double _wt_C,
-	     float sn_ratio, double _zB, int _mask, int blind_index) :
+	     double _zB, valarray<float> _pz_full,
+	     int _mask, int blind_index) :
   SourceObject(_id, ra, dec, 99., 99., _zB, 0.),  // store junk g1, g2, wt in base source object
     mag(_mag), xpos(_xpos), ypos(_ypos), fwhm(_fwhm_image), sn(sn_ratio), mask(_mask) {
 

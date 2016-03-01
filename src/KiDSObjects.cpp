@@ -5,15 +5,18 @@
 using namespace std;
 
 
-KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask,
+KiDSObjectList::KiDSObjectList(const string kids_fits_filename,
+			       const string specz_fits_filename,
+			       int bitmask,
 			       KiDSObjectList::blind blind_index) {
-  // open FITS file
+  // open KiDS FITS file
   const string obj_extension = "OBJECTS";
   auto_ptr<CCfits::FITS> pInfile(0);
 
   try {
     // open the fits table and go to the right extension
-    pInfile.reset(new CCfits::FITS(fits_filename,CCfits::Read, obj_extension));
+    cerr << "reading " << kids_fits_filename << endl;
+    pInfile.reset(new CCfits::FITS(kids_fits_filename,CCfits::Read, obj_extension));
 
   } catch (CCfits::FITS::CantOpen &fitsError) {
       throw KiDSObjectsError(string("Error opening the file with message: ")+fitsError.message());
@@ -116,6 +119,29 @@ KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask,
   column19.read( z_B, 1, max_src_count );
 
 
+  // open spec-z FITS file
+  const string specz_extension = "PSSC";
+  try {
+    // open the fits table and go to the right extension
+    cerr << "reading " << specz_fits_filename << endl;
+    pInfile.reset(new CCfits::FITS(specz_fits_filename,CCfits::Read, specz_extension));
+
+  } catch (CCfits::FITS::CantOpen &fitsError) {
+      throw KiDSObjectsError(string("Error opening the file with message: ")+fitsError.message());
+  } catch (CCfits::FITS::NoSuchHDU &fitsError) {
+      throw KiDSObjectsError(string("Error going to the HDU: ") + fitsError.message());
+  } catch (CCfits::FitsException &fitsError) {
+      throw KiDSObjectsError(string("Error in FITS: ") + fitsError.message());
+  }
+
+  // goto OBJECTS extension
+  CCfits::ExtHDU& specz_table = pInfile->extension(specz_extension);
+
+  // DEBUG: EMPTY ARRAY
+  vector<valarray<float> > pz_full;
+  pz_full.resize(max_src_count);
+  ////////////////////
+
   // declare which blind is being used
   cerr << "Using blind: " << KiDSObjectList::blind_str(blind_index) << endl;
 
@@ -124,11 +150,13 @@ KiDSObjectList::KiDSObjectList(const string fits_filename, int bitmask,
   for (int i=0; i<max_src_count; ++i) {
       if (wt_a[i] == 0) continue;
       if (mask[i] & bitmask) continue;
-      KiDSObject* ptr = new KiDSObject(i, ra[i], dec[i], mag[i], xpos[i], ypos[i], fwhm[i],
+      KiDSObject* ptr = new KiDSObject(i, ra[i], dec[i], mag[i], xpos[i], ypos[i], fwhm[i], sn[i],
 				       g1a[i], g2a[i], g1b[i], g2b[i], g1c[i], g2c[i],
-				       wt_a[i], wt_b[i], wt_c[i], sn[i], z_B[i], mask[i], blind_index);
+				       wt_a[i], wt_b[i], wt_c[i],
+				       z_B[i], pz_full[i], mask[i], blind_index);
       source_list.push_back(ptr);
   }
+
 
   return;
 }
