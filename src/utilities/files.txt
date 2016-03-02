@@ -1,3 +1,6 @@
 Bins.cpp
 Mesh.cpp
 StringStuff.cpp
+Matrix.cpp
+odeint.cpp
+Table.cpp

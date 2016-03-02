@@ -2,24 +2,25 @@
 // KiDSObjects.cpp
 //
 #include "KiDSObjects.h"
+#include <gsl/gsl_histogram.h>
 using namespace std;
 
 
-// The following variables are static members of the KiDSObject class.
-// They need to be defined outside the scope of the class in order to be accessible from outside.
-bool KiDSObject::usePixelCoords;
-int KiDSObject::index;
+int KiDSObjectList::blind_index = -1;  // initialize to invalid index value
+int KiDSObjectList::bitmask = -1;      // initialize to invalid index value
 
-
-KiDSObjectList::KiDSObjectList(const string fits_filename) {
-
-  // open FITS file
+KiDSObjectList::KiDSObjectList(const string kids_fits_filename,
+			       int _bitmask,
+			       int _blind_index,
+			       valarray<float> pz_full) {
+  // open KiDS FITS file
   const string obj_extension = "OBJECTS";
   auto_ptr<CCfits::FITS> pInfile(0);
 
   try {
     // open the fits table and go to the right extension
-    pInfile.reset(new CCfits::FITS(fits_filename,CCfits::Read, obj_extension));
+    cerr << "reading " << kids_fits_filename << endl;
+    pInfile.reset(new CCfits::FITS(kids_fits_filename,CCfits::Read, obj_extension));
 
   } catch (CCfits::FITS::CantOpen &fitsError) {
       throw KiDSObjectsError(string("Error opening the file with message: ")+fitsError.message());
@@ -33,89 +34,258 @@ KiDSObjectList::KiDSObjectList(const string fits_filename) {
   CCfits::ExtHDU& table = pInfile->extension(obj_extension);
 
   // read the following columns (annoyingly, only one column can be read at a time):
-  //  e1/2_A/B/C/D, ALPHA_J2000/DELTA_J2000, Xpos/Ypos, CANDIDATEMASK, MAG_BEST, MAGERR_BEST,
+  //  e1/2_A/B/C, ALPHA_J2000/DELTA_J2000, Xpos/Ypos,
+  //  MAN_MASK, MAG_GAAP_r_CALIB, MAGERR_GAAP_r,
+  //  Z_B, (Z_B_MIN, Z_B_MAX)
   //  FWHM_IMAGE, weight, and assign it to SourceObject
 
-  valarray<float> e1a;
-  CCfits::Column& column1 = table.column("e1_A");
-  column1.read( e1a, 1, column1.rows() );
-  valarray<float> e2a;
-  CCfits::Column& column2 = table.column("e2_A");
-  column2.read( e2a, 1, column2.rows() );
-  valarray<float> e1b;
-  CCfits::Column& column3 = table.column("e1_B");
-  column3.read( e1b, 1, column3.rows() );
-  valarray<float> e2b;
-  CCfits::Column& column4 = table.column("e2_B");
-  column4.read( e2b, 1, column4.rows() );
-  valarray<float> e1c;
-  CCfits::Column& column5 = table.column("e1_C");
-  column5.read( e1c, 1, column5.rows() );
-  valarray<float> e2c;
-  CCfits::Column& column6 = table.column("e2_C");
-  column6.read( e2c, 1, column6.rows() );
-  valarray<float> e1d;
-  CCfits::Column& column7 = table.column("e1_D");
-  column7.read( e1d, 1, column7.rows() );
-  valarray<float> e2d;
-  CCfits::Column& column8 = table.column("e2_D");
-  column8.read( e2d, 1, column8.rows() );
+  valarray<float> g1a;
+  valarray<float> g2a;
+  valarray<float> g1b;
+  valarray<float> g2b;
+  valarray<float> g1c;
+  valarray<float> g2c;
+  valarray<float> wt_a;
+  valarray<float> wt_b;
+  valarray<float> wt_c;
+
+  int max_src_count;
+
+  try {
+    CCfits::Column& column1 = table.column("e1_A");
+    max_src_count = column1.rows();
+    column1.read( g1a, 1, max_src_count );
+    CCfits::Column& column2 = table.column("e2_A");
+    column2.read( g2a, 1, max_src_count );
+    CCfits::Column& column3 = table.column("weight_A");
+    column3.read( wt_a, 1, max_src_count );
+
+    CCfits::Column& column4 = table.column("e1_B");
+    column4.read( g1b, 1, max_src_count );
+    CCfits::Column& column5 = table.column("e2_B");
+    column5.read( g2b, 1, max_src_count );
+    CCfits::Column& column6 = table.column("weight_B");
+    column6.read( wt_b, 1, max_src_count );
+
+    CCfits::Column& column7 = table.column("e1_C");
+    column7.read( g1c, 1, max_src_count );
+    CCfits::Column& column8 = table.column("e2_C");
+    column8.read( g2c, 1, max_src_count );
+    CCfits::Column& column9 = table.column("weight_C");
+    column9.read( wt_c, 1, max_src_count );
+
+  }
+  catch (CCfits::Table::NoSuchColumn& m) {
+    CCfits::Column& column1 = table.column("e1");
+    max_src_count = column1.rows();
+    column1.read( g1a, 1, max_src_count );
+    g1b = g1c = g1a;
+    CCfits::Column& column2 = table.column("e2");
+    column2.read( g2a, 1, max_src_count );
+    g2b = g2c = g2a;
+  }
 
   valarray<double> ra;
-  CCfits::Column& column9 = table.column("ALPHA_J2000");
-  column9.read( ra, 1, column9.rows() );
+  CCfits::Column& column10 = table.column("ALPHA_J2000");
+  column10.read( ra, 1, max_src_count );
   valarray<double> dec;
-  CCfits::Column& column10 = table.column("DELTA_J2000");
-  column10.read( dec, 1, column10.rows() );
+  CCfits::Column& column11 = table.column("DELTA_J2000");
+  column11.read( dec, 1, max_src_count );
 
   valarray<float> xpos;
-  CCfits::Column& column11 = table.column("Xpos");
-  column11.read( xpos, 1, column11.rows() );
+  CCfits::Column& column12 = table.column("Xpos_THELI");
+  column12.read( xpos, 1, max_src_count );
   valarray<float> ypos;
-  CCfits::Column& column12 = table.column("Ypos");
-  column12.read( ypos, 1, column12.rows() );
+  CCfits::Column& column13 = table.column("Ypos_THELI");
+  column13.read( ypos, 1, max_src_count );
 
-  valarray<float> mask;
-  CCfits::Column& column13 = table.column("MAN_MASK");
-  column13.read( mask, 1, column13.rows() );
+  valarray<int> mask;
+  CCfits::Column& column14 = table.column("MASK");
+  column14.read( mask, 1, max_src_count );
 
   valarray<float> mag;
-  CCfits::Column& column14 = table.column("MAG_BEST");
-  column14.read( mag, 1, column14.rows() );
+  CCfits::Column& column15 = table.column("MAG_GAAP_r_CALIB");
+  column15.read( mag, 1, max_src_count );
   valarray<float> magerr;
-  CCfits::Column& column15 = table.column("MAGERR_BEST");
-  column15.read( magerr, 1, column15.rows() );
+  CCfits::Column& column16 = table.column("MAGERR_GAAP_r");
+  column16.read( magerr, 1, max_src_count );
 
   valarray<float> fwhm;
-  CCfits::Column& column16 = table.column("FWHM_IMAGE");
-  column16.read( fwhm, 1, column16.rows() );
-
-  valarray<float> weight;
-  CCfits::Column& column17 = table.column("weight");
-  column17.read( weight, 1, column17.rows() );
+  CCfits::Column& column17 = table.column("FWHM_IMAGE_THELI");
+  column17.read( fwhm, 1, max_src_count );
 
   valarray<float> sn;
-  CCfits::Column& column18 = table.column("SNratio");
-  column18.read( sn, 1, column18.rows() );
+  CCfits::Column& column18 = table.column("pixel_SNratio");
+  column18.read( sn, 1, max_src_count );
+
+  valarray<double> z_B;
+  CCfits::Column& column19 = table.column("Z_B");
+  column19.read( z_B, 1, max_src_count );
+
+
+  // check which blind is being used (throw if wrong blind being used)
+  setBlinding(_blind_index);
+  setBitMask(_bitmask);
 
   // append objects to this list
-  source_list.reserve(column1.rows());
-  for (int i=0; i<column1.rows(); ++i) {
-      if (weight[i] == 0) continue;
-      KiDSObject* ptr = new KiDSObject(i, ra[i], dec[i], mag[i], xpos[i], ypos[i], fwhm[i],
-				       e1a[i], e2a[i], e1b[i], e2b[i],
-				       e1c[i], e2c[i], e1d[i], e2d[i],
-				       sn[i], weight[i]);
+  source_list.reserve(max_src_count);
+  for (int i=0; i<max_src_count; ++i) {
+      if (wt_a[i] == 0) continue;
+      if (mask[i] & bitmask) continue;
+      KiDSObject* ptr = new KiDSObject(i, ra[i], dec[i], mag[i], xpos[i], ypos[i], fwhm[i], sn[i],
+				       g1a[i], g2a[i], g1b[i], g2b[i], g1c[i], g2c[i],
+				       wt_a[i], wt_b[i], wt_c[i],
+				       z_B[i], pz_full, mask[i], _blind_index);
       source_list.push_back(ptr);
   }
 
-  // The following two commands needs to be set after the KiDSObject list has been filled:
-  // - initially set shear to "A" (driver code can change this)
-  setShearIndex(0);
-  // - initially set coordinates to use ra/dec
-  //   (driver code must specify if pixel coordinate is to be used)
-  usePixelCoord(false);
+  // set up the p(z) redshift bins
+  // "a vector of length 70 giving P(z) at redshifts spanning 0<z<3.5 with dz=0.05"
+  float array[NUM_PZ_ELEM];
+  for (int i=0; i<NUM_PZ_ELEM; ++i) {
+    // because we want the midpoint of the bins (only valid if INIT_Z is half of DELTA_Z)
+    array[i] =  (i+1) * DELTA_Z;
+  }
+  SourceObjectList::pzbins = valarray<float>(array, NUM_PZ_ELEM);
 
+  return;
+}
+
+
+valarray<float>
+KiDSObjectList::getPZ(const string specz_fits_filename, float minZB, float maxZB, int bitmask) {
+
+ // open spec-z FITS file
+  const string specz_extension = "PSSC";  // or alternatively, the integer '1'
+  auto_ptr<CCfits::FITS> pInfile(0);
+
+  try {
+    // open the fits table and go to the right extension
+    cerr << "reading " << specz_fits_filename << endl;
+    pInfile.reset(new CCfits::FITS(specz_fits_filename,CCfits::Read, specz_extension));
+
+  } catch (CCfits::FITS::CantOpen &fitsError) {
+      throw KiDSObjectsError(string("Error opening the file with message: ")+fitsError.message());
+  } catch (CCfits::FITS::NoSuchHDU &fitsError) {
+      throw KiDSObjectsError(string("Error going to the HDU: ") + fitsError.message());
+  } catch (CCfits::FitsException &fitsError) {
+      throw KiDSObjectsError(string("Error in FITS: ") + fitsError.message());
+  }
+
+  // goto OBJECTS extension
+  CCfits::ExtHDU& specz_table = pInfile->extension(specz_extension);
+
+  valarray<float> z_spec;
+  valarray<float> Z_B;
+  valarray<int> mask;
+  valarray<float> spec_weight;
+
+  int max_specz_count;
+
+  try {
+    CCfits::Column& column1 = specz_table.column("z_spec");
+    max_specz_count = column1.rows();
+    column1.read( z_spec, 1, max_specz_count );
+    CCfits::Column& column2 = specz_table.column("Z_B");
+    column2.read( Z_B, 1, max_specz_count );
+    CCfits::Column& column3 = specz_table.column("spec_weight");
+    column3.read( spec_weight, 1, max_specz_count );
+    CCfits::Column& column4 = specz_table.column("MASK");
+    column4.read( mask, 1, max_specz_count );
+  }
+  catch (CCfits::Table::NoSuchColumn& fitsError) {
+    throw KiDSObjectsError(string("Error reading column(s): ") + fitsError.message());
+  }
+
+  // append objects to this list
+  vector<float> specz_list;
+  vector<float> specz_weight_list;
+  specz_list.reserve(max_specz_count);
+  specz_weight_list.reserve(max_specz_count);
+  for (int i=0; i<max_specz_count; ++i) {
+    if (spec_weight[i] <= 0) continue;
+    if (mask[i] & bitmask) continue;
+    if (Z_B[i] < minZB || Z_B[i] >= maxZB) continue;
+    specz_list.push_back(z_spec[i]);
+    specz_weight_list.push_back(spec_weight[i]);
+  }
+
+  // create n(z) histogram (to be substituted as P(z))
+  int pz_size = NUM_PZ_ELEM-1;
+  gsl_histogram *h = gsl_histogram_alloc(pz_size);
+  float END_Z = INIT_Z + pz_size * DELTA_Z;
+  gsl_histogram_set_ranges_uniform(h, INIT_Z, END_Z);
+  for (int i=0; i<specz_list.size(); ++i) {
+    gsl_histogram_accumulate(h, specz_list[i], specz_weight_list[i]);
+  }
+
+  // generate histogram array
+  float hist[pz_size];
+  float norm = 0;
+  for (int i=0; i<pz_size; ++i) {
+    hist[i] = gsl_histogram_get(h, i);
+    norm += hist[i];
+  }
+  // normalize histogram
+  for (int i=0; i<NUM_PZ_ELEM; ++i) {
+    hist[i] /= norm;
+  }
+
+  // return normalized histogram
+  return valarray<float>(hist, pz_size);
+}
+
+
+int
+KiDSObjectList::applyMask(int mask_thres) {
+  for (vector<KiDSObject*>::iterator it = source_list.begin();
+       it != source_list.end(); /* no increment */) {
+    if ((*it)->getMask() > mask_thres) {
+      it = source_list.erase(it);
+    } else {
+      ++it;
+    }
+  }
+  return source_list.size();
+}
+
+
+int
+KiDSObjectList::applyBitMask(int bitmask){
+  for (vector<KiDSObject*>::iterator it = source_list.begin();
+       it != source_list.end(); /* no increment */) {
+    if ((*it)->getMask() & bitmask) {
+      it = source_list.erase(it);
+    } else {
+      ++it;
+    }
+  }
+  return source_list.size();
+}
+
+
+void
+KiDSObjectList::checkBlinding(int _blind_index){
+
+  if ((_blind_index<0) || (_blind_index >=KiDSObject::NUM_SHEAR))
+    throw KiDSObjectsError("wrong blinding index specified");
+}
+
+
+void
+KiDSObjectList::setBlinding(int _blind_index){
+
+  checkBlinding(_blind_index);
+  KiDSObjectList::blind_index = _blind_index;
+
+  for (vector<KiDSObject*>::iterator it = source_list.begin();
+       it != source_list.end(); ++it) {
+    Shear s = (*it)->getShearArray()[_blind_index];
+    double g1 = (*it)->getG1Array()[_blind_index];
+    double g2 = (*it)->getG2Array()[_blind_index];
+    double wt = (*it)->getWeightArray()[_blind_index];
+    (*it)->setShearG1G2BiasCorrections(s, g1, g2, wt);
+  }
   return;
 }
 
@@ -126,7 +296,7 @@ KiDSObject::printLine(ostream& os) const {
      << setprecision(5) << setw(10)
      << ra << " " << setw(10) << dec << " "
      << setprecision(3) << setw(10)
-     << this->getE1() << " " << this->getE2() << " "
+     << this->getG1() << " " << this->getG2() << " "
      << wt << " " << mag << " "
      << xpos << " " << ypos << " "
      << fwhm << " " << sn << " ";

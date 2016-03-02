@@ -1,5 +1,6 @@
 #include "Mesh.h"
-
+#include <stdexcept>
+using std::logic_error;
 
 /*
 template <class Ttype, class Tpos> 
@@ -133,43 +134,67 @@ Mesh<Ttype, Tpos>::getNearMeshMap(Tpos x, Tpos y, Tpos z, Tpos rmax, Tpos rmin) 
 }
 
 
-template <class Ttype, class Tpos> 
-multimap<double, int> 
-Mesh<Ttype, Tpos>::getNearAngleMap(Tpos ra, Tpos dec, Tpos z, Tpos thetamax, Tpos thetamin) {
-  std::multimap<double, int> nbr;    // the return list
-  nbr.clear();                       // clear list
-  int ix,iy,iz,ii,p;
-  Tpos angsep, cosangsep;
-  Tpos cosa, sina, cosb, sinb, cosC;
+template <class Ttype, class Tpos>
+void
+Mesh<Ttype, Tpos>::prepare_angular_indices(Tpos ra, Tpos dec, Tpos thetamax,  /* input */
+					   int& ix, int& iy, int& iz,    /* output */
+					   int& srx, int& sry, int& srz  /* output */ ) {
+  Tpos z = 0;  // assume the 3rd dimention is irrelevant in this case
+  Tpos cosb = cos(dec*DEGREE);
+  Tpos sinb = sin(dec*DEGREE);
   ix = int((ra - xmin)/dx);          // calculate index of point
   iy = int((dec - ymin)/dy);              
   iz = int((z - zmin)/dz);
   Tpos cosd_1 = cos((dec+thetamax)*DEGREE);
   Tpos cosd_2 = cos((dec-thetamax)*DEGREE);
+  // XXX PROBLEMATIC WHEN (dec +/- thetamax) IS > 90 deg !!! XXXX
+  // this fatal flaw can be fixed by rotating the sphere so that center is at the ecliptic
+  if ((cosd_1 < 0) or (cosd_2 < 0))
+    throw logic_error("Mesh::getNearAngleMap(): angular separation is too large");
   Tpos cosd = cosd_1;
   if ((cosd_1 > cosd_2)) 
     cosd = cosd_2;
-  //cerr << "! " << cosd << " " << cosd_1 << " " << cosd_2 << endl;
-  //cerr << thetamax << " (" << ra << " " << dec << ")" << endl;
-  // XXX BUG NOTE: THIS IS PROBLEMATIC WHEN (dec +/- thetamax) IS > 90 deg !!!  XXXX
-  int srx = int(thetamax/dx/cosd)+1; // calculate radius in terms of mesh indicies
-  int sry = int(thetamax/dy)+1;      // (ra shrinks by cos(dec), include this effect)
-  int srz = int(thetamax/dz)+1;
+  // specify output
+  srx = int(thetamax/dx/cosd)+1; // calculate radius in terms of mesh indicies
+  sry = int(thetamax/dy)+1;      // (ra shrinks by cos(dec), include this effect)
+  srz = int(thetamax/dz)+1;
+}
+
+
+template <class Ttype, class Tpos>
+Tpos
+Mesh<Ttype, Tpos>::calculate_angular_separation(Tpos ra0, Tpos sin_dec0, Tpos cos_dec0,
+						Tpos ra1, Tpos dec1) {
+  Tpos cosa = cos(dec1*DEGREE);
+  Tpos sina = sin(dec1*DEGREE);
+  Tpos cosC = cos((ra0 - ra1) * DEGREE);
+  Tpos cosangsep = sina*sin_dec0 + cosa*cos_dec0*cosC; // cos_dec == cosb, sin_dec == sinb
+  Tpos angsep = acos(cosangsep) / DEGREE;
+  return angsep;
+}
+
+
+template <class Ttype, class Tpos>
+multimap<double, int>
+Mesh<Ttype, Tpos>::getNearAngleMap(Tpos ra, Tpos dec, Tpos z, Tpos thetamax, Tpos thetamin) {
+
+  std::multimap<double, int> nbr;    // the return list
+  nbr.clear();                       // clear list
+
+  int ix, iy, iz;
+  int srx, sry, srz;
+  prepare_angular_indices(ra, dec, thetamax, ix, iy, iz, srx, sry, srz);
+  Tpos cosb = cos(dec*DEGREE);
+  Tpos sinb = sin(dec*DEGREE);
+
   std::vector<int> close = closemeshes(ix,iy,iz,srx,sry,srz);
   for (std::vector<int>::iterator ii=close.begin(); ii!=close.end(); ii++) {
+    int p;
     if ( (p=head[*ii])>=0 ) {
       do {                           // calculate spherical angle separation
-	cosb = cos(dec*DEGREE);
-	sinb = sin(dec*DEGREE);
-	cosa = cos((*dat)[p]->getY()*DEGREE);
-	sina = sin((*dat)[p]->getY()*DEGREE);
-	cosC = cos((ra - (*dat)[p]->getX()) * DEGREE);
-	cosangsep = sina*sinb + cosa*cosb*cosC;
-	//cerr << cosangsep << "=" << sina << "*" << sinb << "+" 
-	//     << cosa << "*" << cosb << "*" << cosC << endl;
-	angsep = acos(cosangsep) / DEGREE;
-	//cerr << angsep * 3600 << endl;  // DEBUG
-	//return(nbr);  // DEBUG
+	Tpos ra1 = (*dat)[p]->getX();
+	Tpos dec1 = (*dat)[p]->getY();
+	Tpos angsep = calculate_angular_separation(ra, sinb, cosb, ra1, dec1);
 	if (angsep < thetamax && angsep >= thetamin) {
 	  nbr.insert(std::pair<double,int>(angsep,p));
 	}
@@ -177,6 +202,43 @@ Mesh<Ttype, Tpos>::getNearAngleMap(Tpos ra, Tpos dec, Tpos z, Tpos thetamax, Tpo
     }
   }
   return(nbr);
+}
+
+
+template <class Ttype, class Tpos>
+vector<multimap<double, int> >
+Mesh<Ttype, Tpos>::getNearAngleMap(Tpos ra, Tpos dec, Tpos z, vector<Tpos> thetabin_edges) {
+
+  int nbin = thetabin_edges.size() - 1;  // size of the theta bin
+  std::vector<std::multimap<double, int> > nbr_list(nbin);    // match the return vector size
+  // prepare indicies
+  Tpos thetamax = thetabin_edges[nbin];
+  int ix, iy, iz;
+  int srx, sry, srz;
+  prepare_angular_indices(ra, dec, thetamax, ix, iy, iz, srx, sry, srz);
+
+  Tpos cosb = cos(dec*DEGREE);
+  Tpos sinb = sin(dec*DEGREE);
+
+  std::vector<int> close = closemeshes(ix,iy,iz,srx,sry,srz);
+
+  for (std::vector<int>::iterator ii=close.begin(); ii!=close.end(); ii++) {
+    int p;
+    if ( (p=head[*ii])>=0 ) {
+      do {                           // calculate spherical angle separation
+	Tpos ra1 = (*dat)[p]->getX();
+	Tpos dec1 = (*dat)[p]->getY();
+	Tpos angsep = calculate_angular_separation(ra, sinb, cosb, ra1, dec1);
+	for (int i_theta=0; i_theta < nbin; ++i_theta) {
+	  if (angsep < thetabin_edges[i_theta+1] && angsep >= thetabin_edges[i_theta]) {
+	    nbr_list[i_theta].insert(std::pair<double,int>(angsep,p));
+	    break;
+	  }
+	}
+      } while( (p=next[p])>=0 );
+    }
+  }
+  return(nbr_list);
 }
 
 
@@ -401,21 +463,15 @@ Mesh<Ttype, Tpos>::closemeshes(int ix, int iy, int iz,
 	}
   }
   else {
-    //cerr << srx << endl;
     int srxmin = ix-srx;  if (srxmin<  0   ) srxmin=0;  if (srxmin>=nm[0]) srxmin=nm[0]-1;
-    //cerr << srxmin << endl;
     int srymin = iy-sry;  if (srymin<  0   ) srymin=0;  if (srymin>=nm[1]) srymin=nm[1]-1;
-    //cerr << srymin << endl;
     int srzmin = iz-srz;  if (srzmin<  0   ) srzmin=0;  if (srzmin>=nm[2]) srzmin=nm[2]-1;
-    //cerr << srzmin << endl;
     int srxmax = ix+srx;  if (srxmax>=nm[0]) srxmax=nm[0]-1;  if (srxmax<  0   ) srxmax=0; 
-    //cerr << srxmax << endl;
     int srymax = iy+sry;  if (srymax>=nm[1]) srymax=nm[1]-1;  if (srymax<  0   ) srymax=0; 
-    //cerr << srymax << endl;
     int srzmax = iz+srz;  if (srzmax>=nm[2]) srzmax=nm[2]-1;  if (srzmax<  0   ) srzmax=0; 
-    //cerr << srzmax << endl;
+
     retlist.resize( (srxmax-srxmin+1)*(srymax-srymin+1)*(srzmax-srzmin+1) );
-    //cerr << retlist.size() << endl;
+
     nn = 0;
     for (int iix=srxmin; iix<=srxmax; iix++)
       for (int iiy=srymin; iiy<=srymax; iiy++)
@@ -424,7 +480,6 @@ Mesh<Ttype, Tpos>::closemeshes(int ix, int iy, int iz,
 	  retlist[nn] = ii;
 	  nn++;
 	}
-    //cerr << nn << endl;
   }
   return(retlist);
 }

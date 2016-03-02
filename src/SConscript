@@ -7,9 +7,9 @@ ReadFileList = env['_ReadFileList']
 
 # TODO: This won't work on Windows machines...
 env['OBJPREFIX'] = '.obj/'
-env.Append(CPPPATH=['.','utilities'])
+env.Append(CPPPATH=['.','utilities','cosmology'])
 
-subdirs = ['.','utilities']
+subdirs = ['.','utilities','cosmology']
 
 lib_files = []
 for d in subdirs:
@@ -26,6 +26,9 @@ for d in subdirs:
 env.Object('GGLens.cpp')
 env.Object('LensObjects.cpp')
 env.Object('StarMaskObjects.cpp')
+env.Object('GAMAObjects.cpp')
+env.Object('RandomObjects.cpp')
+env.Object('GAMARandomObjects.cpp')
 env.Object('SourceObjects.cpp')
 env.Object('RCSLenSObjects.cpp')
 env.Object('KiDSObjects.cpp')
@@ -34,6 +37,18 @@ env.Object('Shear.cpp')
 env.Object('utilities/Bins.cpp')
 env.Object('utilities/Mesh.cpp')
 env.Object('utilities/StringStuff.cpp')
+env.Object('utilities/GTable.cpp')
+env.Object('utilities/odeint.cpp')
+env.Object('utilities/Matrix.cpp')
+
+env.Object('cosmology/Cosmology.cpp')
+env.Object('cosmology/GrowthFunction.cpp')
+env.Object('cosmology/HuEisenstein.cpp')
+env.Object('cosmology/LensQuantities.cpp')
+env.Object('cosmology/LinearPowerSpectrum.cpp')
+env.Object('cosmology/Bispectra.cpp')
+
+
 
 # Library file containing generic code
 #obj_lib = env.SharedObject(lib_files)

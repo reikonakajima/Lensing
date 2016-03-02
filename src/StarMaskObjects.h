@@ -15,7 +15,7 @@ class StarMaskObjectsError : public MyException {
 /*
  * class StarMaskObject
  *
- * This class reads a file with star positions (in pixels) as well as halo center (which may be
+ * This class reads a file with star positions (in degrees) as well as halo center (which may be
  * offset from the star position), and sets it up as a "lens" in galaxy-galaxy lensing format.
  * The columns are formatted: mag, x (of halo center), y (of halo center), rhalo, xstar, ystar
  * 
@@ -58,4 +58,4 @@ class StarMaskObjectList : public LensObjectList<StarMaskObject*> {
 };
 
 
-#endif // LENSOBJECTS_H
+#endif // STARMASKOBJECTS_H

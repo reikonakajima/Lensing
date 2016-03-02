@@ -31,12 +31,19 @@ class GenericBins {
   void setReverse(bool b) { reverseOrder = b; return; }
   bool isReverse() { return reverseOrder; }
   double operator[](int index) { return binEdges[index]; }
+  double operator/=(double _scale) {
+    for (int i=0; i<this->vectorSize(); ++i) {
+      binEdges[i] /= _scale;
+    }
+  }
   void rescale(double _scale) {
     for (int i=0; i<this->vectorSize(); ++i) {
       binEdges[i] *= _scale;
     }
     return;
   }
+  int trim_high(double _max_val);
+  vector<double> getBinEdges() const { return binEdges; }
  protected:
   vector<double> binEdges;
   int findIndex(double val);

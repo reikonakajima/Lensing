@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <vector>
+#include <valarray>
 #include "Std.h"
 #include "StringStuff.h"
 #include "Shear.h"
@@ -32,18 +33,44 @@ class SourceObject {
 
  public:
   SourceObject();
-  SourceObject(long int _id, double _ra, double _dec, double _e1, double _e2, double _wt=1.) :
-  id(_id), ra(_ra), dec(_dec), e1(_e1), e2(_e2), wt(_wt), responsiv(-10.) {}
+  SourceObject(long int _id, double _ra, double _dec, double _s1, double _s2,
+	       float _zB, double _wt=1., bool _shapeIsReducedShear=true,
+	       double _m=0., double _c1=0., double _c2=0.) :
+  id(_id), ra(_ra), dec(_dec), m(_m), c1(_c1), c2(_c2), zB(_zB), wt(_wt), responsiv(-99.),
+  inputIsReducedShear(_shapeIsReducedShear)
+    {
+      if (inputIsReducedShear) {
+	s.setG1G2(_s1,_s2);
+	g1=_s1, g2=_s2;
+      }
+      else {
+	s.setE1E2(_s1,_s2);
+	s.getG1G2(g1,g2);
+      }
+    }
 
   long int getId() const { return id; }
 
   double getRA() const { return ra; }
   double getDec() const { return dec; }
 
-  Shear getShear() const { return Shear(e1,e2); }
-  double getE1() const { return e1; }
-  double getE2() const { return e2; }
-  double getESq() const { return e1*e1 + e2*e2; }
+  double getE1() const { return s.getE1(); }
+  double getE2() const { return s.getE2(); }
+  double getESq() const { return s.getESq(); }
+  double getG1() const { return g1; }
+  double getG2() const { return g2; }
+  Shear  getShear() const { return s; }
+  double getM() const { return m; }
+  double getC1() const { return c1; }
+  double getC2() const { return c2; }
+
+  float  getRedshift() const { return zB; }
+  std::valarray<float>& getPz() {
+    if (pz.size()==0)
+      throw SourceObjectsError("getPz() not implemented");
+    else
+      return pz;
+  }
 
   double getWeight() const { return wt; }
   void setWeight(double _wt) const { wt = _wt; return; }
@@ -85,8 +112,14 @@ class SourceObject {
  protected:
   long int id;
   double ra, dec;  // position
-  double e1, e2;    // measured shape
+  Shear s;         // shear saves e1,e2 values
+  double g1, g2;   // reduced shear
+  double m;        // multiplicative bias correction factor
+  double c1, c2;   // additive bias correction factors
   mutable double wt;         // calculated weight
+  bool inputIsReducedShear;
+  float zB;             // z_B of photo-z
+  std::valarray<float> pz;  // p(z) of photo-z
 /*
   double shapeerr;  // shape measurement error
   double eRMS;      // shape noise (calculated from rmag)
@@ -142,6 +175,14 @@ class SourceObjectList {
 
   void sortByRA(); 
   void sortByDec();
+  void applyRedshiftCut(float min_z, float max_z);
+
+  std::valarray<float>& getPzBins() { 
+    if (pzbins.size() == 0)
+      throw SourceObjectsError("getPzBins() not implemented");
+    else
+      return pzbins;
+  }
 
   // for use with Mesh object
   const vector<ObjPtr>& getVectorForm() const { return source_list; }
@@ -151,6 +192,7 @@ class SourceObjectList {
 
   vector<ObjPtr> source_list;
   mutable Bounds<double> bounds;
+  std::valarray<float> pzbins;      // p(z) redshifts values
 
   static bool Compare_Source_RA(ObjPtr lhs, ObjPtr rhs) {
       return lhs->getRA() < rhs->getRA(); // sort in increasing order

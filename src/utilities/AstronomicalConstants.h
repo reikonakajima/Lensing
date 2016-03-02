@@ -47,5 +47,14 @@ const double EarthMass        = 3.00349e-6;	//Earth mass in Solar units
 const double MJD0             =2400000.5;	//Offset for modified Julian dates
 
 
+// Lensing constants:
+static const double c_kmpersec = SpeedOfLight * 1e-3;  // c [km/s]
+static const double GravConst = 4.302e-3;              // G [pc M_sun^-1 (km/s)^2]
+static const double SigmaCritPrefactor = c_kmpersec * c_kmpersec /
+                                         (4. * PI * GravConst * HubbleLengthMpc * 1e6);
+                                         // units of SigmaCritPrefactor = [h M_sun pc^-2]
+
+
+
 #endif  // ASTROCONST_H
 

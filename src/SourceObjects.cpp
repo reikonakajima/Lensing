@@ -6,7 +6,7 @@ using namespace std;
 
 
 template <class ObjPtr>
-void 
+void
 SourceObjectList<ObjPtr>::sortByRA() {
   std::sort(source_list.begin(), source_list.end(), SourceObjectList<ObjPtr>::Compare_Source_RA);
   return;
@@ -14,7 +14,7 @@ SourceObjectList<ObjPtr>::sortByRA() {
 
 
 template <class ObjPtr>
-void 
+void
 SourceObjectList<ObjPtr>::sortByDec() {
   std::sort(source_list.begin(), source_list.end(), SourceObjectList<ObjPtr>::Compare_Source_Dec);
   return;
@@ -22,7 +22,22 @@ SourceObjectList<ObjPtr>::sortByDec() {
 
 
 template <class ObjPtr>
-void 
+void
+SourceObjectList<ObjPtr>::applyRedshiftCut(float min_z, float max_z) {
+  for (typename vector<ObjPtr>::iterator it = source_list.begin();
+       it != source_list.end(); /* no increment */) {
+    if ( (*it)->getRedshift() < min_z or (*it)->getRedshift() >= max_z ) {
+      it = source_list.erase(it);
+    } else {
+      ++it;
+    }
+  }
+  return;
+}
+
+
+template <class ObjPtr>
+void
 SourceObjectList<ObjPtr>::findBounds() {
 
   double minra, maxra, mindec, maxdec;
@@ -55,6 +70,8 @@ SourceObject::SourceObject() {
   //vare = varSN = -1.;  // indicate that these quantities have not been set
 
 }
+
+
 
 
 

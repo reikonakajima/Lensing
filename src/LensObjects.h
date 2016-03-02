@@ -30,10 +30,19 @@ class LensObjectsError : public MyException {
 class LensObject {
  public:
   LensObject(const string buffer);
+  LensObject(long int _id, double _ra, double _dec, double _z, float _mag) {
+    id = _id;
+    ra = _ra;
+    dec = _dec;
+    z = _z;
+    mag = _mag;
+  }
 
   long int getId() const {return id;}
   double getRA() const {return ra;}
   double getDec() const {return dec;}
+  double getRedshift() const {return z;}
+  float  getMag() const {return mag;}
   Position<double> getRADec() const {return Position<double>(ra,dec);}
 
   void printLine(ostream& os) const;
@@ -47,6 +56,8 @@ class LensObject {
   LensObject() {}
   long int id;
   double ra, dec;
+  double z;
+  float  mag;
 };
 
 
