@@ -2,6 +2,7 @@
 // gglens_gama_kids.cpp   : For measuring the GGLens signal around gama objects
 //
 #include <iostream>
+#include <cstdlib>
 #include "Std.h"
 #include "StringStuff.h"
 #include "Bounds.h"
@@ -22,11 +23,15 @@ const string usage =
   "\n"
   "gglens_gama_kids: calculate tangential shear around a given central point (halo center)\n"
   "\n"
-  " usage: gglens_gama_kids <lens_cat> <src_cat> <src_specz_cat> <radial_bin_info> <outfile_prefix>\n"
+  " usage: gglens_gama_kids <lens_cat> <src_cat> <src_specz_cat> <src_bitmask> <src_blind_index>\n"
+  "         <radial_bin_info> <stellar_mass_bin_info> <outfile_prefix>\n"
   "  lens_cat:        lens catalog which contains the columns\n"
   "  src_cat:         source catalog, which contains the columns\n"
   "  src_specz_cat:   spec_z catalog which determines the p(z) of the source catalog\n"
+  "  src_bitmask:     bitmask to apply to the source catalog.  Default = [0x7c14]\n"
+  "  src_blind_index: choose blinding for source catalog.  option = [0,1,2]\n"
   "  radial_bin_info: radial bin info (3 numbers, in Mpc/h): [min_Mpch, max_Mpch, rad_nbin]\n"
+  "  stellar_mass_bin_info: stellar mass bin info ([bin edges in log(M/Msun)]\n"
   "  outfile_prefix:  prefix for the output file (suffix is "+suffix+")\n"
   "  \n"
   " stdin:  (none)\n"
@@ -34,10 +39,11 @@ const string usage =
 
 
 /// source redshift cuts (based on z_B)   TODO: These should be specifiable from a parameter file
-const double MIN_SRC_Z = 0.005;
-const double MAX_SRC_Z = 1.2;
+const double MIN_SRC_ZB = 0.005;
+const double MAX_SRC_ZB = 1.2;
 const double MIN_LENS_SRC_SEP = 0.15;
 const double h = 1.0;  // H0 = 100 h km/s/Mpc
+
 
 int
 main(int argc, char* argv[]) {
@@ -45,9 +51,9 @@ main(int argc, char* argv[]) {
   try {
 
     //
-    // process arguments
+    // process arguments (TODO: convert to option flags)
     //
-    if (argc != 6) {
+    if (argc != 9) {
       cerr << usage;
       exit(2);
     }
@@ -55,7 +61,11 @@ main(int argc, char* argv[]) {
     const string lens_filename = argv[++iarg];
     const string source_filename = argv[++iarg];
     const string specz_src_filename = argv[++iarg];
-    const string radial_bin_filename = argv[++iarg];
+    const string src_bitmask_str = argv[++iarg];         // remove bitmask masked objs.
+    const int    src_bitmask = strtol(src_bitmask_str.c_str(), NULL, 0); // convert hex/dec str
+    const int    src_blind_index = atoi(argv[++iarg]);   // choose blinding options.
+    const string radial_bin_filename = argv[++iarg];     // radial mass bin
+    const string sm_bin_filename = argv[++iarg];         // stellar mass bin
     const string outf_prefix = argv[++iarg];
     
     /// open lens file
@@ -94,7 +104,7 @@ main(int argc, char* argv[]) {
     //
     // setup bins (magnitude)
     //
-    ifstream logmstarf("logmstar.txt");
+    ifstream logmstarf(sm_bin_filename.c_str());
     ArbitraryWidthBins logmstar_bin(logmstarf);
 
     //
@@ -107,12 +117,11 @@ main(int argc, char* argv[]) {
     //
     // setup source sample
     //
-    int bitmask = 0x7c14;  /// remove bitmask masked objs.
-    int blind_index = 0;
-    valarray<float> pz_list = KiDSObjectList::getPZ(specz_src_filename, MIN_SRC_Z, MAX_SRC_Z, bitmask);
-    KiDSObjectList master_source_list(source_filename, bitmask, blind_index, pz_list);
+    valarray<float> pz_list = KiDSObjectList::getPZ(specz_src_filename,
+						    MIN_SRC_ZB, MAX_SRC_ZB, src_bitmask);
+    KiDSObjectList master_source_list(source_filename, src_bitmask, src_blind_index, pz_list);
     KiDSObjectList source_list(master_source_list);
-    source_list.applyRedshiftCut(MIN_SRC_Z, MAX_SRC_Z);
+    source_list.applyRedshiftCut(MIN_SRC_ZB, MAX_SRC_ZB);
 
     //
     // diagnostic error messages
@@ -132,6 +141,9 @@ main(int argc, char* argv[]) {
     cerr << "     count ............ " << source_list.size() << "/"
 	 << master_source_list.size() << endl;
     cerr << "     bounds ........... " << source_list.getBounds() << endl;
+    cerr << "     mask ............. " << "0x" << std::hex << source_list.getBitMask();
+    cerr << std::dec << " (" << source_list.getBitMask() << ")" << endl;
+    cerr << "     blind ID ......... " << source_list.getBlindIndex() << endl;
 
     if (source_list.size() == 0) {
       cerr << "no source objects, exiting" << endl;

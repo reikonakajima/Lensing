@@ -16,28 +16,28 @@ using std::fixed;
 using std::setprecision;
 
 
-const string outfprefix = "gglens";
-const string configfname = "config.par";
 const string suffix = ".dat";
 
 const string usage =
   "\n"
   "gglens_random_kids: calculate tangential shear around a given central point (halo center)\n"
   "\n"
-  " usage: gglens_random_kids <lens_cat> <source_cat> <specz_src_cat> <radial_bin_info> <outfile_prefix> <max_num_randoms>\n"
+  " usage: gglens_random_kids <lens_cat> <source_cat> <specz_src_cat> <src_bitmask> <src_blind_index>\n"
+  "        <radial_bin_info> <stellar_mass_bin_info> <outfile_prefix> <max_num_randoms>\n"
   "  lens_catalog:    lens catalog which contains the columns\n"
   "  source_catalog:  source catalog, which contains the columns\n"
   "  specz_src_catalog:  source specz catalog, which contains the columns\n"
   "  radial_bin_info: radial bin info (3 numbers, in arcseconds): [min_theta, max_theta, rad_nbin]\n"
+  "  stellar_mass_bin_info: stellar mass bin info ([bin edges in log(M/Msun)]\n"
+  "  outfile_prefix:  prefix for the output file (suffix is "+suffix+")\n"
   "  max_num_randoms: maximum number of randoms to use to calculate signal\n"
   "  \n"
-  //  " output #1: file name:\" "+outfprefix+suffix+"\"\n"
   " stdin:  (none)\n"
   " stdout: (none)\n";
 
 /// source redshift cuts (based on z_B)   TODO: These should be specifiable from a parameter file
-const double MIN_SRC_Z = 0.005;
-const double MAX_SRC_Z = 1.2;
+const double MIN_SRC_ZB = 0.005;
+const double MAX_SRC_ZB = 1.2;
 const double MIN_LENS_SRC_SEP = 0.15;
 const double h = 1.0;  // H0 = 100 h km/s/Mpc
 
@@ -49,7 +49,7 @@ main(int argc, char* argv[]) {
     //
     // process arguments
     //
-    if (argc != 7) {
+    if (argc != 10) {
       cerr << usage;
       exit(2);
     }
@@ -57,7 +57,11 @@ main(int argc, char* argv[]) {
     const string lens_filename = argv[++iarg];
     const string source_filename = argv[++iarg];
     const string specz_src_filename = argv[++iarg];
+    const string src_bitmask_str = argv[++iarg];         // remove bitmask masked objs.
+    const int    src_bitmask = strtol(src_bitmask_str.c_str(), NULL, 0); // convert hex/dec str
+    const int    src_blind_index = atoi(argv[++iarg]);   // choose blinding options.
     const string radial_bin_filename = argv[++iarg];
+    const string sm_bin_filename = argv[++iarg];         // stellar mass bin
     const string outf_prefix = argv[++iarg];
     const int    max_lens_count = atoi(argv[++iarg]);
     
@@ -65,6 +69,11 @@ main(int argc, char* argv[]) {
     ifstream sourcef(source_filename.c_str());
     if (!sourcef) 
       throw MyException("source catalog file " + source_filename + " not found");
+    sourcef.close();
+    ifstream speczf(specz_src_filename.c_str());
+    if (!speczf)
+      throw MyException("source specz catalog file " + specz_src_filename + " not found");
+    speczf.close();
 
     //
     // setup radial bins (in arcsec)
@@ -85,7 +94,7 @@ main(int argc, char* argv[]) {
     //
     // setup bins (magnitude)
     //
-    ifstream logmstarf("logmstar.txt");
+    ifstream logmstarf(sm_bin_filename.c_str());
     ArbitraryWidthBins logmstar_bin(logmstarf);
 
     //
@@ -98,13 +107,11 @@ main(int argc, char* argv[]) {
     //
     // setup source sample
     //
-    int bitmask = 0x7c14;  // remove bitmask masked objs.
-    int blind_index = 0;   // 0, 1, or 2
-    valarray<float> pz_list = KiDSObjectList::getPZ(specz_src_filename, MIN_SRC_Z, MAX_SRC_Z, bitmask);
-    KiDSObjectList master_source_list(source_filename, bitmask, blind_index, pz_list);
+    valarray<float> pz_list = KiDSObjectList::getPZ(specz_src_filename,
+						    MIN_SRC_ZB, MAX_SRC_ZB, src_bitmask);
+    KiDSObjectList master_source_list(source_filename, src_bitmask, src_blind_index, pz_list);
     KiDSObjectList source_list(master_source_list);  // TODO: add any extra cuts
-    source_list.applyRedshiftCut(MIN_SRC_Z, MAX_SRC_Z);
-
+    source_list.applyRedshiftCut(MIN_SRC_ZB, MAX_SRC_ZB);
 
     //
     // diagnostic error messages
@@ -124,6 +131,9 @@ main(int argc, char* argv[]) {
     cerr << "     count ............ " << source_list.size() << "/"
 	 << master_source_list.size() << endl;
     cerr << "     bounds ........... " << source_list.getBounds() << endl;
+    cerr << "     mask ............. " << "0x" << std::hex << source_list.getBitMask();
+    cerr << std::dec << " (" << source_list.getBitMask() << ")" << endl;
+    cerr << "     blind ID ......... " << source_list.getBlindIndex() << endl;
 
     if (source_list.size() == 0) {
       cerr << "no source objects, exiting" << endl;
@@ -160,7 +170,7 @@ main(int argc, char* argv[]) {
 
     // make output filename
     std::stringstream sstm;
-    sstm << outf_prefix << ".dat";    // output filename
+    sstm << outf_prefix << suffix;    // output filename
     string out_filename = sstm.str();
     ofstream ofs(out_filename.c_str());
 

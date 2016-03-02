@@ -123,7 +123,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     int bad_src = 0;
 
     // integrate over redshift probability distribution?
-    bool use_pz = false;
+    bool use_pz = true;
 
     // get the redshift bins for p(z) of source objects
     valarray<float> src_zbins = source_list.getPzBins();
@@ -186,12 +186,8 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	      continue;  // to the next src obj
 
 	    if (use_pz) {
-	      // first, normalize p(z)
-	      src_pz = srcobj->getPz();   // this is p(z), unnormalized
-	      double pz_sum = 0;
-	      for (int i=0; i<src_pz.size(); ++i) pz_sum += src_pz[i];
-	      src_pz /= pz_sum;
-
+	      // this is p(z), normalized
+	      src_pz = srcobj->getPz();
 	      // integrate over p(z) to get Sigma_crit_inv
 	      Sigma_crit_inv = 0;
 	      for (int i=0; i<src_pz.size(); ++i) {

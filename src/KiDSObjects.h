@@ -42,7 +42,7 @@ class KiDSObjectList : public SourceObjectList<KiDSObject*> {
  friend class KiDSObject;
 
  public:
-  enum blind {C, A, B};      // 1=(A), 2=(B), 0=(C)  index shuffling, where (A)(B)(C) are the original
+  enum blind {C, A, B};  // 1=(A), 2=(B), 0=(C)  index shuffling, where (A)(B)(C) are the original
   static char blind_str(blind b) {
     switch(b) {
       case A: return 'A'; break;
@@ -50,23 +50,28 @@ class KiDSObjectList : public SourceObjectList<KiDSObject*> {
       case C: return 'C'; break;
     }
   }
-  static int blind_index;  // to keep track of which shear to return
 
   KiDSObjectList(const string fits_filename,
-		 int bitmask=0,       // bitmask=0 means *no* masking
-		 int blind_index=0,
+		 int _bitmask=0,       // bitmask=0 means *no* masking
+		 int _blind_index=0,
 		 valarray<float> pz_full=valarray<float>());
   // selection source objects according to the blindings 0, 1, or 2
   void setBlinding(int _blind_index);
+  static int getBlindIndex() { return blind_index; }
   // apply mask such that objects with "MASK <= mask_thres" are kept, return number of kept obj.
   int applyMask(int mask_thres=0);  // mask_thres=0 means mask *everything* except MASK==0
   // apply bit mask, so that (MASK & bitmask)>0 objects are excluded
-  int applyBitMask(int bitmask);
+  int applyBitMask(int _bitmask);
+  static int getBitMask() { return bitmask; }
+  void setBitMask(int _bitmask) { bitmask = _bitmask; }
 
   // read in p(z) from a specz_file
-  static valarray<float> getPZ(const string specz_fits_filename, float minz, float maxz, int bitmask);
-
+  static valarray<float> getPZ(const string specz_fits_filename, float minZB, float maxZB,
+			       int bitmask);
  private:
+
+  static int blind_index;  // to keep track of which shear to return.  option=[0,1,2]
+  static int bitmask;
   // check that the blinding index is within the correct range
   void checkBlinding(int _blind_index);
 
