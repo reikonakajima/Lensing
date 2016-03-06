@@ -137,5 +137,6 @@ GAMAObjectList::applyLogMStarCut(float min_logmstar, float max_logmstar) {
       ++it;  // increment here; only if there were no deletion
     }
   }
+  LensObjectList::bounds = Bounds<double>();  // undefine ra/dec bounds if list is modified
   return lens_list.size();
 }
