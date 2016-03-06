@@ -177,7 +177,7 @@ class SourceObjectList {
   void sortByDec();
   void applyRedshiftCut(float min_z, float max_z);
 
-  std::valarray<float>& getPzBins() { 
+  std::valarray<float>& getPzBins() {
     if (pzbins.size() == 0)
       throw SourceObjectsError("getPzBins() not implemented");
     else

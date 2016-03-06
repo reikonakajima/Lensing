@@ -211,18 +211,17 @@ KiDSObjectList::getPZ(const string specz_fits_filename, float minZB, float maxZB
   }
 
   // create n(z) histogram (to be substituted as P(z))
-  int pz_size = NUM_PZ_ELEM-1;
-  gsl_histogram *h = gsl_histogram_alloc(pz_size);
-  float END_Z = INIT_Z + pz_size * DELTA_Z;
+  gsl_histogram *h = gsl_histogram_alloc(NUM_PZ_ELEM);
+  float END_Z = INIT_Z + (NUM_PZ_ELEM + 0) * DELTA_Z;
   gsl_histogram_set_ranges_uniform(h, INIT_Z, END_Z);
   for (int i=0; i<specz_list.size(); ++i) {
     gsl_histogram_accumulate(h, specz_list[i], specz_weight_list[i]);
   }
 
   // generate histogram array
-  float hist[pz_size];
+  float hist[NUM_PZ_ELEM];
   float norm = 0;
-  for (int i=0; i<pz_size; ++i) {
+  for (int i=0; i<NUM_PZ_ELEM; ++i) {
     hist[i] = gsl_histogram_get(h, i);
     norm += hist[i];
   }
@@ -232,7 +231,7 @@ KiDSObjectList::getPZ(const string specz_fits_filename, float minZB, float maxZB
   }
 
   // return normalized histogram
-  return valarray<float>(hist, pz_size);
+  return valarray<float>(hist, NUM_PZ_ELEM);
 }
 
 
