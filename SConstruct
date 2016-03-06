@@ -73,10 +73,10 @@ sub_objects = '''
 #test = env.Program(target='GGLensTest', source=sub_objects+['src/GGLensDriver.cpp',])
 #starhalo = env.Program(target='gglens_starhalo', source=sub_objects+['src/gglens_starhalo.cpp',])
 gama_kids = env.Program(target='gglens_gama_kids', source=sub_objects+['src/gglens_gama_kids.cpp',])
-#random_kids = env.Program(target='gglens_random_kids', source=sub_objects+['src/gglens_random_kids.cpp',])
+random_kids = env.Program(target='gglens_random_kids', source=sub_objects+['src/gglens_random_kids.cpp',])
 #env.Install('bin', [test, gama_kids, random_kids, starhalo])
-#env.Install('bin', [gama_kids])
-#env.Install('bin', [random_kids])
+env.Install('bin', [gama_kids])
+env.Install('bin', [random_kids])
 #env.Alias('install', 'bin')
 
 # (eventually, build a library code)
