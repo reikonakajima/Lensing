@@ -47,6 +47,7 @@ LensObjectList<ObjPtr>::cullByRA(double minra, double maxra) {
   typename vector<ObjPtr>::iterator i0 = searchRA(lens_list.begin(), lens_list.end(), minra);
   typename vector<ObjPtr>::iterator i1 = searchRA(i0, lens_list.end(), maxra);
   culledlist.lens_list.assign(i0, i1);
+  this->bounds = Bounds<double>();  // undefine ra/dec bounds
   return culledlist;
 }
 
@@ -59,6 +60,7 @@ LensObjectList<ObjPtr>::cullByDec(double mindec, double maxdec) {
   typename vector<ObjPtr>::iterator i0 = searchDec(lens_list.begin(), lens_list.end(), mindec);
   typename vector<ObjPtr>::iterator i1 = searchDec(i0, lens_list.end(), maxdec);
   culledlist.lens_list.assign(i0, i1);
+  this->bounds = Bounds<double>();  // undefine ra/dec bounds
   return culledlist;
 }
 
