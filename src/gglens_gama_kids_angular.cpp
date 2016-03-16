@@ -24,7 +24,7 @@ const string usage =
   "gglens_gama_kids: calculate tangential shear around a given central point (halo center)\n"
   "\n"
   " usage: gglens_gama_kids <lens_cat> <src_cat> <src_specz_cat> <src_bitmask> <src_blind_index>\n"
-  "         <radial_bin_info> <stellar_mass_bin_info> <outfile_prefix>\n"
+  "         <radial_bin_info> <stellar_mass_bin_info> <random_shear_file> <outfile_prefix>\n"
   "  lens_cat:        lens catalog which contains the columns\n"
   "  src_cat:         source catalog, which contains the columns\n"
   "  src_specz_cat:   spec_z catalog which determines the p(z) of the source catalog\n"
@@ -32,6 +32,7 @@ const string usage =
   "  src_blind_index: choose blinding for source catalog.  option = [0,1,2]\n"
   "  radial_bin_info: radial bin info (3 numbers, in arcmin): [min_angle, max_angle, rad_nbin]\n"
   "  stellar_mass_bin_info: stellar mass bin info ([bin edges in log(M/Msun)]\n"
+  "  random_shear_file: TreeCorr output for randoms, for use in subtracting random signals\n"
   "  outfile_prefix:  prefix for the output file (suffix is "+suffix+")\n"
   "  \n"
   " stdin:  (none)\n"
@@ -53,7 +54,7 @@ main(int argc, char* argv[]) {
     //
     // process arguments (TODO: convert to option flags)
     //
-    if (argc != 9) {
+    if (argc != 10) {
       cerr << usage;
       exit(2);
     }
@@ -66,6 +67,7 @@ main(int argc, char* argv[]) {
     const int    src_blind_index = atoi(argv[++iarg]);   // choose blinding options.
     const string radial_bin_filename = argv[++iarg];     // radial mass bin
     const string sm_bin_filename = argv[++iarg];         // stellar mass bin
+    const string random_shear_filename = argv[++iarg];
     const string outf_prefix = argv[++iarg];
     
     /// open lens file
@@ -124,6 +126,13 @@ main(int argc, char* argv[]) {
     source_list.applyRedshiftCut(MIN_SRC_ZB, MAX_SRC_ZB);
 
     //
+    // TODO: read in randoms gglens curve (make a new class)
+    //
+    /*
+    TreeCorrNGOutput random_shear(random_shear_filename);
+    */
+
+    //
     // diagnostic error messages
     //
     cerr << "=== " << argv[0] << " ===" << endl;
@@ -157,6 +166,16 @@ main(int argc, char* argv[]) {
     for (int i=0; i<logmstar_bin.vectorSize(); ++i)  cerr << logmstar_bin[i] << " ";
     cerr << endl;
 
+    //
+    // TODO: print randoms gglens curve info
+    //
+    /*
+    cerr << "random shear data ..... " << random_shear_filename << endl;
+    cerr << "     number of pairs .. " << random_shear.getNPairs() << endl;
+    cerr << "radial bin range ...... " << random_shear.getRadialBin()[0] << " to "
+	 << random_shear.getRadialBin()[random_shear.getRadialBin().binSize()]
+          << " (arcmin)" << endl;
+     */
 
     //
     // create GGLensObjectList from lens_list and source_list (sums tangential shears for each lens)
@@ -170,28 +189,13 @@ main(int argc, char* argv[]) {
       cerr << "h is .................. " << h << endl;
     }
 
-    /*/
-    // DEBUG
-    cerr << "cosmo test (comoving distanes Dc):" << endl;
-    cerr << "z=0.1: " << cosmo.Dc(0.1) * HubbleLengthMpc / h << endl;
-    cerr << "z=0.2: " << cosmo.Dc(0.2) * HubbleLengthMpc / h << endl;
-    cerr << "z=0.3: " << cosmo.Dc(0.3) * HubbleLengthMpc / h << endl;
-    cerr << "z=0.4: " << cosmo.Dc(0.4) * HubbleLengthMpc / h << endl;
-    cerr << "z=0.5: " << cosmo.Dc(0.5) * HubbleLengthMpc / h << endl;
-    cerr << endl;
-    double one_deg_in_radian = 1.0 * DEGREE;
-    cerr << "1deg at z=0.1: " << cosmo.Dc(0.1) * HubbleLengthMpc / h * one_deg_in_radian << endl;
-    cerr << "1deg at z=0.2: " << cosmo.Dc(0.2) * HubbleLengthMpc / h * one_deg_in_radian << endl;
-    cerr << "1deg at z=0.3: " << cosmo.Dc(0.3) * HubbleLengthMpc / h * one_deg_in_radian << endl;
-    cerr << "1deg at z=0.4: " << cosmo.Dc(0.4) * HubbleLengthMpc / h * one_deg_in_radian << endl;
-    cerr << "1deg at z=0.5: " << cosmo.Dc(0.5) * HubbleLengthMpc / h * one_deg_in_radian << endl;
-    cerr << argv[0] << " DEBUG END" << endl;
-    exit(1);
-    // DEBUG END
-    /*/
+    //
+    // TODO: (1) GGLens constructor takes randoms info as input (2) change order so cosmo comes last
+    //
 
     GGLensObjectList<GAMAObject*, KiDSObject*>
       gglens_list(lens_list, source_list, radial_bin, radialBinIsMpc, normalizeToSigmaCrit,
+		  /*random_shear,*/
 		  cosmo, h, MIN_LENS_SRC_SEP);
 
     //
