@@ -73,7 +73,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
   if (radialBinInMpc) {
     radial_bin /= DEGREE; // still in Mpc, divided by DEGREE
   } else {
-    radial_bin /= 3600.;  // convert from arcsec into degree
+    radial_bin /= 60.;  // convert from arcmin into degree
   }
   // determine radial bin size
   int rad_nbin = radial_bin.binSize();

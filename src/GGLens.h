@@ -69,7 +69,7 @@ class GGLensObjectList {
   GGLensObjectList(LensObjectList<lensObjPtr> lens_list,
 		   SourceObjectList<srcObjPtr> source_list,
 		   GenericBins radial_bin,
-		   bool radialBinInMpc = true,  // if not in Mpc, expects arcseconds
+		   bool radialBinInMpc = true,  // if not in Mpc, expects arcminutes
 		   bool normalizeToSigmaCrit = true,
 		   cosmology::Cosmology cosmo = cosmology::Cosmology(0.27,0.73),
 		   double h = 1.0,
