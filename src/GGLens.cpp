@@ -145,7 +145,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	  throw GGLensError("GGLens should not take Flat geometry");
 	} else if (geom == SphericalSurface) {
 	  theta = atan2(cos(ldec)*sin(sdec) - sin(ldec)*cos(sdec)*cos(dra),
-			cos(sdec)*sin(dra));      // spherical surface
+			-cos(sdec)*sin(dra));      // spherical surface ... from the inside!
 	}
 
 	double ct = cos(theta);

@@ -103,17 +103,17 @@ class KiDSObject : public SourceObject {
     mag(_mag), xpos(_xpos), ypos(_ypos), fwhm(_fwhm_image), sn(sn_ratio), mask(_mask) {
 
     // assign shear and weights to KiDSObject (with blinding-shuffling!)
-    shear[KiDSObjectList::A] = Shear().setG1G2(_g1_A, -_g2_A);  // ra runs in negative direction,
-    shear[KiDSObjectList::B] = Shear().setG1G2(_g1_B, -_g2_B);  // so the g2 sign needs to be flipped
-    shear[KiDSObjectList::C] = Shear().setG1G2(_g1_C, -_g2_C);
+    shear[KiDSObjectList::A] = Shear().setG1G2(_g1_A, _g2_A);
+    shear[KiDSObjectList::B] = Shear().setG1G2(_g1_B, _g2_B);
+    shear[KiDSObjectList::C] = Shear().setG1G2(_g1_C, _g2_C);
 
     g1[KiDSObjectList::A] = _g1_A;
     g1[KiDSObjectList::B] = _g1_B;
     g1[KiDSObjectList::C] = _g1_C;
 
-    g2[KiDSObjectList::A] = -_g2_A;
-    g2[KiDSObjectList::B] = -_g2_B;
-    g2[KiDSObjectList::C] = -_g2_C;
+    g2[KiDSObjectList::A] = _g2_A;
+    g2[KiDSObjectList::B] = _g2_B;
+    g2[KiDSObjectList::C] = _g2_C;
 
     weight[KiDSObjectList::A] = _wt_A;
     weight[KiDSObjectList::B] = _wt_B;
