@@ -6,11 +6,11 @@
 
 #include <iostream>
 #include <vector>
-#include <CCfits/CCfits>
 #include "Std.h"
 #include "StringStuff.h"
 #include "Shear.h"
 #include "Bounds.h"
+#include "GGLensData.h"
 using std::vector;
 
 
@@ -30,7 +30,7 @@ class TreeCorrObjectsError : public MyException {
  */
 
 
-class TreeCorrNGObject {
+class TreeCorrNGObject: public GGLensData {
 
  public:
   
@@ -38,7 +38,6 @@ class TreeCorrNGObject {
   TreeCorrNGObject() {}
   TreeCorrNGObject(string ascii_filename);
   // ordinary return value functions
-  int getRBinSize() const { return meanR.size(); }
   float getTotalNPairs() const {
     float sum = 0.0;
     for (int i=0; i < npairs.size(); ++i) {
@@ -46,16 +45,11 @@ class TreeCorrNGObject {
     }
     return sum;
   }
-  vector<float> getMeanR() { return meanR; }
   vector<float> getR_nom() { return R_nom; }
 
  private:
 
-  vector<float> R_nom;
-  vector<float> meanR;
-  vector<float> gamT;
-  vector<float> gamX;
-  vector<float> sigma;
+  vector<float> R_nom;  // nominal radial bin center
   vector<float> weight;
   vector<float> npairs;
 
