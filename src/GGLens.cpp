@@ -79,6 +79,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
   // determine radial bin size
   int rad_nbin = radial_bin.binSize();
 
+
   //
   // iterate over all lens; generate lensing signal profile for each lens object
   //
@@ -102,7 +103,12 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
       angular_radial_bin /= cosmo.DA(zlens) * HUBBLE_LENGTH_MPC;   // angular_radial_bin in degrees
     }
 
-    // remove angular radial bins that are above max_angular_sep
+    /// prepare random shear signal, to be subtracted from main signal
+    vector<float> random_signalT = random_shear.getTangentialSignalAt(angular_radial_bin);
+    vector<float> random_signalX = random_shear.getCrossSignalAt(angular_radial_bin);
+    vector<float> random_sigma = random_shear.getSigmaAt(angular_radial_bin);
+
+    /// remove angular radial bins that are above max_angular_sep
     angular_radial_bin.trim_high(max_angular_sep);
     int this_rad_nbin = angular_radial_bin.binSize();  // <= rad_nbin
 
