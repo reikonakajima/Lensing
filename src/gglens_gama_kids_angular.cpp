@@ -127,12 +127,12 @@ main(int argc, char* argv[]) {
     source_list.applyRedshiftCut(MIN_SRC_ZB, MAX_SRC_ZB);
 
     //
-    // TODO: read in randoms gglens curve (make a new class)
+    // read in randoms gglens curve
     //
     TreeCorrNGObject random_shear(random_shear_filename);
 
     //
-    // diagnostic error messages
+    // print lens catalog info
     //
     cerr << "=== " << argv[0] << " ===" << endl;
     cerr << "lens catalog .......... " << lens_filename << endl;
@@ -145,6 +145,9 @@ main(int argc, char* argv[]) {
       return(9);
     }
 
+    //
+    // print source catalog info
+    //
     cerr << "source catalog ........ " << source_filename << endl;
     cerr << "     count ............ " << source_list.size() << "/"
 	 << master_source_list.size() << endl;
@@ -158,23 +161,24 @@ main(int argc, char* argv[]) {
       return(9);
     }
 
+    //
+    // print randoms gglens curve info
+    //
+    cerr << "random shear data ..... " << random_shear_filename << endl;
+    cerr << "     radial bins ...... " << random_shear.getRBinSize() << endl;
+    cerr << "     rbin range ....... " << random_shear.getR_nom()[0] << " to "
+	 << random_shear.getR_nom()[random_shear.getRBinSize()-1] << " (arcmin)" << endl;
+    cerr << "     number of pairs .. " << random_shear.getTotalNPairs() << endl;
+
+    //
+    // print radial and logmstar bin info
+    //
     cerr << "radial bin range ...... " << radial_bin[0] << " to "
 	 << radial_bin[radial_bin.binSize()] << " (arcmin)" << endl;
 
     cerr << "log(mstar) bin range .. ";
     for (int i=0; i<logmstar_bin.vectorSize(); ++i)  cerr << logmstar_bin[i] << " ";
     cerr << endl;
-
-    //
-    // TODO: print randoms gglens curve info
-    //
-    cerr << "random shear data ..... " << random_shear_filename << endl;
-    cerr << "     number of pairs .. " << random_shear.getTotalNPairs() << endl;
-    /*
-    cerr << "radial bin range ...... " << random_shear.getRadialBin()[0] << " to "
-	 << random_shear.getRadialBin()[random_shear.getRadialBin().binSize()]
-          << " (arcmin)" << endl;
-     */
 
     //
     // create GGLensObjectList from lens_list and source_list (sums tangential shears for each lens)
