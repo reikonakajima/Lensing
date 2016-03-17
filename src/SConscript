@@ -32,6 +32,7 @@ env.Object('GAMARandomObjects.cpp')
 env.Object('SourceObjects.cpp')
 env.Object('RCSLenSObjects.cpp')
 env.Object('KiDSObjects.cpp')
+env.Object('GGLensData.cpp')
 env.Object('TreeCorrObjects.cpp')
 env.Object('Shear.cpp')
 

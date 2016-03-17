@@ -65,6 +65,7 @@ sub_objects = '''
 	    src/.obj/SourceObjects.o
 	    src/.obj/RCSLenSObjects.o
 	    src/.obj/KiDSObjects.o
+	    src/.obj/GGLensData.o
 	    src/.obj/TreeCorrObjects.o
 	    src/.obj/Shear.o
 	    '''.split()
