@@ -183,14 +183,12 @@ main(int argc, char* argv[]) {
 
     //
     // create GGLensObjectList from lens_list and source_list (sums tangential shears for each lens)
-    // TODO: (1) GGLens constructor takes randoms info as input (2) change order so cosmo comes last
     //
     bool radialBinIsMpc = false;
     bool normalizeToSigmaCrit = false;
     GGLensObjectList<GAMAObject*, KiDSObject*>
-      gglens_list(lens_list, source_list, radial_bin, radialBinIsMpc, normalizeToSigmaCrit,
-		  /*random_shear,*/
-		  MIN_LENS_SRC_SEP);
+      gglens_list(lens_list, source_list, radial_bin, random_shear,
+		  radialBinIsMpc, normalizeToSigmaCrit);
 
     //
     // sort each lens into binned_lists
