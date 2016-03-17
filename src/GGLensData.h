@@ -10,6 +10,7 @@
 #include "StringStuff.h"
 #include "Shear.h"
 #include "Bounds.h"
+#include "Bins.h"
 using std::vector;
 
 
@@ -29,6 +30,10 @@ class GGLensData {
 
   // constructor
   GGLensData() {}
+  // interpolation functions
+  vector<float> getTangentialSignalAt(GenericBins radial_bin);
+  vector<float> getCrossSignalAt(GenericBins radial_bin);
+  vector<float> getSigmaAt(GenericBins radial_bin);
   // ordinary return value functions
   int getRBinSize() const { return meanR.size(); }
   vector<float> getMeanR() { return meanR; }
