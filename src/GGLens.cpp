@@ -103,14 +103,16 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
       angular_radial_bin /= cosmo.DA(zlens) * HUBBLE_LENGTH_MPC;   // angular_radial_bin in degrees
     }
 
-    /// prepare random shear signal, to be subtracted from main signal
-    vector<float> random_signalT = random_shear.getTangentialSignalAt(angular_radial_bin);
-    vector<float> random_signalX = random_shear.getCrossSignalAt(angular_radial_bin);
-    vector<float> random_sigma = random_shear.getSigmaAt(angular_radial_bin);
-
     /// remove angular radial bins that are above max_angular_sep
     angular_radial_bin.trim_high(max_angular_sep);
     int this_rad_nbin = angular_radial_bin.binSize();  // <= rad_nbin
+    vector<float> central_angular_bin_vals = angular_radial_bin.getCentralValues();
+
+    /// prepare random shear signal, to be subtracted from main signal
+    vector<float> random_signalT;
+    vector<float> random_signalX;
+    vector<float> random_var;
+    random_shear.getValuesAt(central_angular_bin_vals, random_signalT, random_signalX, random_var);
 
     //
     // collect all matching sources (get their indicies of srcvector) in radial bins
@@ -227,15 +229,16 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 	double weightedVariance_t = obj_weight * et * et;  // w * w_geom * et^2 * Sigma_crit^2
 	double weightedVariance_s = obj_weight * es * es;  //   = w * et^2
 
-	/// add source object to sm bin 
+	/// add source object to sm bin ...
+	/// ... with the weighted randoms shear subtracted.
 	(*this_gglens)[irad].addPairCounts();
 	(*this_gglens)[irad].addWeight(weight);
 	(*this_gglens)[irad].addWeightSq(weight*weight);
 	(*this_gglens)[irad].addResponsivity(responsiv);
-	(*this_gglens)[irad].addDeltaSigma_t(weightedsignal_t);
-	(*this_gglens)[irad].addDeltaSigma_s(weightedsignal_s);
-	(*this_gglens)[irad].addVariance_t(weightedVariance_t);
-	(*this_gglens)[irad].addVariance_s(weightedVariance_s);
+	(*this_gglens)[irad].addDeltaSigma_t(weightedsignal_t - weight * random_signalT[irad]);
+	(*this_gglens)[irad].addDeltaSigma_s(weightedsignal_s - weight * random_signalX[irad]);
+	(*this_gglens)[irad].addVariance_t(weightedVariance_t + weight * random_var[irad]); // fishy?
+	(*this_gglens)[irad].addVariance_s(weightedVariance_s + weight * random_var[irad]); // fishy?
 	(*this_gglens)[irad].addMBias(m*weight);
 
       } // END: source object (within bglist[irad]) 'for' loop
