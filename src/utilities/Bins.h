@@ -44,6 +44,13 @@ class GenericBins {
   }
   int trim_high(double _max_val);
   vector<double> getBinEdges() const { return binEdges; }
+  vector<float> getCentralValues() {
+    vector<float> central_values(nbin, 0);
+    for (int i=0; i<nbin; ++i) {
+      central_values[i] = (binEdges[i] + binEdges[i+1]) / 2.0;
+    }
+    return central_values;
+  }
  protected:
   vector<double> binEdges;
   int findIndex(double val);
