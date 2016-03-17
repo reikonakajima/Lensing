@@ -16,6 +16,7 @@ template<class lensObjPtr, class srcObjPtr>
 GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObjPtr> lens_list,
 							  SourceObjectList<srcObjPtr> source_list,
 							  GenericBins _radial_bin,
+							  GGLensData random_shear,
 							  bool radialBinInMpc,
 							  bool normalizeToSigmaCrit,
 							  double min_lens_src_delta_z,
