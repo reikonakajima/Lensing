@@ -173,10 +173,12 @@ main(int argc, char* argv[]) {
     //
     // print radial and logmstar bin info
     //
-    cerr << "radial bin range ...... " << radial_bin[0] << " to "
+    cerr << "radial bins ........... " << radial_bin.binSize() << endl;
+    cerr << "       bin range ...... " << radial_bin[0] << " to "
 	 << radial_bin[radial_bin.binSize()] << " (arcmin)" << endl;
 
-    cerr << "log(mstar) bin range .. ";
+    cerr << "log(mstar) bin range .. " << logmstar_bin.binSize() << endl;
+    cerr << "           bin edges .. ";
     for (int i=0; i<logmstar_bin.vectorSize(); ++i)  cerr << logmstar_bin[i] << " ";
     cerr << endl;
 
