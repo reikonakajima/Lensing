@@ -18,12 +18,12 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 							  GenericBins _radial_bin,
 							  bool radialBinInMpc,
 							  bool normalizeToSigmaCrit,
+							  double min_lens_src_delta_z,
 							  cosmology::Cosmology cosmo,
 							  double h,
-							  double min_lens_src_delta_z,
+							  double max_angular_sep,
 							  geometry _geom,
-							  double mesh_frac,
-							  double max_angular_sep) :
+							  double mesh_frac) :
   radial_bin(_radial_bin) , geom(_geom) {
 
   //
