@@ -8,6 +8,7 @@
 #include "Bounds.h"
 #include "GAMAObjects.h"
 #include "KiDSObjects.h"
+#include "TreeCorrObjects.h"
 #include "Cosmology.h"
 #include "GGLens.h"
 #include "Bins.h"
@@ -128,9 +129,7 @@ main(int argc, char* argv[]) {
     //
     // TODO: read in randoms gglens curve (make a new class)
     //
-    /*
-    TreeCorrNGOutput random_shear(random_shear_filename);
-    */
+    TreeCorrNGObject random_shear(random_shear_filename);
 
     //
     // diagnostic error messages
@@ -169,9 +168,9 @@ main(int argc, char* argv[]) {
     //
     // TODO: print randoms gglens curve info
     //
-    /*
     cerr << "random shear data ..... " << random_shear_filename << endl;
-    cerr << "     number of pairs .. " << random_shear.getNPairs() << endl;
+    cerr << "     number of pairs .. " << random_shear.getTotalNPairs() << endl;
+    /*
     cerr << "radial bin range ...... " << random_shear.getRadialBin()[0] << " to "
 	 << random_shear.getRadialBin()[random_shear.getRadialBin().binSize()]
           << " (arcmin)" << endl;
