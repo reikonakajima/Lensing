@@ -192,7 +192,7 @@ main(int argc, char* argv[]) {
 
     GGLensObjectList<GAMAObject*, KiDSObject*>
       gglens_list(lens_list, source_list, radial_bin, radialBinIsMpc, normalizeToSigmaCrit,
-		  cosmo, h, MIN_LENS_SRC_SEP);
+		  MIN_LENS_SRC_SEP, cosmo, h);
 
     //
     // sort each lens into binned_lists

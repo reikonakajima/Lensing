@@ -9,7 +9,6 @@
 #include "GAMAObjects.h"
 #include "KiDSObjects.h"
 #include "TreeCorrObjects.h"
-#include "Cosmology.h"
 #include "GGLens.h"
 #include "Bins.h"
 using std::ostringstream;
@@ -184,24 +183,14 @@ main(int argc, char* argv[]) {
 
     //
     // create GGLensObjectList from lens_list and source_list (sums tangential shears for each lens)
-    //
-    double Om=0.315, Ol=1.-Om;
-    cosmology::Cosmology cosmo(Om, Ol);  // unused (but unfortunately necessary)
-    bool radialBinIsMpc = false;
-    bool normalizeToSigmaCrit = false;
-    if (normalizeToSigmaCrit) {
-      cerr << "cosmology is .......... " << "(Om=" << Om << ", Ol=" << Ol << ")" << endl;
-      cerr << "h is .................. " << h << endl;
-    }
-
-    //
     // TODO: (1) GGLens constructor takes randoms info as input (2) change order so cosmo comes last
     //
-
+    bool radialBinIsMpc = false;
+    bool normalizeToSigmaCrit = false;
     GGLensObjectList<GAMAObject*, KiDSObject*>
       gglens_list(lens_list, source_list, radial_bin, radialBinIsMpc, normalizeToSigmaCrit,
 		  /*random_shear,*/
-		  cosmo, h, MIN_LENS_SRC_SEP);
+		  MIN_LENS_SRC_SEP);
 
     //
     // sort each lens into binned_lists
