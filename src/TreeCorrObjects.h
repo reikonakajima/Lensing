@@ -38,17 +38,26 @@ class TreeCorrNGObject {
   TreeCorrNGObject() {}
   TreeCorrNGObject(string ascii_filename);
   // ordinary return value functions
-  int  getTotalNPairs() const { return 0; }
+  int getRBinSize() const { return meanR.size(); }
+  float getTotalNPairs() const {
+    float sum = 0.0;
+    for (int i=0; i < npairs.size(); ++i) {
+      sum += npairs[i];
+    }
+    return sum;
+  }
   vector<float> getMeanR() { return meanR; }
+  vector<float> getR_nom() { return R_nom; }
 
  private:
 
+  vector<float> R_nom;
   vector<float> meanR;
   vector<float> gamT;
   vector<float> gamX;
   vector<float> sigma;
   vector<float> weight;
-  vector<int>   npairs;
+  vector<float> npairs;
 
 };
 
