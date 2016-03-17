@@ -86,6 +86,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 
   // lens objects lost through "not enough BG object count"
   int lost_bgcount = 0;
+  int bad_subtraction_count = 0;
 
   typename vector<lensObjPtr>::iterator it = lens_list.begin();
   for (; it != lens_list.end(); ++it) {
@@ -231,6 +232,11 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 
 	/// add source object to sm bin ...
 	/// ... with the weighted randoms shear subtracted.
+	if (std::isnan(random_signalT[irad])) {
+	  // subtraction signal is invalid, do not add to statistics
+	  bad_subtraction_count++;
+	  continue;
+	}
 	(*this_gglens)[irad].addPairCounts();
 	(*this_gglens)[irad].addWeight(weight);
 	(*this_gglens)[irad].addWeightSq(weight*weight);
@@ -266,6 +272,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
   cerr << "All lens objects loaded and paired with source objects." << endl;
   cerr << "The size of the input LensObjectList is: " << lens_list.size() << endl;
   cerr << "Rejected lenses without enough background source objects: " << lost_bgcount << endl;
+  cerr << "Invalid random subtraction counts: " << bad_subtraction_count << endl;
   cerr << "The size of this GGLensObjectList is: " << this->size() << endl;
 }
 
