@@ -78,7 +78,8 @@ gama_kids = env.Program(target='gglens_gama_kids', source=sub_objects+['src/ggle
 gama_kids_angular = env.Program(target='gglens_gama_kids_angular', source=sub_objects+['src/gglens_gama_kids_angular.cpp',])
 #random_kids = env.Program(target='gglens_random_kids', source=sub_objects+['src/gglens_random_kids.cpp',])
 #env.Install('bin', [test, gama_kids, random_kids, starhalo])
-#env.Install('bin', [gama_kids])
+env.Install('bin', [gama_kids])
+env.Install('bin', [gama_kids_angular])
 #env.Install('bin', [random_kids])
 #env.Alias('install', 'bin')
 
