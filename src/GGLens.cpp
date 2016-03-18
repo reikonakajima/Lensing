@@ -113,7 +113,9 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     vector<float> random_signalT;
     vector<float> random_signalX;
     vector<float> random_var;
+    random_shear.rescaleMeanR(1./60.);  // rescale the meanR to degrees (from arcminutes)
     random_shear.getValuesAt(central_angular_bin_vals, random_signalT, random_signalX, random_var);
+
 
     //
     // collect all matching sources (get their indicies of srcvector) in radial bins

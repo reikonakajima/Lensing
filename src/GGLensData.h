@@ -29,6 +29,8 @@ class GGLensData {
 
   // constructor
   GGLensData() {}
+  // unit conversions for meanR
+  void rescaleMeanR(float scale);
   // interpolation functions
   void getValuesAt(vector<float> radial_vals,
 		   vector<float>& signalT, vector<float>& signalX, vector<float>& var);

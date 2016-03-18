@@ -4,6 +4,16 @@
 #include "GGLensData.h"
 
 void
+GGLensData::rescaleMeanR(float scale) {
+
+  for (int j=0; j<meanR.size(); ++j) {
+    meanR[j] *= scale;
+  }
+  return;
+}
+
+
+void
 GGLensData::getValuesAt(vector<float> radial_vals,
 			vector<float>& signalT, vector<float>& signalX, vector<float>& var) {
 
@@ -34,12 +44,14 @@ GGLensData::getValuesAt(vector<float> radial_vals,
 
     // interpolation (linear) on the signal
     else {
-      for (int j=0; j<meanR.size()-1; ++j) {
-	if (radial_vals[i] >= meanR[j]) {
-	  float dR = meanR[j+1] - meanR[j];
-	  signalT[i] = gamT[j] + dR * (gamT[j+1] - gamT[j]);
-	  signalX[i] = gamX[j] + dR * (gamX[j+1] - gamX[j]);
-	  var[i] = sigma[j] * sigma[j];  // variance by nearest value, no interpolation
+      for (int j=1; j<meanR.size(); ++j) {
+	if (meanR[j] >= radial_vals[i]) {
+	  float dR = radial_vals[i] - meanR[j-1];
+	  float DR = meanR[j] - meanR[j-1];
+	  float frac = dR/DR;
+	  signalT[i] = gamT[j-1] + frac * (gamT[j] - gamT[j-1]);
+	  signalX[i] = gamX[j-1] + frac * (gamX[j] - gamX[j-1]);
+	  var[i] = sigma[j-1] * sigma[j-1];  // conservative variance by nearest value
 	  break;
 	}
       }
