@@ -86,7 +86,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 
   // lens objects lost through "not enough BG object count"
   int lost_bgcount = 0;
-  int bad_subtraction_count = 0;
+  long bad_subtraction_count = 0;
 
   typename vector<lensObjPtr>::iterator it = lens_list.begin();
   for (; it != lens_list.end(); ++it) {
@@ -116,7 +116,6 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     random_shear.rescaleMeanR(1./60.);  // rescale the meanR to degrees (from arcminutes)
     random_shear.getValuesAt(central_angular_bin_vals, random_signalT, random_signalX, random_var);
 
-
     //
     // collect all matching sources (get their indicies of srcvector) in radial bins
     //
@@ -142,6 +141,7 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
 
     multimap<double, int>::const_iterator isrc;
     for (int irad = 0; irad < this_rad_nbin; ++irad) {
+
       for (isrc = bglist[irad].begin(); isrc != bglist[irad].end(); ++isrc) {
 
 	//
