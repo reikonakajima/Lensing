@@ -10,6 +10,7 @@
 #include "ggLensSum.h"
 #include "LensObjects.h"
 #include "SourceObjects.h"
+#include "GGLensData.h"
 #include "Cosmology.h"
 #include "AstronomicalConstants.h"
 
@@ -69,14 +70,15 @@ class GGLensObjectList {
   GGLensObjectList(LensObjectList<lensObjPtr> lens_list,
 		   SourceObjectList<srcObjPtr> source_list,
 		   GenericBins radial_bin,
+		   GGLensData random_shear,
 		   bool radialBinInMpc = true,  // if not in Mpc, expects arcminutes
 		   bool normalizeToSigmaCrit = true,
+		   double min_lens_src_delta_z = 0.15,
 		   cosmology::Cosmology cosmo = cosmology::Cosmology(0.27,0.73),
 		   double h = 1.0,
-		   double min_lens_src_delta_z = 0.15,
+		   double max_angular_sep = 20.0, // maximum separation, must be <90 [degrees].
 		   geometry = SphericalSurface,
-		   double mesh_frac = 0.,
-		   double max_angular_sep = 20.0  // maximum separation, must be <90 [degrees].
+		   double mesh_frac = 0.
     );
 
   int size() { return gglens_object_list.size(); }

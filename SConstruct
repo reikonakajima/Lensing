@@ -65,6 +65,8 @@ sub_objects = '''
 	    src/.obj/SourceObjects.o
 	    src/.obj/RCSLenSObjects.o
 	    src/.obj/KiDSObjects.o
+	    src/.obj/GGLensData.o
+	    src/.obj/TreeCorrObjects.o
 	    src/.obj/Shear.o
 	    '''.split()
 
@@ -72,13 +74,12 @@ sub_objects = '''
 
 #test = env.Program(target='GGLensTest', source=sub_objects+['src/GGLensDriver.cpp',])
 #starhalo = env.Program(target='gglens_starhalo', source=sub_objects+['src/gglens_starhalo.cpp',])
-#gama_kids = env.Program(target='gglens_gama_kids', source=sub_objects+['src/gglens_gama_kids.cpp',])
-#gama_kids_angular = env.Program(target='gglens_gama_kids_angular', source=sub_objects+['src/gglens_gama_kids_angular.cpp',])
-## DEBUG
-gama_kids_angular = env.Program(target='gglens_gama_kids_angular_noflip', source=sub_objects+['src/gglens_gama_kids_angular.cpp',])
+gama_kids = env.Program(target='gglens_gama_kids', source=sub_objects+['src/gglens_gama_kids.cpp',])
+gama_kids_angular = env.Program(target='gglens_gama_kids_angular', source=sub_objects+['src/gglens_gama_kids_angular.cpp',])
 #random_kids = env.Program(target='gglens_random_kids', source=sub_objects+['src/gglens_random_kids.cpp',])
 #env.Install('bin', [test, gama_kids, random_kids, starhalo])
-#env.Install('bin', [gama_kids])
+env.Install('bin', [gama_kids])
+env.Install('bin', [gama_kids_angular])
 #env.Install('bin', [random_kids])
 #env.Alias('install', 'bin')
 

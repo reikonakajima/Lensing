@@ -8,7 +8,7 @@
 #include "Bounds.h"
 #include "GAMAObjects.h"
 #include "KiDSObjects.h"
-#include "Cosmology.h"
+#include "TreeCorrObjects.h"
 #include "GGLens.h"
 #include "Bins.h"
 using std::ostringstream;
@@ -24,7 +24,7 @@ const string usage =
   "gglens_gama_kids: calculate tangential shear around a given central point (halo center)\n"
   "\n"
   " usage: gglens_gama_kids <lens_cat> <src_cat> <src_specz_cat> <src_bitmask> <src_blind_index>\n"
-  "         <radial_bin_info> <stellar_mass_bin_info> <outfile_prefix>\n"
+  "         <radial_bin_info> <stellar_mass_bin_info> <random_shear_file> <outfile_prefix>\n"
   "  lens_cat:        lens catalog which contains the columns\n"
   "  src_cat:         source catalog, which contains the columns\n"
   "  src_specz_cat:   spec_z catalog which determines the p(z) of the source catalog\n"
@@ -32,6 +32,7 @@ const string usage =
   "  src_blind_index: choose blinding for source catalog.  option = [0,1,2]\n"
   "  radial_bin_info: radial bin info (3 numbers, in arcmin): [min_angle, max_angle, rad_nbin]\n"
   "  stellar_mass_bin_info: stellar mass bin info ([bin edges in log(M/Msun)]\n"
+  "  random_shear_file: TreeCorr output for randoms, for use in subtracting random signals\n"
   "  outfile_prefix:  prefix for the output file (suffix is "+suffix+")\n"
   "  \n"
   " stdin:  (none)\n"
@@ -42,7 +43,6 @@ const string usage =
 const double MIN_SRC_ZB = 0.005;
 const double MAX_SRC_ZB = 1.2;
 const double MIN_LENS_SRC_SEP = 0.15;
-const double h = 1.0;  // H0 = 100 h km/s/Mpc
 
 
 int
@@ -53,7 +53,7 @@ main(int argc, char* argv[]) {
     //
     // process arguments (TODO: convert to option flags)
     //
-    if (argc != 9) {
+    if (argc != 10) {
       cerr << usage;
       exit(2);
     }
@@ -66,6 +66,7 @@ main(int argc, char* argv[]) {
     const int    src_blind_index = atoi(argv[++iarg]);   // choose blinding options.
     const string radial_bin_filename = argv[++iarg];     // radial mass bin
     const string sm_bin_filename = argv[++iarg];         // stellar mass bin
+    const string random_shear_filename = argv[++iarg];
     const string outf_prefix = argv[++iarg];
     
     /// open lens file
@@ -86,20 +87,20 @@ main(int argc, char* argv[]) {
 
 
     //
-    // setup radial bins (in Mpc or Mpc/h, depending on definition of h)
+    // setup radial bins (in arcmin)
     //
     ifstream radialbinf(radial_bin_filename.c_str());
-    double min_Mpc = 1e-2;  // 10 kpc/h minimum
-    double max_Mpc = 10;    // 10 Mpc/h maximum
-    int rad_nbin = 16;
+    double min_arcmin = 1e-1;  // 6 arcsecond minimum
+    double max_arcmin = 60;    // 1 degree maximum
+    int rad_nbin = 10;
     if (radialbinf) {
-      if (!(radialbinf >> min_Mpc >> max_Mpc >> rad_nbin))
+      if (!(radialbinf >> min_arcmin >> max_arcmin >> rad_nbin))
 	throw MyException("radialbin file type error");
-      if (rad_nbin < 2 || min_Mpc < 0 || max_Mpc < min_Mpc)
+      if (rad_nbin < 2 || min_arcmin < 0 || max_arcmin < min_arcmin)
 	throw MyException("radialbin file specification error");
     }
     // note that radial_bin will eventually need to be in degrees for use with the Mesh class
-    LogarithmicBins radial_bin(min_Mpc, max_Mpc, rad_nbin);
+    LogarithmicBins radial_bin(min_arcmin, max_arcmin, rad_nbin);
 
     //
     // setup bins (magnitude)
@@ -124,7 +125,12 @@ main(int argc, char* argv[]) {
     source_list.applyRedshiftCut(MIN_SRC_ZB, MAX_SRC_ZB);
 
     //
-    // diagnostic error messages
+    // read in randoms gglens curve
+    //
+    TreeCorrNGObject random_shear(random_shear_filename);
+
+    //
+    // print lens catalog info
     //
     cerr << "=== " << argv[0] << " ===" << endl;
     cerr << "lens catalog .......... " << lens_filename << endl;
@@ -137,6 +143,9 @@ main(int argc, char* argv[]) {
       return(9);
     }
 
+    //
+    // print source catalog info
+    //
     cerr << "source catalog ........ " << source_filename << endl;
     cerr << "     count ............ " << source_list.size() << "/"
 	 << master_source_list.size() << endl;
@@ -150,49 +159,35 @@ main(int argc, char* argv[]) {
       return(9);
     }
 
-    cerr << "radial bin range ...... " << radial_bin[0] << " to "
+    //
+    // print randoms gglens curve info
+    //
+    cerr << "random shear data ..... " << random_shear_filename << endl;
+    cerr << "     radial bins ...... " << random_shear.getRBinSize() << endl;
+    cerr << "     rbin range ....... " << random_shear.getR_nom()[0] << " to "
+	 << random_shear.getR_nom()[random_shear.getRBinSize()-1] << " (arcmin)" << endl;
+    cerr << "     number of pairs .. " << random_shear.getTotalNPairs() << endl;
+
+    //
+    // print radial and logmstar bin info
+    //
+    cerr << "radial bins ........... " << radial_bin.binSize() << endl;
+    cerr << "       bin range ...... " << radial_bin[0] << " to "
 	 << radial_bin[radial_bin.binSize()] << " (arcmin)" << endl;
 
-    cerr << "log(mstar) bin range .. ";
+    cerr << "log(mstar) bin range .. " << logmstar_bin.binSize() << endl;
+    cerr << "           bin edges .. ";
     for (int i=0; i<logmstar_bin.vectorSize(); ++i)  cerr << logmstar_bin[i] << " ";
     cerr << endl;
-
 
     //
     // create GGLensObjectList from lens_list and source_list (sums tangential shears for each lens)
     //
-    double Om=0.315, Ol=1.-Om;
-    cosmology::Cosmology cosmo(Om, Ol);  // unused (but unfortunately necessary)
     bool radialBinIsMpc = false;
     bool normalizeToSigmaCrit = false;
-    if (normalizeToSigmaCrit) {
-      cerr << "cosmology is .......... " << "(Om=" << Om << ", Ol=" << Ol << ")" << endl;
-      cerr << "h is .................. " << h << endl;
-    }
-
-    /*/
-    // DEBUG
-    cerr << "cosmo test (comoving distanes Dc):" << endl;
-    cerr << "z=0.1: " << cosmo.Dc(0.1) * HubbleLengthMpc / h << endl;
-    cerr << "z=0.2: " << cosmo.Dc(0.2) * HubbleLengthMpc / h << endl;
-    cerr << "z=0.3: " << cosmo.Dc(0.3) * HubbleLengthMpc / h << endl;
-    cerr << "z=0.4: " << cosmo.Dc(0.4) * HubbleLengthMpc / h << endl;
-    cerr << "z=0.5: " << cosmo.Dc(0.5) * HubbleLengthMpc / h << endl;
-    cerr << endl;
-    double one_deg_in_radian = 1.0 * DEGREE;
-    cerr << "1deg at z=0.1: " << cosmo.Dc(0.1) * HubbleLengthMpc / h * one_deg_in_radian << endl;
-    cerr << "1deg at z=0.2: " << cosmo.Dc(0.2) * HubbleLengthMpc / h * one_deg_in_radian << endl;
-    cerr << "1deg at z=0.3: " << cosmo.Dc(0.3) * HubbleLengthMpc / h * one_deg_in_radian << endl;
-    cerr << "1deg at z=0.4: " << cosmo.Dc(0.4) * HubbleLengthMpc / h * one_deg_in_radian << endl;
-    cerr << "1deg at z=0.5: " << cosmo.Dc(0.5) * HubbleLengthMpc / h * one_deg_in_radian << endl;
-    cerr << argv[0] << " DEBUG END" << endl;
-    exit(1);
-    // DEBUG END
-    /*/
-
     GGLensObjectList<GAMAObject*, KiDSObject*>
-      gglens_list(lens_list, source_list, radial_bin, radialBinIsMpc, normalizeToSigmaCrit,
-		  cosmo, h, MIN_LENS_SRC_SEP);
+      gglens_list(lens_list, source_list, radial_bin, random_shear,
+		  radialBinIsMpc, normalizeToSigmaCrit);
 
     //
     // sort each lens into binned_lists
@@ -259,7 +254,7 @@ main(int argc, char* argv[]) {
     }
     ofs << endl;
 
-    ofs << "#radbins(Mpc/h),h="<< h <<": ";
+    ofs << "#radbins(arcmin)";
     for (int irad=0; irad<radial_bin.vectorSize(); ++irad) {
       ofs << radial_bin[irad] << " ";
     }
