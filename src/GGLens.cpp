@@ -78,6 +78,8 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
   }
   // determine radial bin size
   int rad_nbin = radial_bin.binSize();
+  // rescale the random_shear::meanR to degrees (from arcminutes)
+  random_shear.rescaleMeanR(1./60.);
 
 
   //
@@ -113,7 +115,6 @@ GGLensObjectList<lensObjPtr, srcObjPtr>::GGLensObjectList(LensObjectList<lensObj
     vector<float> random_signalT;
     vector<float> random_signalX;
     vector<float> random_var;
-    random_shear.rescaleMeanR(1./60.);  // rescale the meanR to degrees (from arcminutes)
     random_shear.getValuesAt(central_angular_bin_vals, random_signalT, random_signalX, random_var);
 
     //
