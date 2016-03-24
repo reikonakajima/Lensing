@@ -43,7 +43,6 @@ const string usage =
 const double MIN_SRC_ZB = 0.005;
 const double MAX_SRC_ZB = 1.2;
 const double MIN_LENS_SRC_SEP = 0.15;
-const double h = 1.0;  // H0 = 100 h km/s/Mpc
 
 
 int
@@ -88,20 +87,20 @@ main(int argc, char* argv[]) {
 
 
     //
-    // setup radial bins (in Mpc or Mpc/h, depending on definition of h)
+    // setup radial bins (in arcmin)
     //
     ifstream radialbinf(radial_bin_filename.c_str());
-    double min_Mpc = 1e-2;  // 10 kpc/h minimum
-    double max_Mpc = 10;    // 10 Mpc/h maximum
-    int rad_nbin = 16;
+    double min_arcmin = 1e-1;  // 6 arcsecond minimum
+    double max_arcmin = 60;    // 1 degree maximum
+    int rad_nbin = 10;
     if (radialbinf) {
-      if (!(radialbinf >> min_Mpc >> max_Mpc >> rad_nbin))
+      if (!(radialbinf >> min_arcmin >> max_arcmin >> rad_nbin))
 	throw MyException("radialbin file type error");
-      if (rad_nbin < 2 || min_Mpc < 0 || max_Mpc < min_Mpc)
+      if (rad_nbin < 2 || min_arcmin < 0 || max_arcmin < min_arcmin)
 	throw MyException("radialbin file specification error");
     }
     // note that radial_bin will eventually need to be in degrees for use with the Mesh class
-    LogarithmicBins radial_bin(min_Mpc, max_Mpc, rad_nbin);
+    LogarithmicBins radial_bin(min_arcmin, max_arcmin, rad_nbin);
 
     //
     // setup bins (magnitude)
@@ -255,7 +254,7 @@ main(int argc, char* argv[]) {
     }
     ofs << endl;
 
-    ofs << "#radbins(Mpc/h),h="<< h <<": ";
+    ofs << "#radbins(arcmin)";
     for (int irad=0; irad<radial_bin.vectorSize(); ++irad) {
       ofs << radial_bin[irad] << " ";
     }
