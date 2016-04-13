@@ -254,7 +254,7 @@ main(int argc, char* argv[]) {
     }
     ofs << endl;
 
-    ofs << "#radbins(arcmin)";
+    ofs << "#radbins(arcmin): ";
     for (int irad=0; irad<radial_bin.vectorSize(); ++irad) {
       ofs << radial_bin[irad] << " ";
     }
